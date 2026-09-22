@@ -8,22 +8,23 @@ fans of Anime, Gaming, Movies, TV Shows, K-Pop, Comics, Manga, and Cosplay.
 
 DIRECTORY STRUCTURE:
 NN-Zynex_End-to-End Web Solutions_NN/
-├── Documentation/       (Project reports, SRS, diagrams, data specifications)
-├── Project/             (All application source code)
-│   ├── Controllers/     (Future API controllers)
-│   ├── Properties/      (Launch profiles & environment config)
-│   ├── appsettings.json (Base configuration & database connection string)
-│   ├── FanHubPlus.csproj(ASP.NET Core Web API project file)
-│   ├── Program.cs       (API entry point, CORS, routes & middleware)
-│   └── frontend/        (React + TypeScript + Vite single-page app)
+├── Documentation/          (Project reports, SRS, diagrams, data specifications)
+├── Project/                (All application source code)
+│   ├── backend/            (ASP.NET Core Web API backend)
+│   │   ├── Properties/     (Launch profiles & environment config)
+│   │   ├── appsettings.json(Base configuration & database connection string)
+│   │   ├── FanHubPlus.csproj
+│   │   ├── FanHubPlus.http
+│   │   └── Program.cs      (API entry point, CORS, routes & middleware)
+│   └── frontend/           (React + TypeScript + Vite single-page app)
 │       ├── src/
 │       ├── package.json
 │       ├── vite.config.ts
 │       └── ...
-├── Video/               (Mandatory demonstration video .mp4)
-├── .gitignore           (Git exclusions for bin, obj, node_modules, secrets)
-├── CONTRIBUTING.md      (Contribution and secret hygiene rules)
-└── ReadMe.txt           (Setup and run instructions)
+├── Video/                  (Mandatory demonstration video .mp4)
+├── .gitignore              (Git exclusions for bin, obj, node_modules, secrets)
+├── CONTRIBUTING.md         (Contribution and secret hygiene rules)
+└── ReadMe.txt              (Setup and run instructions)
 
 ================================================================================
 LOCAL RUN INSTRUCTIONS:
@@ -35,8 +36,8 @@ PREREQUISITES:
 
 STEP 1: RUN THE BACKEND WEB API
 1. Open PowerShell or Command Prompt.
-2. Navigate to the Project folder:
-   cd "NN-Zynex_End-to-End Web Solutions_NN\Project"
+2. Navigate to the backend folder:
+   cd "NN-Zynex_End-to-End Web Solutions_NN\Project\backend"
 3. Run the backend service:
    dotnet run --launch-profile http
    The API will listen at:
