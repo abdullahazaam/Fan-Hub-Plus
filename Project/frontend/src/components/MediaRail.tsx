@@ -59,7 +59,7 @@ export const MediaRail: React.FC<MediaRailProps> = ({
           >
             <div className="rail-thumbnail-box">
               <img
-                src={m.thumbnailUrl || 'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=800&q=80'}
+                src={m.thumbnailUrl || 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=800&q=80'}
                 alt={m.title}
                 className="rail-thumb-img"
                 loading="lazy"

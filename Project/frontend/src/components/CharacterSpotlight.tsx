@@ -1,7 +1,7 @@
 import React from 'react'
 import type { Character } from '../types'
 import { CardShell } from './CardShell'
-import { ArrowRightIcon, BookmarkIcon, StarIcon, UserIcon } from './Icons'
+import { ArrowRightIcon, BookmarkIcon, StarIcon, UserSilhouetteIcon } from './Icons'
 
 interface CharacterSpotlightProps {
   character: Character
@@ -16,42 +16,49 @@ export const CharacterSpotlight: React.FC<CharacterSpotlightProps> = ({
   onToggleBookmark,
   isBookmarked = false,
 }) => {
+  const isSuitableAvatar = Boolean(
+    character.avatarUrl &&
+    character.avatarUrl.trim() !== '' &&
+    !character.avatarUrl.includes('photo-1579783902614') &&
+    !character.avatarUrl.includes('photo-1534447677768') &&
+    !character.avatarUrl.includes('photo-1568602471122')
+  )
+
   return (
     <CardShell className="character-spotlight-card" onClick={() => onSelect(character)}>
-      <div className="spotlight-visual-area">
-        <img
-          src={character.bannerUrl || character.avatarUrl}
-          alt={character.name}
-          className="spotlight-bg-img"
-          loading="lazy"
-          onError={(e) => {
-            (e.target as HTMLImageElement).src =
-              'https://images.unsplash.com/photo-1578632767115-351597cf2477?w=1600&q=80'
-          }}
-        />
-        <div className="spotlight-overlay-gradient" />
-
-        <div className="spotlight-badge-cluster">
-          <span className="spotlight-category-tag">{character.fandomUniverse}</span>
+      <div className="spotlight-visual-area character-popout-stage">
+        {/* Layer 1: Background Environment Layer */}
+        <div className="character-popout-bg">
+          <img
+            src={character.bannerUrl || 'https://images.unsplash.com/photo-1519501025264-65ba15a82390?w=1600&q=80'}
+            alt=""
+            className="spotlight-bg-img popout-bg-img"
+            loading="lazy"
+          />
+          <div className="spotlight-overlay-gradient popout-bg-overlay" />
         </div>
 
-        <div className="spotlight-avatar-box">
-          {character.avatarUrl ? (
+        {/* Layer 2: Foreground Pop-Out Character Layer */}
+        <div className="character-popout-fg">
+          {isSuitableAvatar ? (
             <img
               src={character.avatarUrl}
               alt={character.name}
-              className="spotlight-portrait-img"
+              className="spotlight-portrait-img popout-fg-img"
               loading="lazy"
-              onError={(e) => {
-                (e.target as HTMLImageElement).src =
-                  'https://images.unsplash.com/photo-1534447677768-be436bb09401?w=600&q=80'
-              }}
             />
           ) : (
-            <div className="spotlight-avatar-fallback">
-              <UserIcon size={36} />
+            <div className="neutral-dossier-placeholder spotlight-dossier-placeholder">
+              <div className="dossier-silhouette-icon">
+                <UserSilhouetteIcon size={56} />
+              </div>
+              <span className="artwork-pending-pill">Character artwork pending</span>
             </div>
           )}
+        </div>
+
+        <div className="spotlight-badge-cluster">
+          <span className="spotlight-category-tag">{character.fandomUniverse}</span>
         </div>
 
         {onToggleBookmark && (

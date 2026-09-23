@@ -198,3 +198,14 @@ export const EditIcon: React.FC<IconProps> = ({ size = 16, className = '', color
     <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
   </svg>
 )
+
+export const UserSilhouetteIcon: React.FC<IconProps> = ({ size = 24, className = '', color = 'currentColor', strokeWidth = 1.8 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" className={className}>
+    <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
+    <circle cx="12" cy="7" r="4" />
+    <path d="M4 3h3" />
+    <path d="M17 3h3" />
+    <path d="M4 21h2" />
+    <path d="M18 21h2" />
+  </svg>
+)

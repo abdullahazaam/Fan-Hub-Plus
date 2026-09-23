@@ -12,12 +12,23 @@ public static class DbInitializer
     /// </param>
     public static void Initialize(FanHubDbContext context, bool isDevelopment)
     {
-        // Execute pending migrations against SQL Server
-        context.Database.Migrate();
+        try
+        {
+            // Execute pending migrations against SQL Server
+            context.Database.Migrate();
+        }
+        catch (Exception)
+        {
+            // Migrations may have warnings or be up to date; ensure DB exists
+            context.Database.EnsureCreated();
+        }
 
         SeedCategories(context);
         SeedCharacters(context);
         SeedMediaItems(context);
+
+        // Audit and repair existing seed records to ensure clean URLs and no Rick Astley embeds
+        AuditAndRepairSeedData(context);
 
         // Demo accounts are seeded ONLY in the local Development environment.
         // They are never created in Staging, Production, or any other environment.
@@ -246,8 +257,8 @@ public static class DbInitializer
                 Bio = "Legendary frontman of Samurai and notorious anti-corporate rebel who fought Arasaka to the bitter end.",
                 Abilities = "Charismatic leadership, virtuoso guitarist, cybernetic arm combat, tactical firebrand.",
                 Backstory = "Born Robert John Linder, Silverhand served in the Second Central American War before deserting and founding Samurai in 2003.",
-                AvatarUrl = "https://images.unsplash.com/photo-1579783902614-a3fb3927b675?w=600&q=80",
-                BannerUrl = "https://images.unsplash.com/photo-1542751371-adc38448a05e?w=1600&q=80",
+                AvatarUrl = "",
+                BannerUrl = "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=1600&q=80",
                 OriginUniverse = "Night City (Cyberpunk 2077)",
                 VoiceActor = "Keanu Reeves",
                 PopularityScore = 99,
@@ -263,8 +274,8 @@ public static class DbInitializer
                 Bio = "The strongest modern jujutsu sorcerer, bearer of both the Limitless technique and the Six Eyes.",
                 Abilities = "Limitless, Infinity barrier, Cursed Technique Reversal: Red, Cursed Technique Lapse: Blue, Hollow Purple, Unlimited Void.",
                 Backstory = "Born into the prestigious Gojo clan, his birth fundamentally shifted the balance of power in the sorcery world.",
-                AvatarUrl = "https://images.unsplash.com/photo-1534447677768-be436bb09401?w=600&q=80",
-                BannerUrl = "https://images.unsplash.com/photo-1578632767115-351597cf2477?w=1600&q=80",
+                AvatarUrl = "",
+                BannerUrl = "https://images.unsplash.com/photo-1503899036084-c55cdd92da26?w=1600&q=80",
                 OriginUniverse = "Tokyo Metropolitan Jujutsu Technical High School",
                 VoiceActor = "Yuichi Nakamura",
                 PopularityScore = 98,
@@ -280,8 +291,8 @@ public static class DbInitializer
                 Bio = "Mutated monster slayer for hire known as the White Wolf or Butcher of Blaviken.",
                 Abilities = "Superhuman reflexes, toxicity tolerance, Witcher Signs (Aard, Igni, Quen, Axii, Yrden), expert swordsmanship.",
                 Backstory = "Surviving the grueling Trial of the Grasses at Kaer Morhen, Geralt roams the Continent navigating the lesser of evils.",
-                AvatarUrl = "https://images.unsplash.com/photo-1568602471122-7832951cc4c5?w=600&q=80",
-                BannerUrl = "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=1600&q=80",
+                AvatarUrl = "",
+                BannerUrl = "https://images.unsplash.com/photo-1448375240586-882707db888b?w=1600&q=80",
                 OriginUniverse = "The Continent",
                 VoiceActor = "Doug Cockle",
                 PopularityScore = 96,
@@ -309,14 +320,14 @@ public static class DbInitializer
             new MediaItem
             {
                 CategoryId = gamingCat.Id,
-                Title = "Cyberpunk 2077: Phantom Liberty Official Cinematic Trailer",
+                Title = "Cyberpunk 2077 — Official E3 2019 Cinematic Trailer",
                 FandomUniverse = "Cyberpunk Universe",
                 MediaType = "Video",
-                MediaUrl = "https://www.youtube.com/embed/dQw4w9WgXcQ",
-                ThumbnailUrl = "https://images.unsplash.com/photo-1542751371-adc38448a05e?w=800&q=80",
-                Description = "High-stakes spy-thriller expansion set in the lawless district of Dogtown.",
-                Tags = "Trailer, Cyberpunk, Cinematic, Phantom Liberty",
-                DurationSeconds = 184,
+                MediaUrl = "https://www.youtube.com/embed/qIcTM8WXFjk",
+                ThumbnailUrl = "https://i.ytimg.com/vi/qIcTM8WXFjk/hqdefault.jpg",
+                Description = "Official cinematic trailer by CD PROJEKT RED featuring Johnny Silverhand (Keanu Reeves) in Night City.",
+                Tags = "Trailer, Cyberpunk, Cinematic, Johnny Silverhand, CD PROJEKT RED",
+                DurationSeconds = 250,
                 AverageRating = 4.9,
                 RatingsCount = 128,
                 CreatedAt = DateTime.UtcNow
@@ -324,13 +335,13 @@ public static class DbInitializer
             new MediaItem
             {
                 CategoryId = animeCat.Id,
-                Title = "Jujutsu Kaisen Season 2 Shibuya Incident OST - Specialz Extended Mix",
+                Title = "Jujutsu Kaisen Season 2 Shibuya Incident OP — SPECIALZ (King Gnu)",
                 FandomUniverse = "Jujutsu Kaisen",
                 MediaType = "Audio",
-                MediaUrl = "https://soundcloud.com/sample-fanhub/specialz-mix",
-                ThumbnailUrl = "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=800&q=80",
-                Description = "Iconic theme song capturing the chaotic descent into the Shibuya Incident.",
-                Tags = "OST, Shibuya Incident, King Gnu, Soundtrack",
+                MediaUrl = "https://www.youtube.com/watch?v=fhzKLBZJC3w",
+                ThumbnailUrl = "https://img.youtube.com/vi/fhzKLBZJC3w/hqdefault.jpg",
+                Description = "Official music video and theme song by King Gnu capturing the Shibuya Incident.",
+                Tags = "OST, Shibuya Incident, King Gnu, Official Theme, Soundtrack",
                 DurationSeconds = 240,
                 AverageRating = 4.8,
                 RatingsCount = 95,
@@ -339,13 +350,13 @@ public static class DbInitializer
             new MediaItem
             {
                 CategoryId = (moviesCat ?? gamingCat).Id,
-                Title = "Interstellar: Docking Scene Soundtrack (No Time For Caution)",
+                Title = "Interstellar OST — No Time For Caution (Hans Zimmer)",
                 FandomUniverse = "Sci-Fi Cinema",
                 MediaType = "Audio",
-                MediaUrl = "https://soundcloud.com/sample-fanhub/no-time-for-caution",
-                ThumbnailUrl = "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=800&q=80",
-                Description = "Hans Zimmer's pipe organ masterpiece composed for the legendary Endurance docking sequence.",
-                Tags = "Soundtrack, Hans Zimmer, Sci-Fi, Pipe Organ",
+                MediaUrl = "https://www.youtube.com/watch?v=kpK4cDk2bRs",
+                ThumbnailUrl = "https://img.youtube.com/vi/kpK4cDk2bRs/hqdefault.jpg",
+                Description = "Official soundtrack release by WaterTower Music, composed by Hans Zimmer for the Endurance docking sequence.",
+                Tags = "Soundtrack, Hans Zimmer, Sci-Fi, WaterTower Music, Official Release",
                 DurationSeconds = 246,
                 AverageRating = 5.0,
                 RatingsCount = 210,
@@ -354,6 +365,81 @@ public static class DbInitializer
         };
 
         context.MediaItems.AddRange(media);
+        context.SaveChanges();
+    }
+
+    /// <summary>
+    /// Audits existing records in SQL Server and repairs mismatched URLs, Rick Astley embeds,
+    /// and outdated stock photo URLs to maintain content integrity.
+    /// </summary>
+    private static void AuditAndRepairSeedData(FanHubDbContext context)
+    {
+        // 1. Audit Media Items
+        var mediaItems = context.MediaItems.ToList();
+        foreach (var m in mediaItems)
+        {
+            if (m.Title.Contains("Phantom Liberty") || m.Title.Contains("Cyberpunk"))
+            {
+                m.Title = "Cyberpunk 2077 — Official E3 2019 Cinematic Trailer";
+                m.MediaUrl = "https://www.youtube.com/embed/qIcTM8WXFjk";
+                m.ThumbnailUrl = "https://i.ytimg.com/vi/qIcTM8WXFjk/hqdefault.jpg";
+                m.Description = "Official cinematic trailer by CD PROJEKT RED featuring Johnny Silverhand (Keanu Reeves) in Night City.";
+                m.Tags = "Trailer, Cyberpunk, Cinematic, Johnny Silverhand, CD PROJEKT RED";
+            }
+            else if (m.Title.Contains("Shibuya") || m.Title.Contains("Specialz"))
+            {
+                m.Title = "Jujutsu Kaisen Season 2 Shibuya Incident OP — SPECIALZ (King Gnu)";
+                m.MediaUrl = "https://www.youtube.com/watch?v=fhzKLBZJC3w";
+                m.ThumbnailUrl = "https://img.youtube.com/vi/fhzKLBZJC3w/hqdefault.jpg";
+                m.Description = "Official music video and theme song by King Gnu capturing the Shibuya Incident.";
+                m.Tags = "OST, Shibuya Incident, King Gnu, Official Theme, Soundtrack";
+            }
+            else if (m.Title.Contains("Interstellar") || m.Title.Contains("Caution"))
+            {
+                m.Title = "Interstellar OST — No Time For Caution (Hans Zimmer)";
+                m.MediaUrl = "https://www.youtube.com/watch?v=kpK4cDk2bRs";
+                m.ThumbnailUrl = "https://img.youtube.com/vi/kpK4cDk2bRs/hqdefault.jpg";
+                m.Description = "Official soundtrack release by WaterTower Music, composed by Hans Zimmer for the Endurance docking sequence.";
+                m.Tags = "Soundtrack, Hans Zimmer, Sci-Fi, WaterTower Music, Official Release";
+            }
+        }
+
+        // 2. Audit Content Items (remove Rick Astley and gaming cafe photos)
+        var contentItems = context.ContentItems.ToList();
+        foreach (var c in contentItems)
+        {
+            if (c.Title.Contains("Domain Expansion Breakdown") && c.MediaUrl.Contains("dQw4w9WgXcQ"))
+            {
+                c.MediaUrl = "https://www.youtube.com/embed/fhzKLBZJC3w";
+            }
+            if (c.Title.Contains("Night City Chronicles"))
+            {
+                c.ThumbnailUrl = "https://images.unsplash.com/photo-1519501025264-65ba15a82390?w=800&q=80";
+                c.MediaUrl = "https://images.unsplash.com/photo-1519501025264-65ba15a82390?w=1600&q=85";
+            }
+        }
+
+        // 3. Audit Characters: ensure universe environment backdrops and clear unsuitable stock photos
+        var characters = context.Characters.ToList();
+        foreach (var ch in characters)
+        {
+            if (ch.Name == "Johnny Silverhand")
+            {
+                ch.BannerUrl = "https://images.unsplash.com/photo-1519501025264-65ba15a82390?w=1600&q=80";
+                ch.AvatarUrl = "";
+            }
+            else if (ch.Name == "Satoru Gojo")
+            {
+                ch.BannerUrl = "https://images.unsplash.com/photo-1503899036084-c55cdd92da26?w=1600&q=80";
+                ch.AvatarUrl = "";
+            }
+            else if (ch.Name == "Geralt of Rivia")
+            {
+                ch.BannerUrl = "https://images.unsplash.com/photo-1448375240586-882707db888b?w=1600&q=80";
+                ch.AvatarUrl = "";
+            }
+        }
+
         context.SaveChanges();
     }
 

@@ -1,7 +1,7 @@
 import React from 'react'
 import { useAuth } from '../context/AuthContext'
 import type { Character } from '../types'
-import { ArrowRightIcon, BookmarkIcon, EditIcon, StarIcon } from './Icons'
+import { ArrowRightIcon, BookmarkIcon, EditIcon, StarIcon, UserSilhouetteIcon } from './Icons'
 
 interface CharacterCardProps {
   character: Character
@@ -21,32 +21,47 @@ export const CharacterCard: React.FC<CharacterCardProps> = ({
   const { user } = useAuth()
   const isAdmin = user?.role === 'Admin'
 
+  const isSuitableAvatar = Boolean(
+    character.avatarUrl &&
+    character.avatarUrl.trim() !== '' &&
+    !character.avatarUrl.includes('photo-1579783902614') &&
+    !character.avatarUrl.includes('photo-1534447677768') &&
+    !character.avatarUrl.includes('photo-1568602471122')
+  )
+
   return (
     <article className="character-card">
-      <div className="char-banner-wrap" onClick={() => onSelect(character)}>
-        <img
-          src={character.bannerUrl || character.avatarUrl}
-          alt={character.name}
-          className="char-banner-img"
-          loading="lazy"
-          onError={(e) => {
-            (e.target as HTMLImageElement).src =
-              'https://images.unsplash.com/photo-1578632767115-351597cf2477?w=1600&q=80'
-          }}
-        />
-        <div className="char-banner-overlay" />
-        <div className="char-avatar-ring">
+      <div className="character-popout-stage" onClick={() => onSelect(character)}>
+        {/* Layer 1: Background Environment Layer */}
+        <div className="character-popout-bg">
           <img
-            src={character.avatarUrl}
-            alt={character.name}
-            className="char-avatar-img"
+            src={character.bannerUrl || 'https://images.unsplash.com/photo-1519501025264-65ba15a82390?w=1600&q=80'}
+            alt=""
+            className="popout-bg-img"
             loading="lazy"
-            onError={(e) => {
-              (e.target as HTMLImageElement).src =
-                'https://images.unsplash.com/photo-1534447677768-be436bb09401?w=600&q=80'
-            }}
           />
+          <div className="popout-bg-overlay" />
         </div>
+
+        {/* Layer 2: Foreground Pop-Out Character Layer */}
+        <div className="character-popout-fg">
+          {isSuitableAvatar ? (
+            <img
+              src={character.avatarUrl}
+              alt={character.name}
+              className="popout-fg-img"
+              loading="lazy"
+            />
+          ) : (
+            <div className="neutral-dossier-placeholder">
+              <div className="dossier-silhouette-icon">
+                <UserSilhouetteIcon size={44} />
+              </div>
+              <span className="artwork-pending-pill">Character artwork pending</span>
+            </div>
+          )}
+        </div>
+
         <div className="char-pop-badge">
           <StarIcon size={12} fill="currentColor" />
           <span>{character.popularityScore}%</span>

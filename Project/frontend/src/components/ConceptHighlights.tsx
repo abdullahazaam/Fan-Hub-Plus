@@ -61,7 +61,7 @@ export const ConceptHighlights: React.FC<ConceptHighlightsProps> = ({
         <article className="concept-card" onClick={onExploreMedia} role="button" tabIndex={0} onKeyDown={(e) => { if (e.key === 'Enter') onExploreMedia() }}>
           <div className="concept-card-media">
             <img
-              src="https://images.unsplash.com/photo-1542751371-adc38448a05e?w=800&q=80"
+              src="https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=800&q=80"
               alt="What's New In Multiverse"
               className="concept-card-img"
               loading="lazy"

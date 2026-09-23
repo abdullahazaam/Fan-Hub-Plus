@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { rateMedia } from '../api'
 import { useAuth } from '../context/AuthContext'
 import type { MediaItem } from '../types'
-import { BookmarkIcon, PlayIcon, StarIcon } from './Icons'
+import { BookmarkIcon, MusicIcon, PlayIcon, StarIcon } from './Icons'
 
 interface MediaCardProps {
   item: MediaItem
@@ -24,11 +24,12 @@ export const MediaCard: React.FC<MediaCardProps> = ({
   const { user } = useAuth()
   const isAdmin = user?.role === 'Admin'
   const [embedError, setEmbedError] = useState(false)
+  const [isPlayingVideo, setIsPlayingVideo] = useState(false)
   const [ratingLoading, setRatingLoading] = useState(false)
   const [currentRating, setCurrentRating] = useState<number | null>(item.userRating ?? null)
 
+  const isAudio = item.mediaType.toLowerCase() === 'audio'
   const isYouTube = item.mediaUrl.includes('youtube.com') || item.mediaUrl.includes('youtu.be')
-  const isSoundCloud = item.mediaUrl.includes('soundcloud.com')
 
   // Transform standard YouTube watch links into embed links safely
   const getEmbedUrl = (url: string) => {
@@ -66,54 +67,100 @@ export const MediaCard: React.FC<MediaCardProps> = ({
   return (
     <article className="media-card">
       <div className="media-player-wrapper">
-        {!embedError && isYouTube ? (
+        {isAudio ? (
+          <div className="audio-card-cover-stage">
+            <img
+              src={item.thumbnailUrl || 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=800&q=80'}
+              alt={item.title}
+              className="audio-cover-img"
+              loading="lazy"
+            />
+            <div className="audio-cover-overlay" />
+
+            {/* Designed audio visualizer frequency bars */}
+            <div className="audio-eq-visualizer" aria-hidden="true">
+              <span className="eq-bar bar-1" />
+              <span className="eq-bar bar-2" />
+              <span className="eq-bar bar-3" />
+              <span className="eq-bar bar-4" />
+              <span className="eq-bar bar-5" />
+            </div>
+
+            {/* Working external play action */}
+            <a
+              href={item.mediaUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn-play-audio-stream"
+              title="Stream audio track in new tab"
+            >
+              <PlayIcon size={14} fill="currentColor" />
+              <span>Stream Track ↗</span>
+            </a>
+
+            <span className="audio-format-badge">
+              <MusicIcon size={11} />
+              <span>Audio Soundtrack</span>
+            </span>
+          </div>
+        ) : isPlayingVideo && !embedError && isYouTube ? (
           <iframe
             className="media-iframe"
-            src={getEmbedUrl(item.mediaUrl)}
+            src={`${getEmbedUrl(item.mediaUrl)}${getEmbedUrl(item.mediaUrl).includes('?') ? '&' : '?'}autoplay=1`}
             title={item.title}
-            loading="lazy"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowFullScreen
             onError={() => setEmbedError(true)}
           />
-        ) : !embedError && isSoundCloud ? (
-          <div className="audio-player-box">
-            <div className="audio-visual-wave">
-              <span className="wave-bar" />
-              <span className="wave-bar" />
-              <span className="wave-bar" />
-              <span className="wave-bar" />
-            </div>
-            <div className="audio-track-info">
-              <span className="audio-track-title">{item.title}</span>
-              <a
-                href={item.mediaUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="audio-external-link"
-              >
-                Stream on SoundCloud ↗
-              </a>
-            </div>
-          </div>
         ) : (
-          <div className="embed-fallback-box">
+          <div
+            className="video-card-cover-stage"
+            onClick={() => {
+              if (isYouTube && !embedError) {
+                setIsPlayingVideo(true)
+              } else {
+                window.open(item.mediaUrl, '_blank', 'noopener,noreferrer')
+              }
+            }}
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                if (isYouTube && !embedError) setIsPlayingVideo(true)
+                else window.open(item.mediaUrl, '_blank', 'noopener,noreferrer')
+              }
+            }}
+          >
             <img
-              src={item.thumbnailUrl || 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=800&q=80'}
+              src={item.thumbnailUrl || 'https://i.ytimg.com/vi/qIcTM8WXFjk/hqdefault.jpg'}
               alt={item.title}
-              className="embed-fallback-img"
+              className="video-cover-img"
+              loading="lazy"
             />
-            <div className="embed-fallback-overlay">
-              <a
-                href={item.mediaUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="btn-open-external-media"
-              >
-                <PlayIcon size={12} fill="currentColor" />
-                <span>Open External Stream</span>
-              </a>
-            </div>
+            <div className="video-cover-overlay" />
+
+            <button
+              type="button"
+              className="btn-play-video-trigger"
+              onClick={(e) => {
+                e.stopPropagation()
+                if (isYouTube && !embedError) {
+                  setIsPlayingVideo(true)
+                } else {
+                  window.open(item.mediaUrl, '_blank', 'noopener,noreferrer')
+                }
+              }}
+              title={`Play ${item.title}`}
+              aria-label={`Play ${item.title}`}
+            >
+              <PlayIcon size={14} fill="currentColor" />
+              <span>Watch Trailer</span>
+            </button>
+
+            <span className="video-format-badge">
+              <PlayIcon size={10} fill="currentColor" />
+              <span>Video Trailer</span>
+            </span>
           </div>
         )}
 

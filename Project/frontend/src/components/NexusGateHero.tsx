@@ -44,11 +44,6 @@ export const NexusGateHero: React.FC<NexusGateHeroProps> = ({
     <section className="nexus-hero-section" aria-label="Fandom Multiverse Portal">
       {/* Background Architectural Hall atmosphere with subtle perspective and clean clearance */}
       <div className={`hall-architecture-bg ${theme}`} aria-hidden="true">
-        <div className="hall-pillar pillar-far-left">
-          <div className="hall-banner">
-            <span className="banner-text">A BIGGER BRIGHTER FANDOM TOMORROW</span>
-          </div>
-        </div>
         <div className="hall-pillar pillar-far-right">
           <div className="hall-banner">
             <span className="banner-text">DIFFERENT WORLDS SAME PEOPLE</span>
