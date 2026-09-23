@@ -209,3 +209,12 @@ export const UserSilhouetteIcon: React.FC<IconProps> = ({ size = 24, className =
     <path d="M18 21h2" />
   </svg>
 )
+
+export const MenuIcon: React.FC<IconProps> = ({ size = 20, className = '', color = 'currentColor', strokeWidth = 2 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" className={className}>
+    <line x1="4" y1="6" x2="20" y2="6" />
+    <line x1="4" y1="12" x2="20" y2="12" />
+    <line x1="4" y1="18" x2="20" y2="18" />
+  </svg>
+)
+

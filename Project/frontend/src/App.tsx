@@ -20,6 +20,7 @@ import { Navbar } from './components/Navbar'
 import { NexusGateHero } from './components/NexusGateHero'
 import { ProfileModal } from './components/ProfileModal'
 import { SearchBar } from './components/SearchBar'
+import { SiteAtmosphere } from './components/SiteAtmosphere'
 import { AuthProvider, useAuth } from './context/AuthContext'
 import { CheckIcon, CompassIcon, MusicIcon, PlayIcon, UserIcon, VideoIcon } from './components/Icons'
 import type {
@@ -441,6 +442,9 @@ function AppContent() {
 
   return (
     <div className={`portal-universe theme-${theme}`}>
+      {/* Site-Wide Ambient Atmosphere */}
+      <SiteAtmosphere theme={theme} />
+
       {/* Top Cinematic Navbar */}
       <Navbar
         currentView={currentView}

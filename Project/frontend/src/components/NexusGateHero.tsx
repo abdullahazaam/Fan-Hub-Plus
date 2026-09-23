@@ -12,6 +12,7 @@ import {
   ToriiIcon,
   TvIcon,
 } from './Icons'
+import { NexusGate3DCanvas } from './NexusGate3DCanvas'
 
 interface NexusGateHeroProps {
   categories: Category[]
@@ -42,16 +43,8 @@ export const NexusGateHero: React.FC<NexusGateHeroProps> = ({
 }) => {
   return (
     <section className="nexus-hero-section" aria-label="Fandom Multiverse Portal">
-      {/* Background Architectural Hall atmosphere with subtle perspective and clean clearance */}
-      <div className={`hall-architecture-bg ${theme}`} aria-hidden="true">
-        <div className="hall-pillar pillar-far-right">
-          <div className="hall-banner">
-            <span className="banner-text">DIFFERENT WORLDS SAME PEOPLE</span>
-          </div>
-        </div>
-        <div className="hall-floor-reflection" />
-        <div className="hall-light-cone" />
-      </div>
+      {/* Three.js Animated 3D Architectural Depth & Integrated Nexus Rings */}
+      <NexusGate3DCanvas theme={theme} />
 
       <div className="hero-grid-layout">
         {/* Left Column: Hero Title, Subtitle, and Call to Actions */}
@@ -92,10 +85,10 @@ export const NexusGateHero: React.FC<NexusGateHeroProps> = ({
           </div>
         </div>
 
-        {/* Center / Right Column: Large Focal Octagonal Nexus Gate */}
+        {/* Center / Right Column: Large Focal Octagonal Nexus Gate with 8 Fandom Facets */}
         <div className="hero-nexus-container" id="nexus-gate-3d-slot">
           <div className="nexus-gate-apparatus">
-            {/* The Outer Octagonal Frame */}
+            {/* The Outer Octagonal Frame with 8 Interactive Facets */}
             <div className="octagonal-ring">
               {FANDOM_PORTALS.map(({ name, slug, Icon, position }) => (
                 <button
