@@ -6,6 +6,7 @@
 **/node_modules/
 **/dist/
 **/build/
+Project/backend/lib/
 packages/
 *.local
 
