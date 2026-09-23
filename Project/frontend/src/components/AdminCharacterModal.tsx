@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import type { Category, Character, CharacterFormData } from '../types'
+import { CloseIcon } from './Icons'
 
 interface AdminCharacterModalProps {
   isOpen: boolean
@@ -123,7 +124,9 @@ export const AdminCharacterModal: React.FC<AdminCharacterModalProps> = ({
       <div className="admin-modal-container" onClick={(e) => e.stopPropagation()}>
         <div className="admin-modal-header">
           <h2>{isEditing ? `Edit Character: ${editCharacter.name}` : 'Create Character Profile'}</h2>
-          <button className="modal-close-btn" onClick={onClose} aria-label="Close modal">✕</button>
+          <button className="modal-close-btn" onClick={onClose} aria-label="Close modal">
+            <CloseIcon size={14} />
+          </button>
         </div>
 
         {error && <div className="auth-error">{error}</div>}

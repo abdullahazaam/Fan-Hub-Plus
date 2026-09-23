@@ -1,6 +1,7 @@
 import React from 'react'
 import { useAuth } from '../context/AuthContext'
 import type { Character } from '../types'
+import { ArrowRightIcon, BookmarkIcon, EditIcon, StarIcon } from './Icons'
 
 interface CharacterCardProps {
   character: Character
@@ -46,7 +47,10 @@ export const CharacterCard: React.FC<CharacterCardProps> = ({
             }}
           />
         </div>
-        <div className="char-pop-badge">★ {character.popularityScore}%</div>
+        <div className="char-pop-badge">
+          <StarIcon size={12} fill="currentColor" />
+          <span>{character.popularityScore}%</span>
+        </div>
 
         {user && onToggleBookmark && (
           <button
@@ -58,7 +62,7 @@ export const CharacterCard: React.FC<CharacterCardProps> = ({
             title={isBookmarked ? 'Remove Bookmark' : 'Bookmark Character'}
             aria-label="Toggle character bookmark"
           >
-            {isBookmarked ? '★' : '☆'}
+            <BookmarkIcon size={15} fill={isBookmarked ? 'currentColor' : 'none'} />
           </button>
         )}
       </div>
@@ -81,10 +85,7 @@ export const CharacterCard: React.FC<CharacterCardProps> = ({
         <div className="card-actions">
           <button className="btn-view-detail" onClick={() => onSelect(character)}>
             <span>Dossier</span>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-              <path d="M5 12h14" />
-              <path d="m12 5 7 7-7 7" />
-            </svg>
+            <ArrowRightIcon size={14} />
           </button>
           {isAdmin && onEdit && (
             <button
@@ -96,10 +97,7 @@ export const CharacterCard: React.FC<CharacterCardProps> = ({
               title="Edit character profile (Admin)"
               aria-label="Edit character"
             >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
-                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
-              </svg>
+              <EditIcon size={13} />
               <span>Edit</span>
             </button>
           )}

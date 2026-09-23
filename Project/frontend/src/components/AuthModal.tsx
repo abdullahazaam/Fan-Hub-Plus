@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { apiForgotPassword, apiResetPassword } from '../api'
 import { useAuth } from '../context/AuthContext'
 import type { ForgotPasswordResponse } from '../types'
+import { CloseIcon } from './Icons'
 
 type Tab = 'login' | 'register' | 'forgot' | 'reset'
 
@@ -123,8 +124,10 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
   return (
     <div className="modal-overlay" onClick={onClose} role="dialog" aria-modal="true" aria-label="Authentication">
       <div className="auth-modal" onClick={(e) => e.stopPropagation()}>
-        <button className="modal-close-btn" onClick={onClose} aria-label="Close">✕</button>
-        <div className="auth-logo">⬡ Fan Hub Plus</div>
+        <button className="modal-close-btn" onClick={onClose} aria-label="Close">
+          <CloseIcon size={14} />
+        </button>
+        <div className="auth-logo">FAN HUB PLUS /</div>
 
         {/* Tab bar */}
         <div className="auth-tabs" role="tablist">
@@ -225,7 +228,7 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
                 <p className="auth-success-text">{forgotResult.message}</p>
                 {forgotResult.devResetToken && (
                   <div className="dev-token-box">
-                    <div className="dev-token-badge">🛠 Development Only</div>
+                    <div className="dev-token-badge">Development Only</div>
                     <p className="dev-token-notice">{forgotResult.devNotice}</p>
                     <code className="dev-token-value">{forgotResult.devResetToken}</code>
                     <button
@@ -250,7 +253,7 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
           <div className="auth-form">
             {resetSuccess ? (
               <div className="auth-success-text">
-                <p>✓ Password reset successfully. You may now sign in.</p>
+                <p>Password reset successfully. You may now sign in.</p>
                 <button className="btn-auth-submit" onClick={() => { setTab('login'); setResetSuccess(false) }}>
                   Go to Sign In
                 </button>

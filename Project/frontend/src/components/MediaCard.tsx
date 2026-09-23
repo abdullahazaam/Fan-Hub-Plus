@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { rateMedia } from '../api'
 import { useAuth } from '../context/AuthContext'
 import type { MediaItem } from '../types'
+import { BookmarkIcon, PlayIcon, StarIcon } from './Icons'
 
 interface MediaCardProps {
   item: MediaItem
@@ -109,7 +110,8 @@ export const MediaCard: React.FC<MediaCardProps> = ({
                 rel="noopener noreferrer"
                 className="btn-open-external-media"
               >
-                ▶ Open External Stream
+                <PlayIcon size={12} fill="currentColor" />
+                <span>Open External Stream</span>
               </a>
             </div>
           </div>
@@ -125,7 +127,7 @@ export const MediaCard: React.FC<MediaCardProps> = ({
             title={isBookmarked ? 'Remove Bookmark' : 'Bookmark Media'}
             aria-label="Toggle media bookmark"
           >
-            {isBookmarked ? '★' : '☆'}
+            <BookmarkIcon size={15} fill={isBookmarked ? 'currentColor' : 'none'} />
           </button>
         )}
       </div>
@@ -146,7 +148,7 @@ export const MediaCard: React.FC<MediaCardProps> = ({
         {/* Rating Section */}
         <div className="media-rating-row">
           <div className="average-rating-display">
-            <span className="star-icon">★</span>
+            <StarIcon size={14} fill="currentColor" className="star-icon-svg" />
             <span className="rating-value">{item.averageRating.toFixed(1)}</span>
             <span className="rating-count">({item.ratingsCount} {item.ratingsCount === 1 ? 'review' : 'reviews'})</span>
           </div>
@@ -164,7 +166,7 @@ export const MediaCard: React.FC<MediaCardProps> = ({
                   title={`Rate ${star} Star${star > 1 ? 's' : ''}`}
                   aria-label={`Rate ${star} Star${star > 1 ? 's' : ''}`}
                 >
-                  ★
+                  <StarIcon size={14} fill={(currentRating ?? 0) >= star ? 'currentColor' : 'none'} />
                 </button>
               ))}
             </div>

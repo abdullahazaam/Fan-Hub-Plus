@@ -21,6 +21,7 @@ import { NexusGateHero } from './components/NexusGateHero'
 import { ProfileModal } from './components/ProfileModal'
 import { SearchBar } from './components/SearchBar'
 import { AuthProvider, useAuth } from './context/AuthContext'
+import { CheckIcon, CompassIcon, MusicIcon, PlayIcon, UserIcon, VideoIcon } from './components/Icons'
 import type {
   Bookmark,
   Category,
@@ -438,7 +439,7 @@ function AppContent() {
       {/* Toast Alert */}
       {toastMessage && (
         <div className="nexus-toast">
-          <span className="toast-icon">✓</span>
+          <span className="toast-icon"><CheckIcon size={14} /></span>
           <span>{toastMessage}</span>
         </div>
       )}
@@ -472,7 +473,6 @@ function AppContent() {
           {/* Varied Editorial Layout Section */}
           <section className="editorial-showcase-section">
             <div className="section-divider-title">
-              <span className="eyebrow-spark">✦</span>
               <h2>EDITORIAL SPOTLIGHTS</h2>
               <span className="divider-line" />
             </div>
@@ -616,7 +616,7 @@ function AppContent() {
 
             {!loading && !error && contentItems.length === 0 && (
               <div className="empty-catalog-state">
-                <div className="empty-icon">🪐</div>
+                <div className="empty-icon"><CompassIcon size={36} /></div>
                 <h3>No items discovered in this universe</h3>
                 <p>Try broadening your query, adjusting the filters, or resetting to explore all items.</p>
                 <button className="btn-reset-filters" onClick={handleResetFilters}>
@@ -705,7 +705,7 @@ function AppContent() {
               </div>
             ) : (
               <div className="empty-catalog-state">
-                <div className="empty-icon">👤</div>
+                <div className="empty-icon"><UserIcon size={36} /></div>
                 <h3>No character profiles found</h3>
               </div>
             )}
@@ -736,13 +736,15 @@ function AppContent() {
               className={`btn-media-filter ${mediaFormatFilter === 'Video' ? 'active' : ''}`}
               onClick={() => setMediaFormatFilter('Video')}
             >
-              ▶ Videos & Trailers
+              <PlayIcon size={12} fill="currentColor" />
+              <span>Videos & Trailers</span>
             </button>
             <button
               className={`btn-media-filter ${mediaFormatFilter === 'Audio' ? 'active' : ''}`}
               onClick={() => setMediaFormatFilter('Audio')}
             >
-              ♫ Audio & Soundtracks
+              <MusicIcon size={13} />
+              <span>Audio & Soundtracks</span>
             </button>
           </div>
 
@@ -771,7 +773,7 @@ function AppContent() {
               </div>
             ) : (
               <div className="empty-catalog-state">
-                <div className="empty-icon">🎬</div>
+                <div className="empty-icon"><VideoIcon size={36} /></div>
                 <h3>No media streams available</h3>
               </div>
             )}

@@ -1,4 +1,5 @@
 import React from 'react'
+import { FileTextIcon, UserIcon, VideoIcon } from './Icons'
 
 interface AdminConsoleProps {
   onOpenCreateContent: () => void
@@ -29,7 +30,9 @@ export const AdminConsole: React.FC<AdminConsoleProps> = ({
 
       <div className="admin-action-grid">
         <div className="admin-action-card">
-          <div className="action-icon">📄</div>
+          <div className="action-icon">
+            <FileTextIcon size={32} />
+          </div>
           <h3>Fandom Chronicles</h3>
           <p>Publish or modify universe articles, deep dives, and lore analysis.</p>
           <div className="action-stat">{totalContent} Published</div>
@@ -39,7 +42,9 @@ export const AdminConsole: React.FC<AdminConsoleProps> = ({
         </div>
 
         <div className="admin-action-card">
-          <div className="action-icon">👤</div>
+          <div className="action-icon">
+            <UserIcon size={32} />
+          </div>
           <h3>Character Dossiers</h3>
           <p>Author or update hero/villain profiles, combat powers, and origin backstories.</p>
           <div className="action-stat">{totalCharacters} Characters</div>
@@ -49,7 +54,9 @@ export const AdminConsole: React.FC<AdminConsoleProps> = ({
         </div>
 
         <div className="admin-action-card">
-          <div className="action-icon">🎬</div>
+          <div className="action-icon">
+            <VideoIcon size={32} />
+          </div>
           <h3>Multimedia Streams</h3>
           <p>Embed official trailers, YouTube previews, or SoundCloud soundtrack streams.</p>
           <div className="action-stat">{totalMedia} Media Streams</div>

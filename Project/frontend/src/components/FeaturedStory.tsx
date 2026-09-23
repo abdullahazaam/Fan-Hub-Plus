@@ -1,6 +1,7 @@
 import React from 'react'
 import type { ContentItem } from '../types'
 import { CardShell } from './CardShell'
+import { ArrowRightIcon, BookmarkIcon, StarIcon } from './Icons'
 
 interface FeaturedStoryProps {
   item: ContentItem
@@ -44,7 +45,7 @@ export const FeaturedStory: React.FC<FeaturedStoryProps> = ({
             title={isBookmarked ? 'Remove Bookmark' : 'Bookmark story'}
             aria-label="Toggle bookmark"
           >
-            {isBookmarked ? '★' : '☆'}
+            <BookmarkIcon size={16} fill={isBookmarked ? 'currentColor' : 'none'} />
           </button>
         )}
       </div>
@@ -65,12 +66,15 @@ export const FeaturedStory: React.FC<FeaturedStoryProps> = ({
             })}
           </span>
           <span className="story-dot">•</span>
-          <span className="story-rating">★ {item.popularityScore}% Score</span>
+          <div className="story-rating-pill">
+            <StarIcon size={14} fill="currentColor" />
+            <span>{item.popularityScore}% Score</span>
+          </div>
         </div>
 
         <div className="story-read-cta">
           <span>Read Full Chronicle</span>
-          <span className="cta-arrow">→</span>
+          <ArrowRightIcon size={16} className="cta-arrow" />
         </div>
       </div>
     </CardShell>

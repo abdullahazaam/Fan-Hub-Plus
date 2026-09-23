@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useAuth } from '../context/AuthContext'
 import type { ProfileUpdateForm } from '../types'
+import { CloseIcon } from './Icons'
 
 interface ProfileModalProps {
   isOpen: boolean
@@ -40,7 +41,9 @@ export function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
   return (
     <div className="modal-overlay" onClick={onClose} role="dialog" aria-modal="true" aria-label="User Profile">
       <div className="profile-modal" onClick={(e) => e.stopPropagation()}>
-        <button className="modal-close-btn" onClick={onClose} aria-label="Close">✕</button>
+        <button className="modal-close-btn" onClick={onClose} aria-label="Close">
+          <CloseIcon size={14} />
+        </button>
 
         <div className="profile-header">
           <div className="profile-avatar-ring">
@@ -102,7 +105,7 @@ export function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
           />
 
           {error && <div className="auth-error">{error}</div>}
-          {saved && <div className="auth-success-text">✓ Profile saved successfully!</div>}
+          {saved && <div className="auth-success-text">Profile saved successfully!</div>}
 
           <button className="btn-auth-submit" type="submit" disabled={saving}>
             {saving ? 'Saving…' : 'Save Profile'}

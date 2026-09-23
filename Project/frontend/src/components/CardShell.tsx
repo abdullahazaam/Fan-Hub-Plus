@@ -25,9 +25,7 @@ export const CardShell: React.FC<CardShellProps> = ({
         }
       }}
     >
-      <div className="card-shell-surface">
-        {children}
-      </div>
+      {children}
       <div className="card-shell-border" aria-hidden="true" />
     </div>
   )

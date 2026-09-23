@@ -1,5 +1,6 @@
 import React from 'react'
 import type { Character } from '../types'
+import { CloseIcon, StarIcon } from './Icons'
 
 interface CharacterDetailModalProps {
   character: Character | null
@@ -20,7 +21,7 @@ export const CharacterDetailModal: React.FC<CharacterDetailModalProps> = ({
     <div className="modal-backdrop" onClick={onClose} role="dialog" aria-modal="true">
       <div className="detail-modal-container character-detail-container" onClick={(e) => e.stopPropagation()}>
         <button className="modal-close-btn" onClick={onClose} aria-label="Close modal">
-          ✕
+          <CloseIcon size={14} />
         </button>
 
         <div className="detail-hero-banner">
@@ -37,7 +38,7 @@ export const CharacterDetailModal: React.FC<CharacterDetailModalProps> = ({
           <div className="detail-hero-badges">
             <span className="badge-category">{character.categoryName}</span>
             <span className="badge-type">{character.fandomUniverse}</span>
-            <span className="badge-popularity">★ {character.popularityScore}% Rating</span>
+            <span className="badge-popularity"><StarIcon size={12} fill="currentColor" /> {character.popularityScore}% Rating</span>
           </div>
         </div>
 

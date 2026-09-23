@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import type { Category, MediaFormData, MediaItem } from '../types'
+import { CloseIcon } from './Icons'
 
 interface AdminMediaModalProps {
   isOpen: boolean
@@ -93,7 +94,9 @@ export const AdminMediaModal: React.FC<AdminMediaModalProps> = ({
       <div className="admin-modal-container" onClick={(e) => e.stopPropagation()}>
         <div className="admin-modal-header">
           <h2>{isEditing ? `Edit Media: ${editItem.title}` : 'Add Multimedia Entry'}</h2>
-          <button className="modal-close-btn" onClick={onClose} aria-label="Close modal">✕</button>
+          <button className="modal-close-btn" onClick={onClose} aria-label="Close modal">
+            <CloseIcon size={14} />
+          </button>
         </div>
 
         {error && <div className="auth-error">{error}</div>}

@@ -1,6 +1,7 @@
 import React from 'react'
 import { useAuth } from '../context/AuthContext'
 import type { ContentItem } from '../types'
+import { ArrowRightIcon, BookmarkIcon, EditIcon, StarIcon } from './Icons'
 
 interface ContentCardProps {
   item: ContentItem
@@ -54,9 +55,7 @@ export const ContentCard: React.FC<ContentCardProps> = ({
           </span>
         </div>
         <div className="popularity-indicator">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
-            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-          </svg>
+          <StarIcon size={12} fill="currentColor" />
           <span>{item.popularityScore}%</span>
         </div>
 
@@ -70,7 +69,7 @@ export const ContentCard: React.FC<ContentCardProps> = ({
             title={isBookmarked ? 'Remove Bookmark' : 'Save to Personal Archive'}
             aria-label="Toggle bookmark"
           >
-            {isBookmarked ? '★' : '☆'}
+            <BookmarkIcon size={15} fill={isBookmarked ? 'currentColor' : 'none'} />
           </button>
         )}
       </div>
@@ -104,10 +103,7 @@ export const ContentCard: React.FC<ContentCardProps> = ({
         <div className="card-actions">
           <button className="btn-view-detail" onClick={() => onSelect(item)}>
             <span>View Details</span>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-              <path d="M5 12h14" />
-              <path d="m12 5 7 7-7 7" />
-            </svg>
+            <ArrowRightIcon size={14} />
           </button>
           {isAdmin && (
             <button
@@ -119,10 +115,7 @@ export const ContentCard: React.FC<ContentCardProps> = ({
               title="Edit this item (Admin only)"
               aria-label="Edit content item"
             >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
-                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
-              </svg>
+              <EditIcon size={13} />
               <span>Edit</span>
             </button>
           )}

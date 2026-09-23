@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { useAuth } from '../context/AuthContext'
+import { CloseIcon, MoonIcon, SearchIcon, StarIcon, SunIcon } from './Icons'
 
 interface NavbarProps {
   currentView: 'home' | 'explore' | 'characters' | 'media' | 'admin'
@@ -117,7 +118,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 }}
                 aria-label="Close search"
               >
-                ✕
+                <CloseIcon size={14} />
               </button>
             </div>
           ) : (
@@ -130,10 +131,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               title="Quick Search (Explore)"
               aria-label="Open Search"
             >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
-                <circle cx="11" cy="11" r="8" />
-                <line x1="21" y1="21" x2="16.65" y2="16.65" />
-              </svg>
+              <SearchIcon size={18} />
             </button>
           )}
 
@@ -145,7 +143,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             aria-label={`Switch to ${theme === 'dark' ? 'Light' : 'Dark'} Mode`}
           >
             <span className="theme-toggle-knob">
-              {theme === 'dark' ? '●' : '☼'}
+              {theme === 'dark' ? <MoonIcon size={12} color="#ffffff" /> : <SunIcon size={13} color="#ffffff" />}
             </span>
           </button>
 
@@ -158,7 +156,8 @@ export const Navbar: React.FC<NavbarProps> = ({
                 title="Saved Items"
                 aria-label="View saved items"
               >
-                ★ <span className="saved-badge">{bookmarkCount}</span>
+                <StarIcon size={14} fill="currentColor" />
+                <span className="saved-badge">{bookmarkCount}</span>
               </button>
 
               <button

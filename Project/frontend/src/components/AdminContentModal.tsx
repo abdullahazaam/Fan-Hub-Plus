@@ -130,7 +130,7 @@ export const AdminContentModal: React.FC<AdminContentModalProps> = ({
 
         {error && (
           <div className="admin-error-banner">
-            <span>⚠ {error}</span>
+            <span>{error}</span>
           </div>
         )}
 

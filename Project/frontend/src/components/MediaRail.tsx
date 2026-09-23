@@ -1,6 +1,7 @@
 import React, { useRef } from 'react'
 import type { MediaItem } from '../types'
 import { CardShell } from './CardShell'
+import { BookmarkIcon, ChevronLeftIcon, ChevronRightIcon, MusicIcon, PlayIcon, StarIcon } from './Icons'
 
 interface MediaRailProps {
   items: MediaItem[]
@@ -37,14 +38,14 @@ export const MediaRail: React.FC<MediaRailProps> = ({
             onClick={() => scroll('left')}
             aria-label="Scroll left"
           >
-            ←
+            <ChevronLeftIcon size={18} />
           </button>
           <button
             className="rail-arrow-btn"
             onClick={() => scroll('right')}
             aria-label="Scroll right"
           >
-            →
+            <ChevronRightIcon size={18} />
           </button>
         </div>
       </div>
@@ -65,7 +66,11 @@ export const MediaRail: React.FC<MediaRailProps> = ({
               />
               <div className="rail-thumb-overlay" />
               <div className="rail-play-badge">
-                {m.mediaType.toLowerCase() === 'audio' ? '♫' : '▶'}
+                {m.mediaType.toLowerCase() === 'audio' ? (
+                  <MusicIcon size={18} />
+                ) : (
+                  <PlayIcon size={16} />
+                )}
               </div>
               <span className="rail-format-pill">{m.mediaType}</span>
 
@@ -79,7 +84,7 @@ export const MediaRail: React.FC<MediaRailProps> = ({
                   title="Bookmark media"
                   aria-label="Bookmark media"
                 >
-                  {isBookmarked(m.id) ? '★' : '☆'}
+                  <BookmarkIcon size={15} fill={isBookmarked(m.id) ? 'currentColor' : 'none'} />
                 </button>
               )}
             </div>
@@ -88,7 +93,7 @@ export const MediaRail: React.FC<MediaRailProps> = ({
               <div className="rail-item-universe">{m.fandomUniverse}</div>
               <h4 className="rail-item-title">{m.title}</h4>
               <div className="rail-item-rating">
-                <span className="star">★</span>
+                <StarIcon size={13} fill="currentColor" className="star-svg" />
                 <span>{m.averageRating.toFixed(1)}</span>
                 <span className="count">({m.ratingsCount})</span>
               </div>

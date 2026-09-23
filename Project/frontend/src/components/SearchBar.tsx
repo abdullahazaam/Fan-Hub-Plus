@@ -1,4 +1,5 @@
 import React from 'react'
+import { CloseIcon } from './Icons'
 
 interface SearchBarProps {
   search: string
@@ -73,7 +74,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
         />
         {search && (
           <button className="clear-search-btn" onClick={() => onSearchChange('')} aria-label="Clear search">
-            ✕
+            <CloseIcon size={14} />
           </button>
         )}
       </div>
@@ -139,8 +140,8 @@ export const SearchBar: React.FC<SearchBarProps> = ({
             }}
           >
             <option value="">Any Score</option>
-            <option value="90">★ 90%+</option>
-            <option value="95">★ 95%+</option>
+            <option value="90">90%+ Score</option>
+            <option value="95">95%+ Score</option>
           </select>
         </div>
 

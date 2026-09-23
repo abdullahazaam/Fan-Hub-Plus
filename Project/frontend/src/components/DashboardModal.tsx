@@ -1,6 +1,7 @@
 import React from 'react'
 import { useAuth } from '../context/AuthContext'
 import type { Bookmark } from '../types'
+import { BookmarkIcon, CloseIcon } from './Icons'
 
 interface DashboardModalProps {
   isOpen: boolean
@@ -25,7 +26,7 @@ export const DashboardModal: React.FC<DashboardModalProps> = ({
     <div className="modal-backdrop" onClick={onClose} role="dialog" aria-modal="true">
       <div className="detail-modal-container dashboard-container" onClick={(e) => e.stopPropagation()}>
         <button className="modal-close-btn" onClick={onClose} aria-label="Close modal">
-          ✕
+          <CloseIcon size={14} />
         </button>
 
         <div className="dashboard-header">
@@ -49,7 +50,7 @@ export const DashboardModal: React.FC<DashboardModalProps> = ({
         <div className="dashboard-body">
           {bookmarks.length === 0 ? (
             <div className="empty-catalog-state dashboard-empty">
-              <div className="empty-icon">🔖</div>
+              <div className="empty-icon"><BookmarkIcon size={36} /></div>
               <h3>No Bookmarks Saved Yet</h3>
               <p>Explore articles, characters, and trailers and click the star icon to save them to your personal dossier.</p>
             </div>
@@ -92,7 +93,8 @@ export const DashboardModal: React.FC<DashboardModalProps> = ({
                         title="Remove Bookmark"
                         aria-label="Remove bookmark"
                       >
-                        ✕ Remove
+                        <CloseIcon size={11} />
+                        <span>Remove</span>
                       </button>
                     </div>
                   </div>

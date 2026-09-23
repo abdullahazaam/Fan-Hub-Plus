@@ -1,6 +1,7 @@
 import React from 'react'
 import { useAuth } from '../context/AuthContext'
 import type { ContentItem } from '../types'
+import { CloseIcon, StarIcon } from './Icons'
 
 interface ContentDetailModalProps {
   item: ContentItem | null
@@ -21,7 +22,7 @@ export const ContentDetailModal: React.FC<ContentDetailModalProps> = ({ item, on
     <div className="modal-backdrop" onClick={onClose} role="dialog" aria-modal="true">
       <div className="detail-modal-container" onClick={(e) => e.stopPropagation()}>
         <button className="modal-close-btn" onClick={onClose} aria-label="Close modal">
-          ✕
+          <CloseIcon size={14} />
         </button>
 
         <div className="detail-hero-banner">
@@ -38,7 +39,7 @@ export const ContentDetailModal: React.FC<ContentDetailModalProps> = ({ item, on
           <div className="detail-hero-badges">
             <span className="badge-category">{item.categoryName}</span>
             <span className="badge-type">{item.contentType}</span>
-            <span className="badge-popularity">★ {item.popularityScore}% Rating</span>
+            <span className="badge-popularity"><StarIcon size={12} fill="currentColor" /> {item.popularityScore}% Rating</span>
           </div>
         </div>
 
