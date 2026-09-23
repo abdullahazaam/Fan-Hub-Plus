@@ -11,6 +11,8 @@ public class FanHubDbContext : DbContext
 
     public DbSet<Category> Categories => Set<Category>();
     public DbSet<ContentItem> ContentItems => Set<ContentItem>();
+    public DbSet<User> Users => Set<User>();
+    public DbSet<PasswordResetToken> PasswordResetTokens => Set<PasswordResetToken>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -49,6 +51,44 @@ public class FanHubDbContext : DbContext
             entity.HasIndex(c => c.ContentType);
             entity.HasIndex(c => c.PopularityScore);
             entity.HasIndex(c => c.ReleaseDate);
+        });
+
+        // User Configuration
+        modelBuilder.Entity<User>(entity =>
+        {
+            entity.HasKey(u => u.Id);
+            entity.Property(u => u.Email).IsRequired().HasMaxLength(256);
+            entity.Property(u => u.NormalizedEmail).IsRequired().HasMaxLength(256);
+            entity.Property(u => u.Username).IsRequired().HasMaxLength(100);
+            entity.Property(u => u.PasswordHash).IsRequired();
+            entity.Property(u => u.PasswordSalt).IsRequired();
+            entity.Property(u => u.Role).IsRequired().HasMaxLength(50).HasDefaultValue("User");
+            entity.Property(u => u.DisplayName).HasMaxLength(120);
+            entity.Property(u => u.Bio).HasMaxLength(500);
+            entity.Property(u => u.AvatarUrl).HasMaxLength(1000);
+            entity.Property(u => u.FavoriteCategory).HasMaxLength(100);
+
+            // Unique constraints — email and username must be unique across all users
+            entity.HasIndex(u => u.NormalizedEmail).IsUnique();
+            entity.HasIndex(u => u.Username).IsUnique();
+        });
+
+        // PasswordResetToken Configuration
+        modelBuilder.Entity<PasswordResetToken>(entity =>
+        {
+            entity.HasKey(t => t.Id);
+            // Only the SHA-256 hash of the token is stored, never the raw value
+            entity.Property(t => t.TokenHash).IsRequired().HasMaxLength(512);
+            entity.Property(t => t.ExpiresAt).IsRequired();
+            entity.Property(t => t.IsUsed).HasDefaultValue(false);
+
+            entity.HasOne(t => t.User)
+                  .WithMany(u => u.PasswordResetTokens)
+                  .HasForeignKey(t => t.UserId)
+                  .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasIndex(t => t.TokenHash);
+            entity.HasIndex(t => t.UserId);
         });
     }
 }

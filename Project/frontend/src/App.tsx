@@ -1,17 +1,20 @@
 import { useEffect, useState } from 'react'
 import * as api from './api'
 import { AdminContentModal } from './components/AdminContentModal'
+import { AuthModal } from './components/AuthModal'
 import { CategoryPills } from './components/CategoryPills'
 import { ContentCard } from './components/ContentCard'
 import { ContentDetailModal } from './components/ContentDetailModal'
 import { Navbar } from './components/Navbar'
+import { ProfileModal } from './components/ProfileModal'
 import { SearchBar } from './components/SearchBar'
+import { AuthProvider } from './context/AuthContext'
 import type { Category, ContentFormData, ContentItem } from './types'
 import './App.css'
 
-export function App() {
+function AppContent() {
   // System Health
-  const [apiStatus, setApiStatus] = useState<string>('Connecting')
+  const [apiStatus, setApiStatus] = useState<'online' | 'offline' | 'loading'>('loading')
   const [dbStatus, setDbStatus] = useState<string>('SQL Server')
 
   // Categories & Content State
@@ -31,6 +34,8 @@ export function App() {
   const [selectedDetailItem, setSelectedDetailItem] = useState<ContentItem | null>(null)
   const [isAdminModalOpen, setIsAdminModalOpen] = useState<boolean>(false)
   const [itemToEdit, setItemToEdit] = useState<ContentItem | null>(null)
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState<boolean>(false)
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState<boolean>(false)
 
   // Toast feedback
   const [toastMessage, setToastMessage] = useState<string | null>(null)
@@ -47,10 +52,10 @@ export function App() {
     const initApp = async () => {
       try {
         const health = await api.getHealth()
-        setApiStatus(health.status)
+        setApiStatus(health.status.toLowerCase() === 'healthy' ? 'online' : 'offline')
         if (health.database) setDbStatus(health.database)
       } catch {
-        setApiStatus('Offline')
+        setApiStatus('offline')
       }
 
       try {
@@ -143,6 +148,8 @@ export function App() {
         apiStatus={apiStatus}
         dbStatus={dbStatus}
         onOpenCreate={handleOpenCreate}
+        onOpenAuth={() => setIsAuthModalOpen(true)}
+        onOpenProfile={() => setIsProfileModalOpen(true)}
       />
 
       {/* Toast Alert */}
@@ -270,7 +277,27 @@ export function App() {
         categories={categories}
         editItem={itemToEdit}
       />
+
+      {/* Auth Modal (Sign In / Register / Forgot Password / Reset) */}
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
+      />
+
+      {/* Profile Modal */}
+      <ProfileModal
+        isOpen={isProfileModalOpen}
+        onClose={() => setIsProfileModalOpen(false)}
+      />
     </div>
+  )
+}
+
+export function App() {
+  return (
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
   )
 }
 

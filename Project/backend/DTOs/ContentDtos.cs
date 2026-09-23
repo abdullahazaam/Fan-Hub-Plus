@@ -51,7 +51,7 @@ public record ContentResponseDto(
 );
 
 public record PagedResult<T>(
-    IReadOnlyList<T> Items,
+    List<T> Items,
     int TotalCount,
     int Page,
     int PageSize

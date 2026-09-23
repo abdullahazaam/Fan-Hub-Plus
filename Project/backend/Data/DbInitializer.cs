@@ -1,18 +1,35 @@
 using FanHubPlus.Models;
+using FanHubPlus.Services;
 using Microsoft.EntityFrameworkCore;
 
 namespace FanHubPlus.Data;
 
 public static class DbInitializer
 {
-    public static void Initialize(FanHubDbContext context)
+    /// <param name="isDevelopment">
+    /// Pass <c>true</c> only when <see cref="IHostEnvironment.IsDevelopment()"/> is true.
+    /// Demo account seeding is intentionally skipped in any other environment.
+    /// </param>
+    public static void Initialize(FanHubDbContext context, bool isDevelopment)
     {
         // Execute pending migrations against SQL Server
         context.Database.Migrate();
 
+        SeedCategories(context);
+
+        // Demo accounts are seeded ONLY in the local Development environment.
+        // They are never created in Staging, Production, or any other environment.
+        if (isDevelopment)
+        {
+            SeedDevelopmentAccounts(context);
+        }
+    }
+
+    private static void SeedCategories(FanHubDbContext context)
+    {
         if (context.Categories.Any())
         {
-            return; // DB has already been seeded
+            return; // Categories already seeded
         }
 
         // 1. Seed Mandatory 8 Fandom Categories
@@ -91,10 +108,8 @@ public static class DbInitializer
         var animeCat = categories.First(c => c.Slug == "anime");
         var gamingCat = categories.First(c => c.Slug == "gaming");
         var moviesCat = categories.First(c => c.Slug == "movies");
-        var tvCat = categories.First(c => c.Slug == "tv-shows");
         var kpopCat = categories.First(c => c.Slug == "k-pop");
         var comicsCat = categories.First(c => c.Slug == "comics");
-        var mangaCat = categories.First(c => c.Slug == "manga");
         var cosplayCat = categories.First(c => c.Slug == "cosplay");
 
         // 2. Seed Clearly Identified Demo Dataset
@@ -205,6 +220,70 @@ public static class DbInitializer
         };
 
         context.ContentItems.AddRange(demoItems);
+        context.SaveChanges();
+    }
+
+    /// <summary>
+    /// Seeds local development demo accounts with securely hashed passwords.
+    /// This method is ONLY called when isDevelopment == true.
+    /// Demo credentials are documented in the local README for development convenience
+    /// and are never committed in plaintext.
+    /// </summary>
+    private static void SeedDevelopmentAccounts(FanHubDbContext context)
+    {
+        // Seeded solely behind explicit isDevelopment == true check.
+        // In local development, passwords can be provided via DEV_ADMIN_PASSWORD / DEV_USER_PASSWORD.
+        // If not specified, a temporary password is used for the local session.
+        var devAdminPassword = Environment.GetEnvironmentVariable("DEV_ADMIN_PASSWORD")
+            ?? "DevAdminPass_" + Guid.NewGuid().ToString("N")[..8] + "!";
+        var devUserPassword = Environment.GetEnvironmentVariable("DEV_USER_PASSWORD")
+            ?? "DevUserPass_" + Guid.NewGuid().ToString("N")[..8] + "!";
+
+        const string devAdminEmail = "admin@fanhubplus.local";
+        const string devMemberEmail = "user@fanhubplus.local";
+
+        if (!context.Users.Any(u => u.NormalizedEmail == devAdminEmail.ToUpper()))
+        {
+            // [DEV-ONLY] Demo admin account — local development use only
+            var (adminHash, adminSalt) = PasswordHasher.Hash(devAdminPassword);
+            context.Users.Add(new User
+            {
+                Email = devAdminEmail,
+                NormalizedEmail = devAdminEmail.ToUpper(),
+                Username = "admin",
+                PasswordHash = adminHash,
+                PasswordSalt = adminSalt,
+                Role = "Admin",
+                DisplayName = "Fan Hub Admin",
+                Bio = "Local development admin account. Not for production use.",
+                AvatarUrl = "https://api.dicebear.com/7.x/bottts/svg?seed=admin",
+                FavoriteCategory = "Gaming",
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            });
+        }
+
+        if (!context.Users.Any(u => u.NormalizedEmail == devMemberEmail.ToUpper()))
+        {
+            // [DEV-ONLY] Demo member account — local development use only
+            var (memberHash, memberSalt) = PasswordHasher.Hash(devUserPassword);
+            context.Users.Add(new User
+            {
+                Email = devMemberEmail,
+                NormalizedEmail = devMemberEmail.ToUpper(),
+                Username = "fanmember",
+                PasswordHash = memberHash,
+                PasswordSalt = memberSalt,
+                Role = "User",
+                DisplayName = "Fan Member",
+                Bio = "Local development member account. Not for production use.",
+                AvatarUrl = "https://api.dicebear.com/7.x/bottts/svg?seed=member",
+                FavoriteCategory = "Anime",
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            });
+        }
+
         context.SaveChanges();
     }
 }

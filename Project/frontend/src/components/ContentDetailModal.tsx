@@ -1,4 +1,5 @@
 import React from 'react'
+import { useAuth } from '../context/AuthContext'
 import type { ContentItem } from '../types'
 
 interface ContentDetailModalProps {
@@ -8,6 +9,8 @@ interface ContentDetailModalProps {
 }
 
 export const ContentDetailModal: React.FC<ContentDetailModalProps> = ({ item, onClose, onEdit }) => {
+  const { user } = useAuth()
+  const isAdmin = user?.role === 'Admin'
   if (!item) return null
 
   const tagsList = item.tags
@@ -90,19 +93,22 @@ export const ContentDetailModal: React.FC<ContentDetailModalProps> = ({ item, on
           )}
 
           <div className="detail-footer-actions">
-            <button
-              className="btn-edit-modal"
-              onClick={() => {
-                onClose()
-                onEdit(item)
-              }}
-            >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
-                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
-              </svg>
-              <span>Edit Content (Admin Flow)</span>
-            </button>
+            {isAdmin && (
+              <button
+                className="btn-edit-modal"
+                onClick={() => {
+                  onClose()
+                  onEdit(item)
+                }}
+                aria-label="Edit content item (Admin only)"
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                </svg>
+                <span>Edit Content (Admin)</span>
+              </button>
+            )}
             <button className="btn-close-modal" onClick={onClose}>
               Back to Catalog
             </button>

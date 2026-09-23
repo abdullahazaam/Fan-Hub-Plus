@@ -38,7 +38,13 @@ STEP 1: RUN THE BACKEND WEB API
 1. Open PowerShell or Command Prompt.
 2. Navigate to the backend folder:
    cd "NN-Zynex_End-to-End Web Solutions_NN\Project\backend"
-3. Run the backend service:
+3. Configure the mandatory JWT key via environment variable (minimum 32 characters):
+   In PowerShell:
+     $env:FAN_HUB_JWT_KEY="YourRandomDevelopmentKeyHereAtLeast32Chars!"
+   In Command Prompt / bash:
+     set FAN_HUB_JWT_KEY=YourRandomDevelopmentKeyHereAtLeast32Chars!
+   (Optional dev seed credentials can also be set via DEV_ADMIN_PASSWORD / DEV_USER_PASSWORD)
+4. Run the backend service:
    dotnet run --launch-profile http
    The API will listen at:
    - http://localhost:5075

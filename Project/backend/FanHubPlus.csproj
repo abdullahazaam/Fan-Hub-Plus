@@ -32,6 +32,9 @@
     <Reference Include="Microsoft.IdentityModel.Tokens">
       <HintPath>lib\Microsoft.IdentityModel.Tokens.dll</HintPath>
     </Reference>
+    <Reference Include="System.IdentityModel.Tokens.Jwt">
+      <HintPath>lib\System.IdentityModel.Tokens.Jwt.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.IdentityModel.Logging">
       <HintPath>lib\Microsoft.IdentityModel.Logging.dll</HintPath>
     </Reference>

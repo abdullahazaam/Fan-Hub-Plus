@@ -141,6 +141,115 @@ partial class FanHubDbContextModelSnapshot : ModelSnapshot
                 b.ToTable("ContentItems");
             });
 
+        modelBuilder.Entity("FanHubPlus.Models.PasswordResetToken", b =>
+            {
+                b.Property<int>("Id")
+                    .ValueGeneratedOnAdd()
+                    .HasColumnType("int");
+
+                SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                b.Property<DateTime>("CreatedAt")
+                    .HasColumnType("datetime2");
+
+                b.Property<DateTime>("ExpiresAt")
+                    .HasColumnType("datetime2");
+
+                b.Property<bool>("IsUsed")
+                    .HasDefaultValue(false)
+                    .HasColumnType("bit");
+
+                b.Property<string>("TokenHash")
+                    .IsRequired()
+                    .HasMaxLength(512)
+                    .HasColumnType("nvarchar(512)");
+
+                b.Property<int>("UserId")
+                    .HasColumnType("int");
+
+                b.HasKey("Id");
+
+                b.HasIndex("TokenHash");
+
+                b.HasIndex("UserId");
+
+                b.ToTable("PasswordResetTokens");
+            });
+
+        modelBuilder.Entity("FanHubPlus.Models.User", b =>
+            {
+                b.Property<int>("Id")
+                    .ValueGeneratedOnAdd()
+                    .HasColumnType("int");
+
+                SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                b.Property<string>("AvatarUrl")
+                    .IsRequired()
+                    .HasMaxLength(1000)
+                    .HasColumnType("nvarchar(1000)");
+
+                b.Property<string>("Bio")
+                    .IsRequired()
+                    .HasMaxLength(500)
+                    .HasColumnType("nvarchar(500)");
+
+                b.Property<DateTime>("CreatedAt")
+                    .HasColumnType("datetime2");
+
+                b.Property<string>("DisplayName")
+                    .IsRequired()
+                    .HasMaxLength(120)
+                    .HasColumnType("nvarchar(120)");
+
+                b.Property<string>("Email")
+                    .IsRequired()
+                    .HasMaxLength(256)
+                    .HasColumnType("nvarchar(256)");
+
+                b.Property<string>("FavoriteCategory")
+                    .IsRequired()
+                    .HasMaxLength(100)
+                    .HasColumnType("nvarchar(100)");
+
+                b.Property<string>("NormalizedEmail")
+                    .IsRequired()
+                    .HasMaxLength(256)
+                    .HasColumnType("nvarchar(256)");
+
+                b.Property<string>("PasswordHash")
+                    .IsRequired()
+                    .HasColumnType("nvarchar(max)");
+
+                b.Property<string>("PasswordSalt")
+                    .IsRequired()
+                    .HasColumnType("nvarchar(max)");
+
+                b.Property<string>("Role")
+                    .IsRequired()
+                    .HasMaxLength(50)
+                    .HasDefaultValue("User")
+                    .HasColumnType("nvarchar(50)");
+
+                b.Property<DateTime>("UpdatedAt")
+                    .HasColumnType("datetime2");
+
+                b.Property<string>("Username")
+                    .IsRequired()
+                    .HasMaxLength(100)
+                    .HasColumnType("nvarchar(100)");
+
+                b.HasKey("Id");
+
+                b.HasIndex("NormalizedEmail")
+                    .IsUnique();
+
+                b.HasIndex("Username")
+                    .IsUnique();
+
+                b.ToTable("Users");
+            });
+
         modelBuilder.Entity("FanHubPlus.Models.ContentItem", b =>
             {
                 b.HasOne("FanHubPlus.Models.Category", "Category")
@@ -152,9 +261,25 @@ partial class FanHubDbContextModelSnapshot : ModelSnapshot
                 b.Navigation("Category");
             });
 
+        modelBuilder.Entity("FanHubPlus.Models.PasswordResetToken", b =>
+            {
+                b.HasOne("FanHubPlus.Models.User", "User")
+                    .WithMany("PasswordResetTokens")
+                    .HasForeignKey("UserId")
+                    .OnDelete(DeleteBehavior.Cascade)
+                    .IsRequired();
+
+                b.Navigation("User");
+            });
+
         modelBuilder.Entity("FanHubPlus.Models.Category", b =>
             {
                 b.Navigation("ContentItems");
+            });
+
+        modelBuilder.Entity("FanHubPlus.Models.User", b =>
+            {
+                b.Navigation("PasswordResetTokens");
             });
 #pragma warning restore 612, 618
     }
