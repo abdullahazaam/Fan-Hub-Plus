@@ -3,21 +3,59 @@ import { useAuth } from '../context/AuthContext'
 interface NavbarProps {
   apiStatus: 'online' | 'offline' | 'loading'
   dbStatus: string
+  activeTab: 'catalog' | 'characters' | 'media'
+  onTabChange: (tab: 'catalog' | 'characters' | 'media') => void
+  bookmarkCount: number
   onOpenCreate: () => void
   onOpenAuth: () => void
   onOpenProfile: () => void
+  onOpenDashboard: () => void
 }
 
-export function Navbar({ apiStatus, dbStatus, onOpenCreate, onOpenAuth, onOpenProfile }: NavbarProps) {
+export function Navbar({
+  apiStatus,
+  dbStatus,
+  activeTab,
+  onTabChange,
+  bookmarkCount,
+  onOpenCreate,
+  onOpenAuth,
+  onOpenProfile,
+  onOpenDashboard,
+}: NavbarProps) {
   const { user, logout } = useAuth()
 
   return (
     <nav className="nexus-navbar" role="navigation" aria-label="Main navigation">
-      <div className="navbar-brand">
-        <span className="brand-hex">⬡</span>
-        <span className="brand-title">Fan Hub Plus</span>
-        <span className="brand-divider">|</span>
-        <span className="brand-sub">Fandom Multiverse</span>
+      <div className="navbar-left">
+        <div className="navbar-brand" onClick={() => onTabChange('catalog')} style={{ cursor: 'pointer' }}>
+          <span className="brand-hex">⬡</span>
+          <span className="brand-title">Fan Hub Plus</span>
+          <span className="brand-divider">|</span>
+          <span className="brand-sub">Fandom Multiverse</span>
+        </div>
+
+        {/* Section Navigation Tabs */}
+        <div className="nav-section-tabs">
+          <button
+            className={`nav-tab-btn ${activeTab === 'catalog' ? 'active' : ''}`}
+            onClick={() => onTabChange('catalog')}
+          >
+            Chronicles & Articles
+          </button>
+          <button
+            className={`nav-tab-btn ${activeTab === 'characters' ? 'active' : ''}`}
+            onClick={() => onTabChange('characters')}
+          >
+            Character Dossiers
+          </button>
+          <button
+            className={`nav-tab-btn ${activeTab === 'media' ? 'active' : ''}`}
+            onClick={() => onTabChange('media')}
+          >
+            Multimedia & Streams
+          </button>
+        </div>
       </div>
 
       <div className="navbar-status-group">
@@ -39,15 +77,25 @@ export function Navbar({ apiStatus, dbStatus, onOpenCreate, onOpenAuth, onOpenPr
       <div className="navbar-actions">
         {user ? (
           <>
-            {/* Admin-only: Create button — hidden from non-admins, but API also enforces this */}
+            {/* Bookmarks / Dashboard Link */}
+            <button
+              className="btn-nav-bookmarks"
+              onClick={onOpenDashboard}
+              title="Personal Saved Archives"
+              aria-label="View personal saved items"
+            >
+              <span>★</span> Saved ({bookmarkCount})
+            </button>
+
+            {/* Admin-only: Create button */}
             {user.role === 'Admin' && (
               <button
                 className="btn-create-content"
                 onClick={onOpenCreate}
-                title="Admin: Create new fandom content item"
-                aria-label="Create fandom content (Admin)"
+                title="Admin: Create new entry"
+                aria-label="Create content (Admin)"
               >
-                <span>＋</span> Create Content
+                <span>＋</span> Add Entry
               </button>
             )}
 

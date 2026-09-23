@@ -16,6 +16,8 @@ public static class DbInitializer
         context.Database.Migrate();
 
         SeedCategories(context);
+        SeedCharacters(context);
+        SeedMediaItems(context);
 
         // Demo accounts are seeded ONLY in the local Development environment.
         // They are never created in Staging, Production, or any other environment.
@@ -220,6 +222,138 @@ public static class DbInitializer
         };
 
         context.ContentItems.AddRange(demoItems);
+        context.SaveChanges();
+    }
+
+    private static void SeedCharacters(FanHubDbContext context)
+    {
+        if (context.Characters.Any()) return;
+
+        var animeCat = context.Categories.FirstOrDefault(c => c.Slug == "anime");
+        var gamingCat = context.Categories.FirstOrDefault(c => c.Slug == "gaming");
+        var comicsCat = context.Categories.FirstOrDefault(c => c.Slug == "comics");
+
+        if (animeCat == null || gamingCat == null) return;
+
+        var characters = new[]
+        {
+            new Character
+            {
+                CategoryId = gamingCat.Id,
+                Name = "Johnny Silverhand",
+                FandomUniverse = "Cyberpunk Universe",
+                RoleTitle = "Rockerboy & Digital Ghost",
+                Bio = "Legendary frontman of Samurai and notorious anti-corporate rebel who fought Arasaka to the bitter end.",
+                Abilities = "Charismatic leadership, virtuoso guitarist, cybernetic arm combat, tactical firebrand.",
+                Backstory = "Born Robert John Linder, Silverhand served in the Second Central American War before deserting and founding Samurai in 2003.",
+                AvatarUrl = "https://images.unsplash.com/photo-1579783902614-a3fb3927b675?w=600&q=80",
+                BannerUrl = "https://images.unsplash.com/photo-1542751371-adc38448a05e?w=1600&q=80",
+                OriginUniverse = "Night City (Cyberpunk 2077)",
+                VoiceActor = "Keanu Reeves",
+                PopularityScore = 99,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            },
+            new Character
+            {
+                CategoryId = animeCat.Id,
+                Name = "Satoru Gojo",
+                FandomUniverse = "Jujutsu Kaisen",
+                RoleTitle = "Special Grade Sorcerer",
+                Bio = "The strongest modern jujutsu sorcerer, bearer of both the Limitless technique and the Six Eyes.",
+                Abilities = "Limitless, Infinity barrier, Cursed Technique Reversal: Red, Cursed Technique Lapse: Blue, Hollow Purple, Unlimited Void.",
+                Backstory = "Born into the prestigious Gojo clan, his birth fundamentally shifted the balance of power in the sorcery world.",
+                AvatarUrl = "https://images.unsplash.com/photo-1534447677768-be436bb09401?w=600&q=80",
+                BannerUrl = "https://images.unsplash.com/photo-1578632767115-351597cf2477?w=1600&q=80",
+                OriginUniverse = "Tokyo Metropolitan Jujutsu Technical High School",
+                VoiceActor = "Yuichi Nakamura",
+                PopularityScore = 98,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            },
+            new Character
+            {
+                CategoryId = (comicsCat ?? gamingCat).Id,
+                Name = "Geralt of Rivia",
+                FandomUniverse = "The Witcher",
+                RoleTitle = "Witcher of the School of the Wolf",
+                Bio = "Mutated monster slayer for hire known as the White Wolf or Butcher of Blaviken.",
+                Abilities = "Superhuman reflexes, toxicity tolerance, Witcher Signs (Aard, Igni, Quen, Axii, Yrden), expert swordsmanship.",
+                Backstory = "Surviving the grueling Trial of the Grasses at Kaer Morhen, Geralt roams the Continent navigating the lesser of evils.",
+                AvatarUrl = "https://images.unsplash.com/photo-1568602471122-7832951cc4c5?w=600&q=80",
+                BannerUrl = "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=1600&q=80",
+                OriginUniverse = "The Continent",
+                VoiceActor = "Doug Cockle",
+                PopularityScore = 96,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            }
+        };
+
+        context.Characters.AddRange(characters);
+        context.SaveChanges();
+    }
+
+    private static void SeedMediaItems(FanHubDbContext context)
+    {
+        if (context.MediaItems.Any()) return;
+
+        var animeCat = context.Categories.FirstOrDefault(c => c.Slug == "anime");
+        var gamingCat = context.Categories.FirstOrDefault(c => c.Slug == "gaming");
+        var moviesCat = context.Categories.FirstOrDefault(c => c.Slug == "movies");
+
+        if (animeCat == null || gamingCat == null) return;
+
+        var media = new[]
+        {
+            new MediaItem
+            {
+                CategoryId = gamingCat.Id,
+                Title = "Cyberpunk 2077: Phantom Liberty Official Cinematic Trailer",
+                FandomUniverse = "Cyberpunk Universe",
+                MediaType = "Video",
+                MediaUrl = "https://www.youtube.com/embed/dQw4w9WgXcQ",
+                ThumbnailUrl = "https://images.unsplash.com/photo-1542751371-adc38448a05e?w=800&q=80",
+                Description = "High-stakes spy-thriller expansion set in the lawless district of Dogtown.",
+                Tags = "Trailer, Cyberpunk, Cinematic, Phantom Liberty",
+                DurationSeconds = 184,
+                AverageRating = 4.9,
+                RatingsCount = 128,
+                CreatedAt = DateTime.UtcNow
+            },
+            new MediaItem
+            {
+                CategoryId = animeCat.Id,
+                Title = "Jujutsu Kaisen Season 2 Shibuya Incident OST - Specialz Extended Mix",
+                FandomUniverse = "Jujutsu Kaisen",
+                MediaType = "Audio",
+                MediaUrl = "https://soundcloud.com/sample-fanhub/specialz-mix",
+                ThumbnailUrl = "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=800&q=80",
+                Description = "Iconic theme song capturing the chaotic descent into the Shibuya Incident.",
+                Tags = "OST, Shibuya Incident, King Gnu, Soundtrack",
+                DurationSeconds = 240,
+                AverageRating = 4.8,
+                RatingsCount = 95,
+                CreatedAt = DateTime.UtcNow
+            },
+            new MediaItem
+            {
+                CategoryId = (moviesCat ?? gamingCat).Id,
+                Title = "Interstellar: Docking Scene Soundtrack (No Time For Caution)",
+                FandomUniverse = "Sci-Fi Cinema",
+                MediaType = "Audio",
+                MediaUrl = "https://soundcloud.com/sample-fanhub/no-time-for-caution",
+                ThumbnailUrl = "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=800&q=80",
+                Description = "Hans Zimmer's pipe organ masterpiece composed for the legendary Endurance docking sequence.",
+                Tags = "Soundtrack, Hans Zimmer, Sci-Fi, Pipe Organ",
+                DurationSeconds = 246,
+                AverageRating = 5.0,
+                RatingsCount = 210,
+                CreatedAt = DateTime.UtcNow
+            }
+        };
+
+        context.MediaItems.AddRange(media);
         context.SaveChanges();
     }
 

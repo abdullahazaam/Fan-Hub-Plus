@@ -51,6 +51,83 @@ export interface ContentFormData {
   releaseDate: string
 }
 
+// ─── Character Types ────────────────────────────────────────────────────────
+export interface Character {
+  id: number
+  categoryId: number
+  categoryName: string
+  name: string
+  fandomUniverse: string
+  roleTitle: string
+  bio: string
+  abilities: string
+  backstory: string
+  avatarUrl: string
+  bannerUrl: string
+  originUniverse: string
+  voiceActor: string
+  popularityScore: number
+  createdAt: string
+  updatedAt: string
+}
+
+export interface CharacterFormData {
+  categoryId: number
+  name: string
+  fandomUniverse: string
+  roleTitle: string
+  bio: string
+  abilities: string
+  backstory: string
+  avatarUrl: string
+  bannerUrl: string
+  originUniverse: string
+  voiceActor: string
+  popularityScore: number
+}
+
+// ─── Media Types ────────────────────────────────────────────────────────────
+export interface MediaItem {
+  id: number
+  categoryId: number
+  categoryName: string
+  title: string
+  fandomUniverse: string
+  mediaType: 'Video' | 'Audio' | string
+  mediaUrl: string
+  thumbnailUrl: string
+  description: string
+  tags: string
+  durationSeconds: number
+  averageRating: number
+  ratingsCount: number
+  userRating?: number | null
+  createdAt: string
+}
+
+export interface MediaFormData {
+  categoryId: number
+  title: string
+  fandomUniverse: string
+  mediaType: string
+  mediaUrl: string
+  thumbnailUrl: string
+  description: string
+  tags: string
+  durationSeconds: number
+}
+
+// ─── Bookmark Types ─────────────────────────────────────────────────────────
+export interface Bookmark {
+  id: number
+  itemType: 'Content' | 'Character' | 'Media' | string
+  itemId: number
+  itemTitle: string
+  itemSubtitle: string
+  itemImageUrl: string
+  createdAt: string
+}
+
 // ─── Auth & User Types ──────────────────────────────────────────────────────
 export interface AuthUser {
   userId: number

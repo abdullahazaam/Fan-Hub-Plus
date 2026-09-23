@@ -5,20 +5,58 @@ interface SearchBarProps {
   onSearchChange: (val: string) => void
   contentType: string
   onContentTypeChange: (val: string) => void
+  genre: string
+  onGenreChange: (val: string) => void
+  releaseYear: number | undefined
+  onReleaseYearChange: (val: number | undefined) => void
+  minPopularity: number | undefined
+  onMinPopularityChange: (val: number | undefined) => void
   sortBy: string
   onSortByChange: (val: string) => void
   resultsCount: number
+  onResetFilters: () => void
 }
+
+const POPULAR_GENRES = [
+  'All',
+  'Sci-Fi',
+  'Cyberpunk',
+  'Shonen',
+  'Animation',
+  'RPG',
+  'Worldbuilding',
+  'Sorcery',
+  'Soundtrack',
+  'Comics',
+  'Cosplay',
+]
+
+const YEARS = [2026, 2025, 2024, 2023, 2022, 2020]
 
 export const SearchBar: React.FC<SearchBarProps> = ({
   search,
   onSearchChange,
   contentType,
   onContentTypeChange,
+  genre,
+  onGenreChange,
+  releaseYear,
+  onReleaseYearChange,
+  minPopularity,
+  onMinPopularityChange,
   sortBy,
   onSortByChange,
   resultsCount,
+  onResetFilters,
 }) => {
+  const hasActiveFilters =
+    search.trim().length > 0 ||
+    contentType !== 'All' ||
+    genre !== 'All' ||
+    releaseYear !== undefined ||
+    minPopularity !== undefined ||
+    sortBy !== 'popular'
+
   return (
     <div className="search-control-bar">
       <div className="search-input-wrapper">
@@ -29,7 +67,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
         <input
           type="text"
           className="search-input"
-          placeholder="Search by title, fandom universe (e.g. Cyberpunk, Jujutsu), or tags..."
+          placeholder="Search by title, universe (Cyberpunk, Jujutsu...), or lore tags..."
           value={search}
           onChange={(e) => onSearchChange(e.target.value)}
         />
@@ -41,6 +79,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
       </div>
 
       <div className="filter-dropdowns">
+        {/* Content Type */}
         <div className="select-wrapper">
           <label htmlFor="filter-type">Type:</label>
           <select
@@ -50,12 +89,62 @@ export const SearchBar: React.FC<SearchBarProps> = ({
           >
             <option value="All">All Types</option>
             <option value="Article">Articles</option>
-            <option value="Video">Videos / Trailers</option>
-            <option value="Audio">Audio / OST</option>
+            <option value="Video">Videos</option>
+            <option value="Audio">Audio</option>
             <option value="Image">Cosplay / Images</option>
           </select>
         </div>
 
+        {/* Genre / Tag */}
+        <div className="select-wrapper">
+          <label htmlFor="filter-genre">Genre:</label>
+          <select
+            id="filter-genre"
+            value={genre}
+            onChange={(e) => onGenreChange(e.target.value)}
+          >
+            {POPULAR_GENRES.map((g) => (
+              <option key={g} value={g}>{g}</option>
+            ))}
+          </select>
+        </div>
+
+        {/* Release Year */}
+        <div className="select-wrapper">
+          <label htmlFor="filter-year">Year:</label>
+          <select
+            id="filter-year"
+            value={releaseYear ?? ''}
+            onChange={(e) => {
+              const val = e.target.value ? parseInt(e.target.value, 10) : undefined
+              onReleaseYearChange(val)
+            }}
+          >
+            <option value="">All Years</option>
+            {YEARS.map((y) => (
+              <option key={y} value={y}>{y}</option>
+            ))}
+          </select>
+        </div>
+
+        {/* Min Popularity */}
+        <div className="select-wrapper">
+          <label htmlFor="filter-pop">Min Rating:</label>
+          <select
+            id="filter-pop"
+            value={minPopularity ?? ''}
+            onChange={(e) => {
+              const val = e.target.value ? parseInt(e.target.value, 10) : undefined
+              onMinPopularityChange(val)
+            }}
+          >
+            <option value="">Any Score</option>
+            <option value="90">★ 90%+</option>
+            <option value="95">★ 95%+</option>
+          </select>
+        </div>
+
+        {/* Sort */}
         <div className="select-wrapper">
           <label htmlFor="filter-sort">Sort:</label>
           <select
@@ -69,8 +158,14 @@ export const SearchBar: React.FC<SearchBarProps> = ({
           </select>
         </div>
 
+        {hasActiveFilters && (
+          <button className="btn-filter-reset" onClick={onResetFilters} title="Reset all search filters">
+            Reset
+          </button>
+        )}
+
         <div className="results-badge">
-          <span>{resultsCount} {resultsCount === 1 ? 'item' : 'items'} found</span>
+          <span>{resultsCount} {resultsCount === 1 ? 'item' : 'items'}</span>
         </div>
       </div>
     </div>

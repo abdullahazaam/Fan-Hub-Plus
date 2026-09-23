@@ -6,11 +6,20 @@ interface ContentCardProps {
   item: ContentItem
   onSelect: (item: ContentItem) => void
   onEdit: (item: ContentItem) => void
+  isBookmarked?: boolean
+  onToggleBookmark?: (item: ContentItem) => void
 }
 
-export const ContentCard: React.FC<ContentCardProps> = ({ item, onSelect, onEdit }) => {
+export const ContentCard: React.FC<ContentCardProps> = ({
+  item,
+  onSelect,
+  onEdit,
+  isBookmarked = false,
+  onToggleBookmark,
+}) => {
   const { user } = useAuth()
   const isAdmin = user?.role === 'Admin'
+
   const getTypeColor = (type: string) => {
     switch (type.toLowerCase()) {
       case 'video': return 'badge-video'
@@ -50,6 +59,20 @@ export const ContentCard: React.FC<ContentCardProps> = ({ item, onSelect, onEdit
           </svg>
           <span>{item.popularityScore}%</span>
         </div>
+
+        {user && onToggleBookmark && (
+          <button
+            className={`btn-card-bookmark ${isBookmarked ? 'bookmarked' : ''}`}
+            onClick={(e) => {
+              e.stopPropagation()
+              onToggleBookmark(item)
+            }}
+            title={isBookmarked ? 'Remove Bookmark' : 'Save to Personal Archive'}
+            aria-label="Toggle bookmark"
+          >
+            {isBookmarked ? '★' : '☆'}
+          </button>
+        )}
       </div>
 
       <div className="card-body">

@@ -13,6 +13,10 @@ public class FanHubDbContext : DbContext
     public DbSet<ContentItem> ContentItems => Set<ContentItem>();
     public DbSet<User> Users => Set<User>();
     public DbSet<PasswordResetToken> PasswordResetTokens => Set<PasswordResetToken>();
+    public DbSet<Character> Characters => Set<Character>();
+    public DbSet<MediaItem> MediaItems => Set<MediaItem>();
+    public DbSet<MediaRating> MediaRatings => Set<MediaRating>();
+    public DbSet<UserBookmark> UserBookmarks => Set<UserBookmark>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -68,7 +72,6 @@ public class FanHubDbContext : DbContext
             entity.Property(u => u.AvatarUrl).HasMaxLength(1000);
             entity.Property(u => u.FavoriteCategory).HasMaxLength(100);
 
-            // Unique constraints — email and username must be unique across all users
             entity.HasIndex(u => u.NormalizedEmail).IsUnique();
             entity.HasIndex(u => u.Username).IsUnique();
         });
@@ -77,7 +80,6 @@ public class FanHubDbContext : DbContext
         modelBuilder.Entity<PasswordResetToken>(entity =>
         {
             entity.HasKey(t => t.Id);
-            // Only the SHA-256 hash of the token is stored, never the raw value
             entity.Property(t => t.TokenHash).IsRequired().HasMaxLength(512);
             entity.Property(t => t.ExpiresAt).IsRequired();
             entity.Property(t => t.IsUsed).HasDefaultValue(false);
@@ -89,6 +91,91 @@ public class FanHubDbContext : DbContext
 
             entity.HasIndex(t => t.TokenHash);
             entity.HasIndex(t => t.UserId);
+        });
+
+        // Character Configuration
+        modelBuilder.Entity<Character>(entity =>
+        {
+            entity.HasKey(c => c.Id);
+            entity.Property(c => c.Name).IsRequired().HasMaxLength(150);
+            entity.Property(c => c.FandomUniverse).IsRequired().HasMaxLength(150);
+            entity.Property(c => c.RoleTitle).HasMaxLength(100);
+            entity.Property(c => c.Bio).HasMaxLength(2000);
+            entity.Property(c => c.Abilities).HasMaxLength(1000);
+            entity.Property(c => c.Backstory).HasMaxLength(4000);
+            entity.Property(c => c.AvatarUrl).HasMaxLength(1000);
+            entity.Property(c => c.BannerUrl).HasMaxLength(1000);
+            entity.Property(c => c.OriginUniverse).HasMaxLength(150);
+            entity.Property(c => c.VoiceActor).HasMaxLength(150);
+
+            entity.HasOne(c => c.Category)
+                  .WithMany()
+                  .HasForeignKey(c => c.CategoryId)
+                  .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasIndex(c => c.CategoryId);
+            entity.HasIndex(c => c.FandomUniverse);
+            entity.HasIndex(c => c.PopularityScore);
+        });
+
+        // MediaItem Configuration
+        modelBuilder.Entity<MediaItem>(entity =>
+        {
+            entity.HasKey(m => m.Id);
+            entity.Property(m => m.Title).IsRequired().HasMaxLength(250);
+            entity.Property(m => m.FandomUniverse).IsRequired().HasMaxLength(150);
+            entity.Property(m => m.MediaType).IsRequired().HasMaxLength(50);
+            entity.Property(m => m.MediaUrl).IsRequired().HasMaxLength(1500);
+            entity.Property(m => m.ThumbnailUrl).HasMaxLength(1000);
+            entity.Property(m => m.Description).HasMaxLength(1500);
+            entity.Property(m => m.Tags).HasMaxLength(500);
+
+            entity.HasOne(m => m.Category)
+                  .WithMany()
+                  .HasForeignKey(m => m.CategoryId)
+                  .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasIndex(m => m.CategoryId);
+            entity.HasIndex(m => m.MediaType);
+            entity.HasIndex(m => m.AverageRating);
+        });
+
+        // MediaRating Configuration
+        modelBuilder.Entity<MediaRating>(entity =>
+        {
+            entity.HasKey(r => r.Id);
+            entity.Property(r => r.Score).IsRequired();
+
+            entity.HasOne(r => r.MediaItem)
+                  .WithMany(m => m.Ratings)
+                  .HasForeignKey(r => r.MediaItemId)
+                  .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(r => r.User)
+                  .WithMany()
+                  .HasForeignKey(r => r.UserId)
+                  .OnDelete(DeleteBehavior.Cascade);
+
+            // One rating per user per media item
+            entity.HasIndex(r => new { r.MediaItemId, r.UserId }).IsUnique();
+        });
+
+        // UserBookmark Configuration
+        modelBuilder.Entity<UserBookmark>(entity =>
+        {
+            entity.HasKey(b => b.Id);
+            entity.Property(b => b.ItemType).IsRequired().HasMaxLength(50);
+            entity.Property(b => b.ItemTitle).IsRequired().HasMaxLength(250);
+            entity.Property(b => b.ItemSubtitle).HasMaxLength(200);
+            entity.Property(b => b.ItemImageUrl).HasMaxLength(1000);
+
+            entity.HasOne(b => b.User)
+                  .WithMany()
+                  .HasForeignKey(b => b.UserId)
+                  .OnDelete(DeleteBehavior.Cascade);
+
+            // A user can bookmark a specific item of a type only once
+            entity.HasIndex(b => new { b.UserId, b.ItemType, b.ItemId }).IsUnique();
         });
     }
 }

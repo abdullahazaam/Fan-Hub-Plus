@@ -33,8 +33,8 @@ if (string.IsNullOrWhiteSpace(jwtKey) || jwtKey.Length < 32)
     Console.Error.WriteLine(
         "STARTUP FAILED: JWT signing key is missing or too short (minimum 32 characters).\n" +
         "Set the FAN_HUB_JWT_KEY environment variable before starting the server.\n" +
-        "Example (PowerShell): $env:FAN_HUB_JWT_KEY='FanHubPlus-Dev-Secret-2026-Minimum32Chars!'\n" +
-        "Example (cmd):        set FAN_HUB_JWT_KEY=FanHubPlus-Dev-Secret-2026-Minimum32Chars!");
+        "Example (PowerShell): $env:FAN_HUB_JWT_KEY='<YourSecureRandomKeyAtLeast32Chars>'\n" +
+        "Example (cmd):        set FAN_HUB_JWT_KEY=<YourSecureRandomKeyAtLeast32Chars>");
     Console.ResetColor();
     return;
 }
@@ -194,6 +194,9 @@ app.MapGet("/api/content", async (
     string? search,
     int? categoryId,
     string? contentType,
+    string? genre,
+    int? releaseYear,
+    int? minPopularity,
     string? sortBy,
     int page = 1,
     int pageSize = 12) =>
@@ -218,6 +221,22 @@ app.MapGet("/api/content", async (
 
     if (!string.IsNullOrWhiteSpace(contentType) && !contentType.Equals("all", StringComparison.OrdinalIgnoreCase))
         query = query.Where(c => c.ContentType.ToLower() == contentType.ToLower());
+
+    if (!string.IsNullOrWhiteSpace(genre) && !genre.Equals("all", StringComparison.OrdinalIgnoreCase))
+    {
+        var genreTerm = genre.Trim().ToLower();
+        query = query.Where(c => c.Tags.ToLower().Contains(genreTerm));
+    }
+
+    if (releaseYear.HasValue && releaseYear.Value > 1900)
+    {
+        query = query.Where(c => c.ReleaseDate.Year == releaseYear.Value);
+    }
+
+    if (minPopularity.HasValue && minPopularity.Value > 0)
+    {
+        query = query.Where(c => c.PopularityScore >= minPopularity.Value);
+    }
 
     query = sortBy?.ToLower() switch
     {
@@ -634,6 +653,422 @@ app.MapPut("/api/profile", async (HttpContext ctx, FanHubDbContext db, UpdatePro
         user.Id, user.Email, user.Username, user.Role,
         user.DisplayName, user.Bio, user.AvatarUrl,
         user.FavoriteCategory, user.CreatedAt));
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// CHARACTERS: Public Browse & Detail
+// ─────────────────────────────────────────────────────────────────────────────
+app.MapGet("/api/characters", async (
+    FanHubDbContext db,
+    string? search,
+    int? categoryId,
+    string? sortBy,
+    int page = 1,
+    int pageSize = 12) =>
+{
+    if (page < 1) page = 1;
+    if (pageSize < 1 || pageSize > 50) pageSize = 12;
+
+    var query = db.Characters.Include(c => c.Category).AsQueryable();
+
+    if (!string.IsNullOrWhiteSpace(search))
+    {
+        var term = search.Trim().ToLower();
+        query = query.Where(c =>
+            c.Name.ToLower().Contains(term) ||
+            c.FandomUniverse.ToLower().Contains(term) ||
+            c.RoleTitle.ToLower().Contains(term) ||
+            c.Bio.ToLower().Contains(term) ||
+            c.Abilities.ToLower().Contains(term));
+    }
+
+    if (categoryId.HasValue && categoryId.Value > 0)
+        query = query.Where(c => c.CategoryId == categoryId.Value);
+
+    query = sortBy?.ToLower() switch
+    {
+        "name"   => query.OrderBy(c => c.Name),
+        "latest" => query.OrderByDescending(c => c.CreatedAt),
+        _        => query.OrderByDescending(c => c.PopularityScore)
+    };
+
+    var totalCount = await query.CountAsync();
+    var items = await query
+        .Skip((page - 1) * pageSize)
+        .Take(pageSize)
+        .Select(c => new CharacterDto(
+            c.Id, c.CategoryId, c.Category != null ? c.Category.Name : string.Empty,
+            c.Name, c.FandomUniverse, c.RoleTitle, c.Bio, c.Abilities, c.Backstory,
+            c.AvatarUrl, c.BannerUrl, c.OriginUniverse, c.VoiceActor, c.PopularityScore,
+            c.CreatedAt, c.UpdatedAt))
+        .ToListAsync();
+
+    return Results.Ok(new PagedResult<CharacterDto>(items, totalCount, page, pageSize));
+});
+
+app.MapGet("/api/characters/{id:int}", async (FanHubDbContext db, int id) =>
+{
+    var c = await db.Characters.Include(ch => ch.Category).FirstOrDefaultAsync(ch => ch.Id == id);
+    if (c is null) return Results.NotFound(new { message = $"Character {id} not found." });
+
+    return Results.Ok(new CharacterDto(
+        c.Id, c.CategoryId, c.Category?.Name ?? string.Empty,
+        c.Name, c.FandomUniverse, c.RoleTitle, c.Bio, c.Abilities, c.Backstory,
+        c.AvatarUrl, c.BannerUrl, c.OriginUniverse, c.VoiceActor, c.PopularityScore,
+        c.CreatedAt, c.UpdatedAt));
+});
+
+// Admin Character CRUD
+app.MapPost("/api/characters", async (HttpContext ctx, FanHubDbContext db, UpsertCharacterDto dto) =>
+{
+    var (isAuth, _, role) = GetAuthInfo(ctx.User);
+    if (!isAuth) return Results.Unauthorized();
+    if (role != "Admin") return Results.Json(new { message = "Forbidden: Admin role required." }, statusCode: 403);
+
+    if (string.IsNullOrWhiteSpace(dto.Name))
+        return Results.BadRequest(new { message = "Character name is required." });
+
+    var character = new Character
+    {
+        CategoryId = dto.CategoryId,
+        Name = dto.Name.Trim(),
+        FandomUniverse = dto.FandomUniverse.Trim(),
+        RoleTitle = dto.RoleTitle.Trim(),
+        Bio = dto.Bio.Trim(),
+        Abilities = dto.Abilities.Trim(),
+        Backstory = dto.Backstory.Trim(),
+        AvatarUrl = string.IsNullOrWhiteSpace(dto.AvatarUrl) ? "https://images.unsplash.com/photo-1534447677768-be436bb09401?w=600&q=80" : dto.AvatarUrl.Trim(),
+        BannerUrl = string.IsNullOrWhiteSpace(dto.BannerUrl) ? "https://images.unsplash.com/photo-1578632767115-351597cf2477?w=1600&q=80" : dto.BannerUrl.Trim(),
+        OriginUniverse = dto.OriginUniverse.Trim(),
+        VoiceActor = dto.VoiceActor.Trim(),
+        PopularityScore = dto.PopularityScore > 0 ? dto.PopularityScore : 90,
+        CreatedAt = DateTime.UtcNow,
+        UpdatedAt = DateTime.UtcNow
+    };
+
+    db.Characters.Add(character);
+    await db.SaveChangesAsync();
+    await db.Entry(character).Reference(c => c.Category).LoadAsync();
+
+    return Results.Created($"/api/characters/{character.Id}", new CharacterDto(
+        character.Id, character.CategoryId, character.Category?.Name ?? string.Empty,
+        character.Name, character.FandomUniverse, character.RoleTitle, character.Bio,
+        character.Abilities, character.Backstory, character.AvatarUrl, character.BannerUrl,
+        character.OriginUniverse, character.VoiceActor, character.PopularityScore,
+        character.CreatedAt, character.UpdatedAt));
+});
+
+app.MapPut("/api/characters/{id:int}", async (HttpContext ctx, FanHubDbContext db, int id, UpsertCharacterDto dto) =>
+{
+    var (isAuth, _, role) = GetAuthInfo(ctx.User);
+    if (!isAuth) return Results.Unauthorized();
+    if (role != "Admin") return Results.Json(new { message = "Forbidden: Admin role required." }, statusCode: 403);
+
+    var character = await db.Characters.Include(c => c.Category).FirstOrDefaultAsync(c => c.Id == id);
+    if (character is null) return Results.NotFound(new { message = $"Character {id} not found." });
+
+    character.CategoryId = dto.CategoryId;
+    character.Name = dto.Name.Trim();
+    character.FandomUniverse = dto.FandomUniverse.Trim();
+    character.RoleTitle = dto.RoleTitle.Trim();
+    character.Bio = dto.Bio.Trim();
+    character.Abilities = dto.Abilities.Trim();
+    character.Backstory = dto.Backstory.Trim();
+    character.AvatarUrl = dto.AvatarUrl.Trim();
+    character.BannerUrl = dto.BannerUrl.Trim();
+    character.OriginUniverse = dto.OriginUniverse.Trim();
+    character.VoiceActor = dto.VoiceActor.Trim();
+    character.PopularityScore = dto.PopularityScore;
+    character.UpdatedAt = DateTime.UtcNow;
+
+    await db.SaveChangesAsync();
+    await db.Entry(character).Reference(c => c.Category).LoadAsync();
+
+    return Results.Ok(new CharacterDto(
+        character.Id, character.CategoryId, character.Category?.Name ?? string.Empty,
+        character.Name, character.FandomUniverse, character.RoleTitle, character.Bio,
+        character.Abilities, character.Backstory, character.AvatarUrl, character.BannerUrl,
+        character.OriginUniverse, character.VoiceActor, character.PopularityScore,
+        character.CreatedAt, character.UpdatedAt));
+});
+
+app.MapDelete("/api/characters/{id:int}", async (HttpContext ctx, FanHubDbContext db, int id) =>
+{
+    var (isAuth, _, role) = GetAuthInfo(ctx.User);
+    if (!isAuth) return Results.Unauthorized();
+    if (role != "Admin") return Results.Json(new { message = "Forbidden: Admin role required." }, statusCode: 403);
+
+    var character = await db.Characters.FindAsync(id);
+    if (character is null) return Results.NotFound(new { message = $"Character {id} not found." });
+
+    db.Characters.Remove(character);
+    await db.SaveChangesAsync();
+    return Results.NoContent();
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// MULTIMEDIA: Videos, Trailers, Audio, and User Ratings
+// ─────────────────────────────────────────────────────────────────────────────
+app.MapGet("/api/media", async (
+    HttpContext ctx,
+    FanHubDbContext db,
+    string? mediaType,
+    int? categoryId,
+    string? search,
+    int page = 1,
+    int pageSize = 12) =>
+{
+    if (page < 1) page = 1;
+    if (pageSize < 1 || pageSize > 50) pageSize = 12;
+
+    var (isAuth, currentUserId, _) = GetAuthInfo(ctx.User);
+
+    var query = db.MediaItems.Include(m => m.Category).Include(m => m.Ratings).AsQueryable();
+
+    if (!string.IsNullOrWhiteSpace(mediaType) && !mediaType.Equals("all", StringComparison.OrdinalIgnoreCase))
+        query = query.Where(m => m.MediaType.ToLower() == mediaType.ToLower());
+
+    if (categoryId.HasValue && categoryId.Value > 0)
+        query = query.Where(m => m.CategoryId == categoryId.Value);
+
+    if (!string.IsNullOrWhiteSpace(search))
+    {
+        var term = search.Trim().ToLower();
+        query = query.Where(m =>
+            m.Title.ToLower().Contains(term) ||
+            m.FandomUniverse.ToLower().Contains(term) ||
+            m.Tags.ToLower().Contains(term) ||
+            m.Description.ToLower().Contains(term));
+    }
+
+    var totalCount = await query.CountAsync();
+    var rawItems = await query
+        .OrderByDescending(m => m.AverageRating)
+        .ThenByDescending(m => m.Id)
+        .Skip((page - 1) * pageSize)
+        .Take(pageSize)
+        .ToListAsync();
+
+    var dtos = rawItems.Select(m =>
+    {
+        int? myRating = isAuth ? m.Ratings.FirstOrDefault(r => r.UserId == currentUserId)?.Score : null;
+        return new MediaItemDto(
+            m.Id, m.CategoryId, m.Category?.Name ?? string.Empty,
+            m.Title, m.FandomUniverse, m.MediaType, m.MediaUrl, m.ThumbnailUrl,
+            m.Description, m.Tags, m.DurationSeconds, m.AverageRating, m.RatingsCount,
+            myRating, m.CreatedAt);
+    }).ToList();
+
+    return Results.Ok(new PagedResult<MediaItemDto>(dtos, totalCount, page, pageSize));
+});
+
+// Admin Media CRUD
+app.MapPost("/api/media", async (HttpContext ctx, FanHubDbContext db, UpsertMediaItemDto dto) =>
+{
+    var (isAuth, _, role) = GetAuthInfo(ctx.User);
+    if (!isAuth) return Results.Unauthorized();
+    if (role != "Admin") return Results.Json(new { message = "Forbidden: Admin role required." }, statusCode: 403);
+
+    if (string.IsNullOrWhiteSpace(dto.Title) || string.IsNullOrWhiteSpace(dto.MediaUrl))
+        return Results.BadRequest(new { message = "Title and Media URL are required." });
+
+    var item = new MediaItem
+    {
+        CategoryId = dto.CategoryId,
+        Title = dto.Title.Trim(),
+        FandomUniverse = dto.FandomUniverse.Trim(),
+        MediaType = string.IsNullOrWhiteSpace(dto.MediaType) ? "Video" : dto.MediaType.Trim(),
+        MediaUrl = dto.MediaUrl.Trim(),
+        ThumbnailUrl = dto.ThumbnailUrl.Trim(),
+        Description = dto.Description.Trim(),
+        Tags = dto.Tags.Trim(),
+        DurationSeconds = dto.DurationSeconds,
+        AverageRating = 5.0,
+        RatingsCount = 1,
+        CreatedAt = DateTime.UtcNow
+    };
+
+    db.MediaItems.Add(item);
+    await db.SaveChangesAsync();
+    await db.Entry(item).Reference(m => m.Category).LoadAsync();
+
+    return Results.Created($"/api/media/{item.Id}", new MediaItemDto(
+        item.Id, item.CategoryId, item.Category?.Name ?? string.Empty,
+        item.Title, item.FandomUniverse, item.MediaType, item.MediaUrl,
+        item.ThumbnailUrl, item.Description, item.Tags, item.DurationSeconds,
+        item.AverageRating, item.RatingsCount, null, item.CreatedAt));
+});
+
+app.MapPut("/api/media/{id:int}", async (HttpContext ctx, FanHubDbContext db, int id, UpsertMediaItemDto dto) =>
+{
+    var (isAuth, _, role) = GetAuthInfo(ctx.User);
+    if (!isAuth) return Results.Unauthorized();
+    if (role != "Admin") return Results.Json(new { message = "Forbidden: Admin role required." }, statusCode: 403);
+
+    var item = await db.MediaItems.Include(m => m.Category).FirstOrDefaultAsync(m => m.Id == id);
+    if (item is null) return Results.NotFound(new { message = $"Media item {id} not found." });
+
+    item.CategoryId = dto.CategoryId;
+    item.Title = dto.Title.Trim();
+    item.FandomUniverse = dto.FandomUniverse.Trim();
+    item.MediaType = dto.MediaType.Trim();
+    item.MediaUrl = dto.MediaUrl.Trim();
+    item.ThumbnailUrl = dto.ThumbnailUrl.Trim();
+    item.Description = dto.Description.Trim();
+    item.Tags = dto.Tags.Trim();
+    item.DurationSeconds = dto.DurationSeconds;
+
+    await db.SaveChangesAsync();
+
+    return Results.Ok(new MediaItemDto(
+        item.Id, item.CategoryId, item.Category?.Name ?? string.Empty,
+        item.Title, item.FandomUniverse, item.MediaType, item.MediaUrl,
+        item.ThumbnailUrl, item.Description, item.Tags, item.DurationSeconds,
+        item.AverageRating, item.RatingsCount, null, item.CreatedAt));
+});
+
+app.MapDelete("/api/media/{id:int}", async (HttpContext ctx, FanHubDbContext db, int id) =>
+{
+    var (isAuth, _, role) = GetAuthInfo(ctx.User);
+    if (!isAuth) return Results.Unauthorized();
+    if (role != "Admin") return Results.Json(new { message = "Forbidden: Admin role required." }, statusCode: 403);
+
+    var item = await db.MediaItems.FindAsync(id);
+    if (item is null) return Results.NotFound(new { message = $"Media item {id} not found." });
+
+    db.MediaItems.Remove(item);
+    await db.SaveChangesAsync();
+    return Results.NoContent();
+});
+
+// Authenticated User Rating (1 to 5 stars)
+app.MapPost("/api/media/{id:int}/rate", async (HttpContext ctx, FanHubDbContext db, int id, RateMediaDto dto) =>
+{
+    var (isAuth, userId, _) = GetAuthInfo(ctx.User);
+    if (!isAuth) return Results.Unauthorized();
+
+    if (dto.Score < 1 || dto.Score > 5)
+        return Results.BadRequest(new { message = "Rating score must be between 1 and 5." });
+
+    var media = await db.MediaItems.Include(m => m.Ratings).FirstOrDefaultAsync(m => m.Id == id);
+    if (media is null) return Results.NotFound(new { message = $"Media item {id} not found." });
+
+    var existingRating = await db.MediaRatings.FirstOrDefaultAsync(r => r.MediaItemId == id && r.UserId == userId);
+    if (existingRating != null)
+    {
+        existingRating.Score = dto.Score;
+        existingRating.UpdatedAt = DateTime.UtcNow;
+    }
+    else
+    {
+        db.MediaRatings.Add(new MediaRating
+        {
+            MediaItemId = id,
+            UserId = userId,
+            Score = dto.Score,
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow
+        });
+    }
+
+    await db.SaveChangesAsync();
+
+    // Recalculate average rating
+    var allRatings = await db.MediaRatings.Where(r => r.MediaItemId == id).Select(r => r.Score).ToListAsync();
+    media.RatingsCount = allRatings.Count;
+    media.AverageRating = Math.Round(allRatings.Average(), 1);
+    await db.SaveChangesAsync();
+
+    return Results.Ok(new
+    {
+        mediaItemId = id,
+        userRating = dto.Score,
+        averageRating = media.AverageRating,
+        ratingsCount = media.RatingsCount
+    });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// USER BOOKMARKS: Personal Saved Items
+// ─────────────────────────────────────────────────────────────────────────────
+app.MapGet("/api/bookmarks", async (HttpContext ctx, FanHubDbContext db) =>
+{
+    var (isAuth, userId, _) = GetAuthInfo(ctx.User);
+    if (!isAuth) return Results.Unauthorized();
+
+    var bookmarks = await db.UserBookmarks
+        .Where(b => b.UserId == userId)
+        .OrderByDescending(b => b.CreatedAt)
+        .Select(b => new BookmarkDto(
+            b.Id, b.ItemType, b.ItemId, b.ItemTitle, b.ItemSubtitle, b.ItemImageUrl, b.CreatedAt))
+        .ToListAsync();
+
+    return Results.Ok(bookmarks);
+});
+
+app.MapPost("/api/bookmarks", async (HttpContext ctx, FanHubDbContext db, CreateBookmarkDto dto) =>
+{
+    var (isAuth, userId, _) = GetAuthInfo(ctx.User);
+    if (!isAuth) return Results.Unauthorized();
+
+    if (string.IsNullOrWhiteSpace(dto.ItemType) || dto.ItemId <= 0)
+        return Results.BadRequest(new { message = "ItemType and valid ItemId are required." });
+
+    var existing = await db.UserBookmarks
+        .FirstOrDefaultAsync(b => b.UserId == userId && b.ItemType == dto.ItemType && b.ItemId == dto.ItemId);
+
+    if (existing != null)
+    {
+        return Results.Ok(new BookmarkDto(
+            existing.Id, existing.ItemType, existing.ItemId,
+            existing.ItemTitle, existing.ItemSubtitle, existing.ItemImageUrl, existing.CreatedAt));
+    }
+
+    var bookmark = new UserBookmark
+    {
+        UserId = userId,
+        ItemType = dto.ItemType.Trim(),
+        ItemId = dto.ItemId,
+        ItemTitle = dto.ItemTitle.Trim(),
+        ItemSubtitle = dto.ItemSubtitle.Trim(),
+        ItemImageUrl = dto.ItemImageUrl.Trim(),
+        CreatedAt = DateTime.UtcNow
+    };
+
+    db.UserBookmarks.Add(bookmark);
+    await db.SaveChangesAsync();
+
+    return Results.Created($"/api/bookmarks/{bookmark.Id}", new BookmarkDto(
+        bookmark.Id, bookmark.ItemType, bookmark.ItemId,
+        bookmark.ItemTitle, bookmark.ItemSubtitle, bookmark.ItemImageUrl, bookmark.CreatedAt));
+});
+
+app.MapDelete("/api/bookmarks/{id:int}", async (HttpContext ctx, FanHubDbContext db, int id) =>
+{
+    var (isAuth, userId, _) = GetAuthInfo(ctx.User);
+    if (!isAuth) return Results.Unauthorized();
+
+    var bookmark = await db.UserBookmarks.FirstOrDefaultAsync(b => b.Id == id && b.UserId == userId);
+    if (bookmark is null) return Results.NotFound(new { message = "Bookmark not found or belongs to another user." });
+
+    db.UserBookmarks.Remove(bookmark);
+    await db.SaveChangesAsync();
+    return Results.NoContent();
+});
+
+app.MapDelete("/api/bookmarks/item/{itemType}/{itemId:int}", async (HttpContext ctx, FanHubDbContext db, string itemType, int itemId) =>
+{
+    var (isAuth, userId, _) = GetAuthInfo(ctx.User);
+    if (!isAuth) return Results.Unauthorized();
+
+    var bookmark = await db.UserBookmarks
+        .FirstOrDefaultAsync(b => b.UserId == userId && b.ItemType.ToLower() == itemType.ToLower() && b.ItemId == itemId);
+
+    if (bookmark is null) return Results.NotFound();
+
+    db.UserBookmarks.Remove(bookmark);
+    await db.SaveChangesAsync();
+    return Results.NoContent();
 });
 
 
