@@ -1,6 +1,6 @@
 import React from 'react'
 import type { Character } from '../types'
-import { CloseIcon, StarIcon } from './Icons'
+import { CloseIcon, StarIcon, UserSilhouetteIcon } from './Icons'
 
 interface CharacterDetailModalProps {
   character: Character | null
@@ -17,6 +17,12 @@ export const CharacterDetailModal: React.FC<CharacterDetailModalProps> = ({
 }) => {
   if (!character) return null
 
+  const hasAvatar = Boolean(
+    character.avatarUrl &&
+    character.avatarUrl.trim() !== '' &&
+    !character.avatarUrl.includes('photo-1534447677768')
+  )
+
   return (
     <div className="modal-backdrop" onClick={onClose} role="dialog" aria-modal="true">
       <div className="detail-modal-container character-detail-container" onClick={(e) => e.stopPropagation()}>
@@ -29,10 +35,6 @@ export const CharacterDetailModal: React.FC<CharacterDetailModalProps> = ({
             src={character.bannerUrl || character.avatarUrl}
             alt={character.name}
             className="detail-hero-img"
-            onError={(e) => {
-              (e.target as HTMLImageElement).src =
-                'https://images.unsplash.com/photo-1578632767115-351597cf2477?w=1600&q=80'
-            }}
           />
           <div className="detail-hero-gradient" />
           <div className="detail-hero-badges">
@@ -45,14 +47,16 @@ export const CharacterDetailModal: React.FC<CharacterDetailModalProps> = ({
         <div className="detail-body-wrapper">
           <div className="character-header-profile">
             <div className="character-avatar-large">
-              <img
-                src={character.avatarUrl}
-                alt={character.name}
-                onError={(e) => {
-                  (e.target as HTMLImageElement).src =
-                    'https://images.unsplash.com/photo-1534447677768-be436bb09401?w=600&q=80'
-                }}
-              />
+              {hasAvatar ? (
+                <img
+                  src={character.avatarUrl}
+                  alt={character.name}
+                />
+              ) : (
+                <div className="dossier-modal-placeholder">
+                  <UserSilhouetteIcon size={38} />
+                </div>
+              )}
             </div>
             <div className="character-identity-info">
               <div className="detail-universe">{character.fandomUniverse}</div>

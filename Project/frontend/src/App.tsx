@@ -34,6 +34,25 @@ import type {
 } from './types'
 import './App.css'
 
+export const PROTOTYPE_CHARACTER: Character = {
+  id: -1,
+  categoryId: 2,
+  categoryName: 'Astral Nexus',
+  name: 'Vanguard Operative Valerius',
+  fandomUniverse: 'Astral Nexus // Original Prototype',
+  roleTitle: 'Nexus Gate Sentinel & Explorer',
+  bio: 'Experimental deep-space vanguard operative wearing pressurized obsidian composite armor and astral-harmonic sensory optics. Developed as an original prototype specimen to demonstrate multi-layer spatial perspective and portrait pop-out interaction.',
+  abilities: 'Dimensional breach navigation, inertial dampening, kinetic shield harmonic resonance, tactical telemetry scanning.',
+  backstory: 'Forged within the Astral Gate Complex, Valerius charts unexplored multiverse corridors between interconnected fandom sectors.',
+  avatarUrl: '/astral_vanguard_cutout.png',
+  bannerUrl: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=1600&q=80',
+  originUniverse: 'Astral Gate Complex (Original IP)',
+  voiceActor: 'Original Audio Synthesis',
+  popularityScore: 100,
+  createdAt: '2026-09-23T00:00:00Z',
+  updatedAt: '2026-09-23T00:00:00Z'
+}
+
 function AppContent() {
   const { user } = useAuth()
   const isAdmin = user?.role === 'Admin'
@@ -689,17 +708,19 @@ function AppContent() {
               </div>
             ) : characters.length > 0 ? (
               <div className="characters-grid">
-                {characters.map((char) => (
+                {[PROTOTYPE_CHARACTER, ...characters].map((char) => (
                   <CharacterCard
                     key={char.id}
                     character={char}
+                    isPrototype={char.id === -1}
                     onSelect={(sel) => setSelectedCharacter(sel)}
                     onEdit={(edit) => {
+                      if (edit.id === -1) return
                       setCharToEdit(edit)
                       setIsAdminCharModalOpen(true)
                     }}
-                    isBookmarked={isItemBookmarked('Character', char.id)}
-                    onToggleBookmark={handleToggleCharacterBookmark}
+                    isBookmarked={char.id !== -1 && isItemBookmarked('Character', char.id)}
+                    onToggleBookmark={char.id !== -1 ? handleToggleCharacterBookmark : undefined}
                   />
                 ))}
               </div>
