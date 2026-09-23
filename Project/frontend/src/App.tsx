@@ -1,17 +1,23 @@
 import { useEffect, useState } from 'react'
 import * as api from './api'
 import { AdminCharacterModal } from './components/AdminCharacterModal'
+import { AdminConsole } from './components/AdminConsole'
 import { AdminContentModal } from './components/AdminContentModal'
 import { AdminMediaModal } from './components/AdminMediaModal'
 import { AuthModal } from './components/AuthModal'
 import { CategoryPills } from './components/CategoryPills'
 import { CharacterCard } from './components/CharacterCard'
 import { CharacterDetailModal } from './components/CharacterDetailModal'
+import { CharacterSpotlight } from './components/CharacterSpotlight'
+import { ConceptHighlights } from './components/ConceptHighlights'
 import { ContentCard } from './components/ContentCard'
 import { ContentDetailModal } from './components/ContentDetailModal'
 import { DashboardModal } from './components/DashboardModal'
+import { FeaturedStory } from './components/FeaturedStory'
 import { MediaCard } from './components/MediaCard'
+import { MediaRail } from './components/MediaRail'
 import { Navbar } from './components/Navbar'
+import { NexusGateHero } from './components/NexusGateHero'
 import { ProfileModal } from './components/ProfileModal'
 import { SearchBar } from './components/SearchBar'
 import { AuthProvider, useAuth } from './context/AuthContext'
@@ -31,12 +37,11 @@ function AppContent() {
   const { user } = useAuth()
   const isAdmin = user?.role === 'Admin'
 
-  // System Health
-  const [apiStatus, setApiStatus] = useState<'online' | 'offline' | 'loading'>('loading')
-  const [dbStatus, setDbStatus] = useState<string>('SQL Server')
+  // Theme state: 'dark' or 'light'
+  const [theme, setTheme] = useState<'dark' | 'light'>('dark')
 
-  // Top Section Navigation Tab: 'catalog' | 'characters' | 'media'
-  const [activeTab, setActiveTab] = useState<'catalog' | 'characters' | 'media'>('catalog')
+  // Top navigation view: 'home' | 'explore' | 'characters' | 'media' | 'admin'
+  const [currentView, setCurrentView] = useState<'home' | 'explore' | 'characters' | 'media' | 'admin'>('home')
 
   // Global Categories
   const [categories, setCategories] = useState<Category[]>([])
@@ -65,7 +70,7 @@ function AppContent() {
   const [loading, setLoading] = useState<boolean>(true)
   const [error, setError] = useState<string | null>(null)
 
-  // Shared Filters
+  // Filters State
   const [search, setSearch] = useState<string>('')
   const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null)
   const [contentType, setContentType] = useState<string>('All')
@@ -94,17 +99,9 @@ function AppContent() {
     setTimeout(() => setToastMessage(null), 4000)
   }
 
-  // Load Initial Health & Categories
+  // Load Categories on mount
   useEffect(() => {
     const initApp = async () => {
-      try {
-        const health = await api.getHealth()
-        setApiStatus(health.status.toLowerCase() === 'healthy' ? 'online' : 'offline')
-        if (health.database) setDbStatus(health.database)
-      } catch {
-        setApiStatus('offline')
-      }
-
       try {
         const cats = await api.getCategories()
         setCategories(cats)
@@ -133,7 +130,7 @@ function AppContent() {
     loadBookmarks()
   }, [user])
 
-  // Load Content (Articles / Chronicles)
+  // Load Content
   const loadContent = async () => {
     try {
       setLoading(true)
@@ -179,7 +176,7 @@ function AppContent() {
     }
   }
 
-  // Load Media Items
+  // Load Media
   const loadMedia = async () => {
     try {
       setLoading(true)
@@ -200,18 +197,22 @@ function AppContent() {
     }
   }
 
-  // Switch between tabs triggers respective load
+  // Fetch relevant content based on active view
   useEffect(() => {
-    if (activeTab === 'catalog') {
+    if (currentView === 'home') {
       loadContent()
-    } else if (activeTab === 'characters') {
       loadCharacters()
-    } else if (activeTab === 'media') {
+      loadMedia()
+    } else if (currentView === 'explore') {
+      loadContent()
+    } else if (currentView === 'characters') {
+      loadCharacters()
+    } else if (currentView === 'media') {
       loadMedia()
     }
-  }, [activeTab, search, selectedCategoryId, contentType, genre, releaseYear, minPopularity, sortBy, page, charPage, mediaPage, mediaFormatFilter])
+  }, [currentView, search, selectedCategoryId, contentType, genre, releaseYear, minPopularity, sortBy, page, charPage, mediaPage, mediaFormatFilter])
 
-  // Reset all filters
+  // Reset filters
   const handleResetFilters = () => {
     setSearch('')
     setSelectedCategoryId(null)
@@ -223,6 +224,11 @@ function AppContent() {
     setPage(1)
     setCharPage(1)
     setMediaPage(1)
+  }
+
+  // Toggle theme
+  const handleToggleTheme = () => {
+    setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'))
   }
 
   // Bookmarking helpers
@@ -239,7 +245,7 @@ function AppContent() {
     if (already) {
       await api.removeBookmarkByItem('Content', item.id)
       setBookmarks((prev) => prev.filter((b) => !(b.itemType.toLowerCase() === 'content' && b.itemId === item.id)))
-      showToast(`Removed "${item.title}" from saved archive.`)
+      showToast(`Removed "${item.title}" from saved items.`)
     } else {
       const added = await api.addBookmark({
         itemType: 'Content',
@@ -262,7 +268,7 @@ function AppContent() {
     if (already) {
       await api.removeBookmarkByItem('Character', char.id)
       setBookmarks((prev) => prev.filter((b) => !(b.itemType.toLowerCase() === 'character' && b.itemId === char.id)))
-      showToast(`Removed "${char.name}" from saved archive.`)
+      showToast(`Removed "${char.name}" from saved items.`)
     } else {
       const added = await api.addBookmark({
         itemType: 'Character',
@@ -285,7 +291,7 @@ function AppContent() {
     if (already) {
       await api.removeBookmarkByItem('Media', m.id)
       setBookmarks((prev) => prev.filter((b) => !(b.itemType.toLowerCase() === 'media' && b.itemId === m.id)))
-      showToast(`Removed "${m.title}" from saved archive.`)
+      showToast(`Removed "${m.title}" from saved items.`)
     } else {
       const added = await api.addBookmark({
         itemType: 'Media',
@@ -321,7 +327,7 @@ function AppContent() {
         showToast('Could not load character.')
       }
     } else {
-      setActiveTab('media')
+      setCurrentView('media')
     }
   }
 
@@ -404,56 +410,29 @@ function AppContent() {
     showToast(`Rated ${userScore} stars! (Average: ${avg.toFixed(1)})`)
   }
 
-  // Active items count for search bar
-  const currentCount =
-    activeTab === 'catalog' ? totalCount : activeTab === 'characters' ? totalCharacters : totalMedia
+  // Editorial Breakdown for Homepage:
+  // 1 large featured story, 1 asymmetric character spotlight, horizontal media rail, compact remaining grid
+  const featuredItem = contentItems.length > 0 ? contentItems[0] : null
+  const spotlightCharacter = characters.length > 0 ? characters[0] : null
+  const compactContentItems = contentItems.slice(1, 7)
 
-  // Pagination helper
-  const totalPages = Math.ceil(
-    (activeTab === 'catalog'
-      ? totalCount
-      : activeTab === 'characters'
-      ? totalCharacters
-      : totalMedia) / pageSize
-  )
-  const currentPage = activeTab === 'catalog' ? page : activeTab === 'characters' ? charPage : mediaPage
-  const setCurrentPage = (p: number) => {
-    if (activeTab === 'catalog') setPage(p)
-    else if (activeTab === 'characters') setCharPage(p)
-    else setMediaPage(p)
-  }
+  // Pagination for Explore section
+  const totalExplorePages = Math.ceil(totalCount / pageSize)
 
   return (
-    <div className="portal-universe">
-      <div className="astral-ambient-bg" aria-hidden="true" />
-
-      {/* Top Navbar */}
+    <div className={`portal-universe theme-${theme}`}>
+      {/* Top Cinematic Navbar */}
       <Navbar
-        apiStatus={apiStatus}
-        dbStatus={dbStatus}
-        activeTab={activeTab}
-        onTabChange={(t) => {
-          setActiveTab(t)
-          setPage(1)
-          setCharPage(1)
-          setMediaPage(1)
-        }}
+        currentView={currentView}
+        onNavigate={setCurrentView}
+        theme={theme}
+        onToggleTheme={handleToggleTheme}
         bookmarkCount={bookmarks.length}
-        onOpenCreate={() => {
-          if (activeTab === 'catalog') {
-            setItemToEdit(null)
-            setIsAdminModalOpen(true)
-          } else if (activeTab === 'characters') {
-            setCharToEdit(null)
-            setIsAdminCharModalOpen(true)
-          } else {
-            setMediaToEdit(null)
-            setIsAdminMediaModalOpen(true)
-          }
-        }}
         onOpenAuth={() => setIsAuthModalOpen(true)}
         onOpenProfile={() => setIsProfileModalOpen(true)}
         onOpenDashboard={() => setIsDashboardModalOpen(true)}
+        searchQuery={search}
+        onSearchChange={setSearch}
       />
 
       {/* Toast Alert */}
@@ -464,245 +443,385 @@ function AppContent() {
         </div>
       )}
 
-      {/* Hero Section */}
-      <section className="portal-hero">
-        <div className="hero-content">
-          <div className="hero-eyebrow">
-            <span className="eyebrow-spark">✦</span>
-            <span>Obsidian & Crimson Nexus • 8 Fandom Universes</span>
-          </div>
-          <h1 className="hero-headline">
-            Explore The <span className="gradient-text">Fandom Multiverse</span>
-          </h1>
-          <p className="hero-subtext">
-            Curated chronicles, character dossiers, high-definition trailers, and original soundtrack streams
-            spanning Anime, Gaming, Movies, TV Shows, K-Pop, Comics, Manga, and Cosplay.
-          </p>
-        </div>
-      </section>
+      {/* =====================================================================
+          1. HOMEPAGE VIEW: Concept Art Layout
+          ===================================================================== */}
+      {currentView === 'home' && (
+        <main className="homepage-main">
+          {/* Full-viewport Hero with Left Headline & Nexus Gate Visual Slot */}
+          <NexusGateHero
+            categories={categories}
+            selectedCategorySlug={null}
+            onSelectCategory={(slug) => {
+              const cat = categories.find((c) => c.slug === slug)
+              if (cat) setSelectedCategoryId(cat.id)
+              setCurrentView('explore')
+            }}
+            onExploreClick={() => setCurrentView('explore')}
+            onWatchPreviewClick={() => setCurrentView('media')}
+            theme={theme}
+          />
 
-      {/* Main Content Area */}
-      <main className="portal-main-container">
-        {/* Category Navigation Strip */}
-        <CategoryPills
-          categories={categories}
-          selectedCategoryId={selectedCategoryId}
-          onSelectCategory={(id) => {
-            setSelectedCategoryId(id)
-            setPage(1)
-            setCharPage(1)
-            setMediaPage(1)
-          }}
-          totalCount={currentCount}
-        />
+          {/* 3 Lower Highlights matching concept image */}
+          <ConceptHighlights
+            onExploreWorld={() => setCurrentView('explore')}
+            onExploreCharacters={() => setCurrentView('characters')}
+            onExploreMedia={() => setCurrentView('media')}
+          />
 
-        {/* Search, Filter, & Sort Bar */}
-        <SearchBar
-          search={search}
-          onSearchChange={(v) => {
-            setSearch(v)
-            setPage(1)
-            setCharPage(1)
-            setMediaPage(1)
-          }}
-          contentType={contentType}
-          onContentTypeChange={(t) => {
-            setContentType(t)
-            setPage(1)
-          }}
-          genre={genre}
-          onGenreChange={(g) => {
-            setGenre(g)
-            setPage(1)
-          }}
-          releaseYear={releaseYear}
-          onReleaseYearChange={(y) => {
-            setReleaseYear(y)
-            setPage(1)
-          }}
-          minPopularity={minPopularity}
-          onMinPopularityChange={(p) => {
-            setMinPopularity(p)
-            setPage(1)
-          }}
-          sortBy={sortBy}
-          onSortByChange={(s) => {
-            setSortBy(s)
-            setPage(1)
-            setCharPage(1)
-          }}
-          resultsCount={currentCount}
-          onResetFilters={handleResetFilters}
-        />
-
-        {/* Section View Router */}
-        <section className="catalog-section">
-          {/* Loading State */}
-          {loading && (
-            <div className="loading-container">
-              <div className="astral-spinner" />
-              <p className="loading-text">Synchronizing with SQL Server Database...</p>
+          {/* Varied Editorial Layout Section */}
+          <section className="editorial-showcase-section">
+            <div className="section-divider-title">
+              <span className="eyebrow-spark">✦</span>
+              <h2>EDITORIAL SPOTLIGHTS</h2>
+              <span className="divider-line" />
             </div>
-          )}
 
-          {/* Error State */}
-          {error && !loading && (
-            <div className="catalog-error-box">
-              <div className="error-title">Database Query Interruption</div>
-              <p className="error-desc">{error}</p>
-              <button
-                className="btn-retry"
-                onClick={() => {
-                  if (activeTab === 'catalog') loadContent()
-                  else if (activeTab === 'characters') loadCharacters()
-                  else loadMedia()
-                }}
-              >
-                Retry Query
-              </button>
-            </div>
-          )}
-
-          {/* Empty State */}
-          {!loading && !error && currentCount === 0 && (
-            <div className="empty-catalog-state">
-              <div className="empty-icon">🪐</div>
-              <h3>No items discovered in this universe</h3>
-              <p>Try broadening your query, adjusting the filters, or resetting to explore all items.</p>
-              <button className="btn-reset-filters" onClick={handleResetFilters}>
-                Reset All Filters
-              </button>
-            </div>
-          )}
-
-          {/* 1. ARTICLES & CHRONICLES VIEW */}
-          {!loading && !error && activeTab === 'catalog' && contentItems.length > 0 && (
-            <div className="content-grid">
-              {contentItems.map((item) => (
-                <ContentCard
-                  key={item.id}
-                  item={item}
-                  onSelect={(sel) => setSelectedDetailItem(sel)}
-                  onEdit={(edit) => {
-                    setItemToEdit(edit)
-                    setIsAdminModalOpen(true)
-                  }}
-                  isBookmarked={isItemBookmarked('Content', item.id)}
+            {/* 1. Large Featured Story */}
+            {featuredItem && (
+              <div className="editorial-story-container">
+                <FeaturedStory
+                  item={featuredItem}
+                  onSelect={(item) => setSelectedDetailItem(item)}
                   onToggleBookmark={handleToggleContentBookmark}
+                  isBookmarked={isItemBookmarked('Content', featuredItem.id)}
                 />
-              ))}
-            </div>
-          )}
-
-          {/* 2. CHARACTER DOSSIERS VIEW */}
-          {!loading && !error && activeTab === 'characters' && characters.length > 0 && (
-            <div className="characters-grid">
-              {characters.map((char) => (
-                <CharacterCard
-                  key={char.id}
-                  character={char}
-                  onSelect={(sel) => setSelectedCharacter(sel)}
-                  onEdit={(edit) => {
-                    setCharToEdit(edit)
-                    setIsAdminCharModalOpen(true)
-                  }}
-                  isBookmarked={isItemBookmarked('Character', char.id)}
-                  onToggleBookmark={handleToggleCharacterBookmark}
-                />
-              ))}
-            </div>
-          )}
-
-          {/* 3. MULTIMEDIA & STREAMS VIEW */}
-          {!loading && !error && activeTab === 'media' && (
-            <div className="media-section-container">
-              <div className="media-format-selector">
-                <button
-                  className={`btn-media-filter ${mediaFormatFilter === 'All' ? 'active' : ''}`}
-                  onClick={() => setMediaFormatFilter('All')}
-                >
-                  All Streams
-                </button>
-                <button
-                  className={`btn-media-filter ${mediaFormatFilter === 'Video' ? 'active' : ''}`}
-                  onClick={() => setMediaFormatFilter('Video')}
-                >
-                  ▶ Videos & Trailers
-                </button>
-                <button
-                  className={`btn-media-filter ${mediaFormatFilter === 'Audio' ? 'active' : ''}`}
-                  onClick={() => setMediaFormatFilter('Audio')}
-                >
-                  ♫ Audio & Soundtracks
-                </button>
               </div>
+            )}
 
-              {mediaItems.length > 0 ? (
-                <div className="media-grid">
-                  {mediaItems.map((m) => (
-                    <MediaCard
-                      key={m.id}
-                      item={m}
+            {/* 2. Asymmetric Character Spotlight & Secondary Feature */}
+            {spotlightCharacter && (
+              <div className="editorial-spotlight-container">
+                <CharacterSpotlight
+                  character={spotlightCharacter}
+                  onSelect={(char) => setSelectedCharacter(char)}
+                  onToggleBookmark={handleToggleCharacterBookmark}
+                  isBookmarked={isItemBookmarked('Character', spotlightCharacter.id)}
+                />
+              </div>
+            )}
+
+            {/* 3. Horizontal Media Rail */}
+            {mediaItems.length > 0 && (
+              <MediaRail
+                items={mediaItems}
+                onSelectMedia={() => setCurrentView('media')}
+                onToggleBookmark={handleToggleMediaBookmark}
+                isBookmarked={(id) => isItemBookmarked('Media', id)}
+              />
+            )}
+
+            {/* 4. Compact Content Grid for remaining stories */}
+            {compactContentItems.length > 0 && (
+              <div className="compact-showcase-container">
+                <div className="compact-header">
+                  <h3>More Multiverse Chronicles</h3>
+                  <button className="btn-view-all-explore" onClick={() => setCurrentView('explore')}>
+                    Explore All Chronicles →
+                  </button>
+                </div>
+                <div className="content-grid compact-grid">
+                  {compactContentItems.map((item) => (
+                    <ContentCard
+                      key={item.id}
+                      item={item}
+                      onSelect={(sel) => setSelectedDetailItem(sel)}
                       onEdit={(edit) => {
-                        setMediaToEdit(edit)
-                        setIsAdminMediaModalOpen(true)
+                        setItemToEdit(edit)
+                        setIsAdminModalOpen(true)
                       }}
-                      onDelete={handleDeleteMedia}
-                      isBookmarked={isItemBookmarked('Media', m.id)}
-                      onToggleBookmark={handleToggleMediaBookmark}
-                      onRatingUpdated={handleRatingUpdated}
+                      isBookmarked={isItemBookmarked('Content', item.id)}
+                      onToggleBookmark={handleToggleContentBookmark}
                     />
                   ))}
                 </div>
-              ) : (
-                <div className="empty-catalog-state">
-                  <div className="empty-icon">🎬</div>
-                  <h3>No media streams found</h3>
-                  <p>Try switching the media filter or selecting another category.</p>
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* Pagination Controls */}
-          {!loading && !error && totalPages > 1 && (
-            <div className="pagination-bar">
-              <button
-                className="btn-page-nav"
-                disabled={currentPage <= 1}
-                onClick={() => setCurrentPage(currentPage - 1)}
-              >
-                ← Previous
-              </button>
-              <div className="page-indicator">
-                Page <strong>{currentPage}</strong> of <strong>{totalPages}</strong>
               </div>
-              <button
-                className="btn-page-nav"
-                disabled={currentPage >= totalPages}
-                onClick={() => setCurrentPage(currentPage + 1)}
-              >
-                Next →
-              </button>
-            </div>
-          )}
-        </section>
-      </main>
+            )}
+          </section>
+        </main>
+      )}
+
+      {/* =====================================================================
+          2. DEDICATED EXPLORE VIEW (Moved filters and catalog)
+          ===================================================================== */}
+      {currentView === 'explore' && (
+        <main className="explore-page-main">
+          <div className="explore-hero-strip">
+            <h1 className="explore-title">Multiverse Chronicle Explorer</h1>
+            <p className="explore-subtitle">
+              Filter by realm, genre, release timeline, and popularity rating.
+            </p>
+          </div>
+
+          <CategoryPills
+            categories={categories}
+            selectedCategoryId={selectedCategoryId}
+            onSelectCategory={(id) => {
+              setSelectedCategoryId(id)
+              setPage(1)
+            }}
+            totalCount={totalCount}
+          />
+
+          <SearchBar
+            search={search}
+            onSearchChange={(v) => {
+              setSearch(v)
+              setPage(1)
+            }}
+            contentType={contentType}
+            onContentTypeChange={(t) => {
+              setContentType(t)
+              setPage(1)
+            }}
+            genre={genre}
+            onGenreChange={(g) => {
+              setGenre(g)
+              setPage(1)
+            }}
+            releaseYear={releaseYear}
+            onReleaseYearChange={(y) => {
+              setReleaseYear(y)
+              setPage(1)
+            }}
+            minPopularity={minPopularity}
+            onMinPopularityChange={(p) => {
+              setMinPopularity(p)
+              setPage(1)
+            }}
+            sortBy={sortBy}
+            onSortByChange={(s) => {
+              setSortBy(s)
+              setPage(1)
+            }}
+            resultsCount={totalCount}
+            onResetFilters={handleResetFilters}
+          />
+
+          <section className="catalog-section">
+            {loading && (
+              <div className="loading-container">
+                <div className="astral-spinner" />
+                <p className="loading-text">Synchronizing catalog entries...</p>
+              </div>
+            )}
+
+            {error && !loading && (
+              <div className="catalog-error-box">
+                <div className="error-title">Database Query Interruption</div>
+                <p className="error-desc">{error}</p>
+                <button className="btn-retry" onClick={loadContent}>Retry Query</button>
+              </div>
+            )}
+
+            {!loading && !error && contentItems.length === 0 && (
+              <div className="empty-catalog-state">
+                <div className="empty-icon">🪐</div>
+                <h3>No items discovered in this universe</h3>
+                <p>Try broadening your query, adjusting the filters, or resetting to explore all items.</p>
+                <button className="btn-reset-filters" onClick={handleResetFilters}>
+                  Reset All Filters
+                </button>
+              </div>
+            )}
+
+            {!loading && !error && contentItems.length > 0 && (
+              <div className="content-grid">
+                {contentItems.map((item) => (
+                  <ContentCard
+                    key={item.id}
+                    item={item}
+                    onSelect={(sel) => setSelectedDetailItem(sel)}
+                    onEdit={(edit) => {
+                      setItemToEdit(edit)
+                      setIsAdminModalOpen(true)
+                    }}
+                    isBookmarked={isItemBookmarked('Content', item.id)}
+                    onToggleBookmark={handleToggleContentBookmark}
+                  />
+                ))}
+              </div>
+            )}
+
+            {/* Pagination */}
+            {!loading && !error && totalExplorePages > 1 && (
+              <div className="pagination-bar">
+                <button
+                  className="btn-page-nav"
+                  disabled={page <= 1}
+                  onClick={() => setPage(page - 1)}
+                >
+                  ← Previous
+                </button>
+                <div className="page-indicator">
+                  Page <strong>{page}</strong> of <strong>{totalExplorePages}</strong>
+                </div>
+                <button
+                  className="btn-page-nav"
+                  disabled={page >= totalExplorePages}
+                  onClick={() => setPage(page + 1)}
+                >
+                  Next →
+                </button>
+              </div>
+            )}
+          </section>
+        </main>
+      )}
+
+      {/* =====================================================================
+          3. CHARACTERS VIEW
+          ===================================================================== */}
+      {currentView === 'characters' && (
+        <main className="characters-page-main">
+          <div className="explore-hero-strip">
+            <h1 className="explore-title">Character Dossiers & Archives</h1>
+            <p className="explore-subtitle">
+              Detailed records of legends, sorcerers, anti-heroes, and iconic figures across 8 universes.
+            </p>
+          </div>
+
+          <section className="catalog-section">
+            {loading ? (
+              <div className="loading-container">
+                <div className="astral-spinner" />
+                <p className="loading-text">Loading character profiles...</p>
+              </div>
+            ) : characters.length > 0 ? (
+              <div className="characters-grid">
+                {characters.map((char) => (
+                  <CharacterCard
+                    key={char.id}
+                    character={char}
+                    onSelect={(sel) => setSelectedCharacter(sel)}
+                    onEdit={(edit) => {
+                      setCharToEdit(edit)
+                      setIsAdminCharModalOpen(true)
+                    }}
+                    isBookmarked={isItemBookmarked('Character', char.id)}
+                    onToggleBookmark={handleToggleCharacterBookmark}
+                  />
+                ))}
+              </div>
+            ) : (
+              <div className="empty-catalog-state">
+                <div className="empty-icon">👤</div>
+                <h3>No character profiles found</h3>
+              </div>
+            )}
+          </section>
+        </main>
+      )}
+
+      {/* =====================================================================
+          4. MULTIMEDIA VIEW
+          ===================================================================== */}
+      {currentView === 'media' && (
+        <main className="media-page-main">
+          <div className="explore-hero-strip">
+            <h1 className="explore-title">Audiovisual Multiverse Streams</h1>
+            <p className="explore-subtitle">
+              Embedded cinema trailers, gameplay teasers, and original soundtrack streams.
+            </p>
+          </div>
+
+          <div className="media-format-selector" style={{ maxWidth: '1280px', margin: '0 auto 1.5rem', padding: '0 1.5rem' }}>
+            <button
+              className={`btn-media-filter ${mediaFormatFilter === 'All' ? 'active' : ''}`}
+              onClick={() => setMediaFormatFilter('All')}
+            >
+              All Streams
+            </button>
+            <button
+              className={`btn-media-filter ${mediaFormatFilter === 'Video' ? 'active' : ''}`}
+              onClick={() => setMediaFormatFilter('Video')}
+            >
+              ▶ Videos & Trailers
+            </button>
+            <button
+              className={`btn-media-filter ${mediaFormatFilter === 'Audio' ? 'active' : ''}`}
+              onClick={() => setMediaFormatFilter('Audio')}
+            >
+              ♫ Audio & Soundtracks
+            </button>
+          </div>
+
+          <section className="catalog-section">
+            {loading ? (
+              <div className="loading-container">
+                <div className="astral-spinner" />
+                <p className="loading-text">Loading media streams...</p>
+              </div>
+            ) : mediaItems.length > 0 ? (
+              <div className="media-grid">
+                {mediaItems.map((m) => (
+                  <MediaCard
+                    key={m.id}
+                    item={m}
+                    onEdit={(edit) => {
+                      setMediaToEdit(edit)
+                      setIsAdminMediaModalOpen(true)
+                    }}
+                    onDelete={handleDeleteMedia}
+                    isBookmarked={isItemBookmarked('Media', m.id)}
+                    onToggleBookmark={handleToggleMediaBookmark}
+                    onRatingUpdated={handleRatingUpdated}
+                  />
+                ))}
+              </div>
+            ) : (
+              <div className="empty-catalog-state">
+                <div className="empty-icon">🎬</div>
+                <h3>No media streams available</h3>
+              </div>
+            )}
+          </section>
+        </main>
+      )}
+
+      {/* =====================================================================
+          5. ADMIN CONSOLE VIEW (Dedicated Admin Center)
+          ===================================================================== */}
+      {currentView === 'admin' && isAdmin && (
+        <main className="admin-page-main">
+          <AdminConsole
+            onOpenCreateContent={() => {
+              setItemToEdit(null)
+              setIsAdminModalOpen(true)
+            }}
+            onOpenCreateCharacter={() => {
+              setCharToEdit(null)
+              setIsAdminCharModalOpen(true)
+            }}
+            onOpenCreateMedia={() => {
+              setMediaToEdit(null)
+              setIsAdminMediaModalOpen(true)
+            }}
+            totalContent={totalCount}
+            totalCharacters={totalCharacters}
+            totalMedia={totalMedia}
+          />
+        </main>
+      )}
 
       {/* Footer */}
       <footer className="portal-footer">
         <div className="footer-content">
           <div className="footer-meta">
-            <span className="footer-brand">Fan Hub Plus</span>
-            <span className="footer-sub">NN-Zynex End-to-End Web Solutions</span>
+            <span className="footer-brand">FAN HUB PLUS /</span>
+            <span className="footer-sub">Eight Worlds. One Universe.</span>
           </div>
-          <div className="footer-status">
-            <span>Powered by ASP.NET Core Web API, EF Core & SQL Server</span>
+          <div className="footer-links-row">
+            <button onClick={() => setCurrentView('home')}>Home</button>
+            <button onClick={() => setCurrentView('explore')}>Explore</button>
+            <button onClick={() => setCurrentView('characters')}>Characters</button>
+            <button onClick={() => setCurrentView('media')}>Media</button>
+            {isAdmin && <button onClick={() => setCurrentView('admin')}>Admin Console</button>}
           </div>
         </div>
       </footer>
 
-      {/* Content Detail Modal */}
+      {/* Modals */}
       <ContentDetailModal
         item={selectedDetailItem}
         onClose={() => setSelectedDetailItem(null)}
@@ -712,7 +831,6 @@ function AppContent() {
         }}
       />
 
-      {/* Character Detail Modal */}
       <CharacterDetailModal
         character={selectedCharacter}
         onClose={() => setSelectedCharacter(null)}
@@ -723,7 +841,6 @@ function AppContent() {
         isAdmin={isAdmin}
       />
 
-      {/* Admin Content Modal */}
       <AdminContentModal
         isOpen={isAdminModalOpen}
         onClose={() => setIsAdminModalOpen(false)}
@@ -733,7 +850,6 @@ function AppContent() {
         editItem={itemToEdit}
       />
 
-      {/* Admin Character Modal */}
       <AdminCharacterModal
         isOpen={isAdminCharModalOpen}
         onClose={() => setIsAdminCharModalOpen(false)}
@@ -743,7 +859,6 @@ function AppContent() {
         editCharacter={charToEdit}
       />
 
-      {/* Admin Media Modal */}
       <AdminMediaModal
         isOpen={isAdminMediaModalOpen}
         onClose={() => setIsAdminMediaModalOpen(false)}
@@ -752,7 +867,6 @@ function AppContent() {
         editItem={mediaToEdit}
       />
 
-      {/* Personal Dashboard Modal */}
       <DashboardModal
         isOpen={isDashboardModalOpen}
         onClose={() => setIsDashboardModalOpen(false)}
@@ -761,13 +875,11 @@ function AppContent() {
         onOpenItem={handleOpenBookmarkedItem}
       />
 
-      {/* Auth Modal */}
       <AuthModal
         isOpen={isAuthModalOpen}
         onClose={() => setIsAuthModalOpen(false)}
       />
 
-      {/* Profile Modal */}
       <ProfileModal
         isOpen={isProfileModalOpen}
         onClose={() => setIsProfileModalOpen(false)}

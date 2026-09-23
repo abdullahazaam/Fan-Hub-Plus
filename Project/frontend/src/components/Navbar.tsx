@@ -1,132 +1,201 @@
+import React, { useState } from 'react'
 import { useAuth } from '../context/AuthContext'
 
 interface NavbarProps {
-  apiStatus: 'online' | 'offline' | 'loading'
-  dbStatus: string
-  activeTab: 'catalog' | 'characters' | 'media'
-  onTabChange: (tab: 'catalog' | 'characters' | 'media') => void
+  currentView: 'home' | 'explore' | 'characters' | 'media' | 'admin'
+  onNavigate: (view: 'home' | 'explore' | 'characters' | 'media' | 'admin') => void
+  theme: 'dark' | 'light'
+  onToggleTheme: () => void
   bookmarkCount: number
-  onOpenCreate: () => void
   onOpenAuth: () => void
   onOpenProfile: () => void
   onOpenDashboard: () => void
+  searchQuery: string
+  onSearchChange: (q: string) => void
 }
 
-export function Navbar({
-  apiStatus,
-  dbStatus,
-  activeTab,
-  onTabChange,
+export const Navbar: React.FC<NavbarProps> = ({
+  currentView,
+  onNavigate,
+  theme,
+  onToggleTheme,
   bookmarkCount,
-  onOpenCreate,
   onOpenAuth,
   onOpenProfile,
   onOpenDashboard,
-}: NavbarProps) {
+  searchQuery,
+  onSearchChange,
+}) => {
   const { user, logout } = useAuth()
+  const isAdmin = user?.role === 'Admin'
+  const [showSearchInput, setShowSearchInput] = useState(false)
 
   return (
-    <nav className="nexus-navbar" role="navigation" aria-label="Main navigation">
-      <div className="navbar-left">
-        <div className="navbar-brand" onClick={() => onTabChange('catalog')} style={{ cursor: 'pointer' }}>
-          <span className="brand-hex">⬡</span>
-          <span className="brand-title">Fan Hub Plus</span>
-          <span className="brand-divider">|</span>
-          <span className="brand-sub">Fandom Multiverse</span>
+    <header className="cinematic-header" role="banner">
+      <div className="header-container">
+        {/* Brand / Logo */}
+        <div
+          className="brand-link"
+          onClick={() => onNavigate('home')}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') onNavigate('home')
+          }}
+          aria-label="Fan Hub Plus Home"
+        >
+          <span className="brand-text">FAN HUB PLUS</span>
+          <span className="brand-slash">/</span>
         </div>
 
-        {/* Section Navigation Tabs */}
-        <div className="nav-section-tabs">
+        {/* Primary Navigation Links */}
+        <nav className="primary-nav" role="navigation" aria-label="Main Navigation">
           <button
-            className={`nav-tab-btn ${activeTab === 'catalog' ? 'active' : ''}`}
-            onClick={() => onTabChange('catalog')}
+            className={`nav-link-btn ${currentView === 'home' ? 'active' : ''}`}
+            onClick={() => onNavigate('home')}
           >
-            Chronicles & Articles
+            Home
           </button>
           <button
-            className={`nav-tab-btn ${activeTab === 'characters' ? 'active' : ''}`}
-            onClick={() => onTabChange('characters')}
+            className={`nav-link-btn ${currentView === 'explore' ? 'active' : ''}`}
+            onClick={() => onNavigate('explore')}
           >
-            Character Dossiers
+            Explore
           </button>
           <button
-            className={`nav-tab-btn ${activeTab === 'media' ? 'active' : ''}`}
-            onClick={() => onTabChange('media')}
+            className={`nav-link-btn ${currentView === 'characters' ? 'active' : ''}`}
+            onClick={() => onNavigate('characters')}
           >
-            Multimedia & Streams
+            Characters
           </button>
-        </div>
-      </div>
+          <button
+            className={`nav-link-btn ${currentView === 'media' ? 'active' : ''}`}
+            onClick={() => onNavigate('media')}
+          >
+            Media
+          </button>
 
-      <div className="navbar-status-group">
-        <div className={`status-chip ${apiStatus}`} title={dbStatus}>
-          <span className="status-dot" />
-          <span className="status-label">
-            {apiStatus === 'loading' ? 'Connecting…' : apiStatus === 'online' ? 'API Live' : 'API Offline'}
-          </span>
-        </div>
-
-        {apiStatus === 'online' && (
-          <div className="status-chip online" title="SQL Server active">
-            <span className="status-dot" />
-            <span className="status-label">SQL Server</span>
-          </div>
-        )}
-      </div>
-
-      <div className="navbar-actions">
-        {user ? (
-          <>
-            {/* Bookmarks / Dashboard Link */}
+          {/* Admin link (Only visible to Admin) */}
+          {isAdmin && (
             <button
-              className="btn-nav-bookmarks"
-              onClick={onOpenDashboard}
-              title="Personal Saved Archives"
-              aria-label="View personal saved items"
+              className={`nav-link-btn admin-link ${currentView === 'admin' ? 'active' : ''}`}
+              onClick={() => onNavigate('admin')}
+              title="Admin Management Console"
             >
-              <span>★</span> Saved ({bookmarkCount})
+              Admin Tools
             </button>
+          )}
+        </nav>
 
-            {/* Admin-only: Create button */}
-            {user.role === 'Admin' && (
+        {/* Right Utility Group */}
+        <div className="header-right-group">
+          {/* Quick search input or toggle button */}
+          {showSearchInput ? (
+            <div className="nav-search-bar">
+              <input
+                type="text"
+                className="nav-search-input"
+                placeholder="Search multiverse..."
+                value={searchQuery}
+                onChange={(e) => {
+                  onSearchChange(e.target.value)
+                  if (currentView !== 'explore') onNavigate('explore')
+                }}
+                autoFocus
+                onBlur={() => {
+                  if (!searchQuery) setShowSearchInput(false)
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Escape') setShowSearchInput(false)
+                }}
+              />
               <button
-                className="btn-create-content"
-                onClick={onOpenCreate}
-                title="Admin: Create new entry"
-                aria-label="Create content (Admin)"
+                className="btn-nav-icon"
+                onClick={() => {
+                  setShowSearchInput(false)
+                  onSearchChange('')
+                }}
+                aria-label="Close search"
               >
-                <span>＋</span> Add Entry
+                ✕
               </button>
-            )}
-
-            {/* User identity pill */}
-            <div className="user-pill" role="group" aria-label="User menu">
-              <div className="user-pill-avatar">
-                {user.avatarUrl ? (
-                  <img src={user.avatarUrl} alt="" className="user-avatar-img" />
-                ) : (
-                  <span className="user-avatar-initial">
-                    {(user.displayName || user.username).charAt(0).toUpperCase()}
-                  </span>
-                )}
-              </div>
-              <span className="user-pill-name">{user.displayName || user.username}</span>
-              <span className={`role-badge ${user.role.toLowerCase()}`}>{user.role}</span>
             </div>
+          ) : (
+            <button
+              className="btn-nav-icon"
+              onClick={() => {
+                setShowSearchInput(true)
+                if (currentView !== 'explore') onNavigate('explore')
+              }}
+              title="Quick Search (Explore)"
+              aria-label="Open Search"
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+                <circle cx="11" cy="11" r="8" />
+                <line x1="21" y1="21" x2="16.65" y2="16.65" />
+              </svg>
+            </button>
+          )}
 
-            <button className="btn-nav-secondary" onClick={onOpenProfile} aria-label="Open profile">
-              Profile
-            </button>
-            <button className="btn-nav-signout" onClick={logout} aria-label="Sign out">
-              Sign Out
-            </button>
-          </>
-        ) : (
-          <button className="btn-nav-auth" onClick={onOpenAuth} aria-label="Sign in or register">
-            Sign In / Register
+          {/* Theme Switcher Toggle Pill */}
+          <button
+            className={`theme-toggle-pill ${theme === 'light' ? 'light-active' : 'dark-active'}`}
+            onClick={onToggleTheme}
+            title={`Switch to ${theme === 'dark' ? 'Light' : 'Dark'} Mode`}
+            aria-label={`Switch to ${theme === 'dark' ? 'Light' : 'Dark'} Mode`}
+          >
+            <span className="theme-toggle-knob">
+              {theme === 'dark' ? '●' : '☼'}
+            </span>
           </button>
-        )}
+
+          {/* Account Actions */}
+          {user ? (
+            <div className="user-nav-dropdown">
+              <button
+                className="btn-nav-saved"
+                onClick={onOpenDashboard}
+                title="Saved Items"
+                aria-label="View saved items"
+              >
+                ★ <span className="saved-badge">{bookmarkCount}</span>
+              </button>
+
+              <button
+                className="btn-nav-profile-pill"
+                onClick={onOpenProfile}
+                title="Open User Profile"
+              >
+                <div className="avatar-chip">
+                  {user.avatarUrl ? (
+                    <img src={user.avatarUrl} alt="" className="avatar-img-sm" />
+                  ) : (
+                    <span>{(user.displayName || user.username).charAt(0).toUpperCase()}</span>
+                  )}
+                </div>
+                <span className="username-sm">{user.displayName || user.username}</span>
+              </button>
+
+              <button
+                className="btn-nav-logout"
+                onClick={logout}
+                title="Sign Out"
+                aria-label="Sign out"
+              >
+                Sign out
+              </button>
+            </div>
+          ) : (
+            <button
+              className="btn-nav-signin"
+              onClick={onOpenAuth}
+              aria-label="Sign in"
+            >
+              Sign in
+            </button>
+          )}
+        </div>
       </div>
-    </nav>
+    </header>
   )
 }
