@@ -1,0 +1,14 @@
+.cinematic-image {
+  --art-sky:#332727;--art-night:#100f12;--art-front:#514947;--art-mid:#282629;--art-edge:#aa9381;
+  position:relative;display:block;overflow:hidden;
+}
+.theme-light .cinematic-image { --art-sky:#e9dfd0;--art-night:#aca08e;--art-front:#eee5d7;--art-mid:#c3b5a1;--art-edge:#fff3dc; }
+.cinematic-image>svg,.cinematic-image>img { position:absolute;inset:0;width:100%;height:100%;object-fit:cover; }
+.cinematic-image>img { opacity:0;transition:opacity .35s; }
+.cinematic-image[data-image-state='loaded']>img { opacity:1; }
+.cinematic-image[data-image-state='loaded']>svg { visibility:hidden; }
+.artwork-availability { position:absolute;bottom:14px;left:16px;color:#d8c6b6;font:500 8px var(--font-sans);letter-spacing:.14em;text-transform:uppercase;opacity:.75; }
+.theme-light .artwork-availability { color:#494137; }
+@media(prefers-reduced-motion:reduce) { .cinematic-image>img { transition:none; } }
+
+.cinematic-image>img.local-universe-art { opacity:1; }

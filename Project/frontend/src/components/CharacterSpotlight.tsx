@@ -1,3 +1,4 @@
+import { CinematicImage } from './CinematicImage'
 import React from 'react'
 import type { Character } from '../types'
 import { CardShell } from './CardShell'
@@ -29,7 +30,7 @@ export const CharacterSpotlight: React.FC<CharacterSpotlightProps> = ({
       <div className="spotlight-visual-area character-popout-stage">
         {/* Layer 1: Background Environment Layer */}
         <div className="character-popout-bg">
-          <img
+          <CinematicImage universe="character"
             src={character.bannerUrl || 'https://images.unsplash.com/photo-1519501025264-65ba15a82390?w=1600&q=80'}
             alt=""
             className="spotlight-bg-img popout-bg-img"

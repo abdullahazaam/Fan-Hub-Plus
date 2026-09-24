@@ -17,6 +17,7 @@ import { FeaturedStory } from './components/FeaturedStory'
 import { MediaCard } from './components/MediaCard'
 import { MediaRail } from './components/MediaRail'
 import { Navbar } from './components/Navbar'
+import { HomepageExperience } from './components/HomepageExperience'
 import { NexusGateHero } from './components/NexusGateHero'
 import { ProfileModal } from './components/ProfileModal'
 import { SearchBar } from './components/SearchBar'
@@ -55,7 +56,7 @@ export const PROTOTYPE_CHARACTER: Character = {
 }
 
 function AppContent() {
-  const { user } = useAuth()
+  const { user, logout } = useAuth()
   const isAdmin = user?.role === 'Admin'
 
   // Theme state: 'dark' or 'light'
@@ -150,6 +151,11 @@ function AppContent() {
   useEffect(() => {
     loadBookmarks()
   }, [user])
+
+  // Scroll to top automatically when navigating between views
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' })
+  }, [currentView])
 
   // Load Content
   const loadContent = async () => {
@@ -471,7 +477,7 @@ function AppContent() {
           1. HOMEPAGE VIEW: Concept Art Layout
           ===================================================================== */}
       {currentView === 'home' && (
-        <main className="homepage-main">
+        <HomepageExperience>
           {/* Full-viewport Hero with Left Headline & Nexus Gate Visual Slot */}
           <NexusGateHero
             categories={categories}
@@ -561,7 +567,7 @@ function AppContent() {
               </div>
             )}
           </section>
-        </main>
+        </HomepageExperience>
       )}
 
       {/* =====================================================================
@@ -570,9 +576,14 @@ function AppContent() {
       {currentView === 'explore' && (
         <main className="explore-page-main">
           <div className="explore-hero-strip">
+            <div className="page-eyebrow">
+              <span className="page-eyebrow-pip" />
+              <span>CHRONICLES & ARCHIVES // MULTIVERSE LORE</span>
+            </div>
             <h1 className="explore-title">Multiverse Chronicle Explorer</h1>
+            <div className="page-title-rule" />
             <p className="explore-subtitle">
-              Filter by realm, genre, release timeline, and popularity rating.
+              Filter by realm, genre, release timeline, and popularity rating across 8 connected universes.
             </p>
           </div>
 
@@ -698,7 +709,12 @@ function AppContent() {
       {currentView === 'characters' && (
         <main className="characters-page-main">
           <div className="explore-hero-strip">
+            <div className="page-eyebrow">
+              <span className="page-eyebrow-pip" />
+              <span>CHARACTER ARCHIVE // CLASSIFIED DOSSIERS</span>
+            </div>
             <h1 className="explore-title">Character Dossiers & Archives</h1>
+            <div className="page-title-rule" />
             <p className="explore-subtitle">
               Detailed records of legends, sorcerers, anti-heroes, and iconic figures across 8 universes.
             </p>
@@ -744,9 +760,14 @@ function AppContent() {
       {currentView === 'media' && (
         <main className="media-page-main">
           <div className="explore-hero-strip">
+            <div className="page-eyebrow">
+              <span className="page-eyebrow-pip" />
+              <span>AUDIOVISUAL ARCHIVES // MULTIVERSE FEEDS</span>
+            </div>
             <h1 className="explore-title">Audiovisual Multiverse Streams</h1>
+            <div className="page-title-rule" />
             <p className="explore-subtitle">
-              Embedded cinema trailers, gameplay teasers, and original soundtrack streams.
+              Embedded cinema trailers, gameplay teasers, and original soundtrack streams from across the multiverse.
             </p>
           </div>
 
@@ -831,19 +852,157 @@ function AppContent() {
         </main>
       )}
 
-      {/* Footer */}
-      <footer className="portal-footer">
-        <div className="footer-content">
-          <div className="footer-meta">
-            <span className="footer-brand">FAN HUB PLUS /</span>
-            <span className="footer-sub">Eight Worlds. One Universe.</span>
+      {/* =====================================================================
+          PREMIUM CINEMATIC FOOTER
+          ===================================================================== */}
+      <footer className="portal-footer" role="contentinfo">
+        <div className="footer-top-accent-line" />
+        <div className="footer-container">
+          <div className="footer-columns-grid">
+            {/* Col 1: Brand & Multiverse Mission */}
+            <div className="footer-col footer-col-brand">
+              <div className="footer-brand-header">
+                <div className="brand-mark-chip">
+                  <span className="brand-mark-initials">FH+</span>
+                  <div className="brand-mark-crimson-line" />
+                </div>
+                <div className="footer-brand-title">
+                  <span className="brand-text">FAN HUB PLUS</span>
+                  <span className="brand-badge">MULTIVERSE</span>
+                </div>
+              </div>
+              <p className="footer-tagline">Eight Worlds. One Universe.</p>
+              <p className="footer-mission-text">
+                The centralized multiverse gateway connecting eight legendary fandom dimensions into one synchronized chronicle archive.
+              </p>
+              <div className="footer-status-indicator">
+                <span className="status-ping-dot" />
+                <span className="status-label">NEXUS GATE LINK OPERATIONAL</span>
+              </div>
+            </div>
+
+            {/* Col 2: Portal Directory */}
+            <div className="footer-col">
+              <h4 className="footer-col-title">Portal Directory</h4>
+              <ul className="footer-nav-list">
+                <li>
+                  <button className="footer-link-btn" onClick={() => setCurrentView('home')}>
+                    <span>Nexus Home</span>
+                  </button>
+                </li>
+                <li>
+                  <button className="footer-link-btn" onClick={() => setCurrentView('explore')}>
+                    <span>Explore Chronicles</span>
+                  </button>
+                </li>
+                <li>
+                  <button className="footer-link-btn" onClick={() => setCurrentView('characters')}>
+                    <span>Character Dossiers</span>
+                  </button>
+                </li>
+                <li>
+                  <button className="footer-link-btn" onClick={() => setCurrentView('media')}>
+                    <span>Audiovisual Streams</span>
+                  </button>
+                </li>
+                {isAdmin && (
+                  <li>
+                    <button className="footer-link-btn admin-link" onClick={() => setCurrentView('admin')}>
+                      <span>Admin Console</span>
+                    </button>
+                  </li>
+                )}
+              </ul>
+            </div>
+
+            {/* Col 3: Connected Universes */}
+            <div className="footer-col">
+              <h4 className="footer-col-title">Connected Realms</h4>
+              <ul className="footer-nav-list universe-links-grid">
+                {categories.length > 0 ? (
+                  categories.map((cat) => (
+                    <li key={cat.id}>
+                      <button
+                        className="footer-link-btn"
+                        onClick={() => {
+                          setSelectedCategoryId(cat.id)
+                          setCurrentView('explore')
+                          setPage(1)
+                        }}
+                      >
+                        <span>{cat.name}</span>
+                      </button>
+                    </li>
+                  ))
+                ) : (
+                  <>
+                    <li><button className="footer-link-btn" onClick={() => setCurrentView('explore')}><span>Anime</span></button></li>
+                    <li><button className="footer-link-btn" onClick={() => setCurrentView('explore')}><span>Gaming</span></button></li>
+                    <li><button className="footer-link-btn" onClick={() => setCurrentView('explore')}><span>Movies</span></button></li>
+                    <li><button className="footer-link-btn" onClick={() => setCurrentView('explore')}><span>TV Shows</span></button></li>
+                    <li><button className="footer-link-btn" onClick={() => setCurrentView('explore')}><span>K-Pop</span></button></li>
+                    <li><button className="footer-link-btn" onClick={() => setCurrentView('explore')}><span>Comics</span></button></li>
+                    <li><button className="footer-link-btn" onClick={() => setCurrentView('explore')}><span>Manga</span></button></li>
+                    <li><button className="footer-link-btn" onClick={() => setCurrentView('explore')}><span>Cosplay</span></button></li>
+                  </>
+                )}
+              </ul>
+            </div>
+
+            {/* Col 4: Platform & Auth Terminal */}
+            <div className="footer-col">
+              <h4 className="footer-col-title">Terminal Access</h4>
+              <ul className="footer-nav-list">
+                {user ? (
+                  <>
+                    <li>
+                      <button className="footer-link-btn" onClick={() => setIsProfileModalOpen(true)}>
+                        <span>Operative Profile</span>
+                      </button>
+                    </li>
+                    <li>
+                      <button className="footer-link-btn" onClick={() => setIsDashboardModalOpen(true)}>
+                        <span>Personal Archive ({bookmarks.length})</span>
+                      </button>
+                    </li>
+                    <li>
+                      <button className="footer-link-btn" onClick={() => logout()}>
+                        <span>Disconnect (Sign Out)</span>
+                      </button>
+                    </li>
+                  </>
+                ) : (
+                  <>
+                    <li>
+                      <button className="footer-link-btn highlight" onClick={() => setIsAuthModalOpen(true)}>
+                        <span>Sign In / Authenticate</span>
+                      </button>
+                    </li>
+                    <li>
+                      <button className="footer-link-btn" onClick={() => setIsAuthModalOpen(true)}>
+                        <span>Create Operative Account</span>
+                      </button>
+                    </li>
+                  </>
+                )}
+              </ul>
+              <div className="footer-specs-badge">
+                <span className="specs-line">Archival Engine v2.4</span>
+                <span className="specs-dim">EF Core 9 // SQLite Studio</span>
+              </div>
+            </div>
           </div>
-          <div className="footer-links-row">
-            <button onClick={() => setCurrentView('home')}>Home</button>
-            <button onClick={() => setCurrentView('explore')}>Explore</button>
-            <button onClick={() => setCurrentView('characters')}>Characters</button>
-            <button onClick={() => setCurrentView('media')}>Media</button>
-            {isAdmin && <button onClick={() => setCurrentView('admin')}>Admin Console</button>}
+
+          {/* Bottom Strip */}
+          <div className="footer-bottom-strip">
+            <div className="footer-copyright">
+              <span>© 2026 Fan Hub Plus. Nexus Gate Archive. All rights reserved.</span>
+            </div>
+            <div className="footer-bottom-meta">
+              <span className="footer-meta-pill">Obsidian Abyss Edition</span>
+              <span className="footer-meta-sep">•</span>
+              <span className="footer-meta-pill">Eight Universes Unified</span>
+            </div>
           </div>
         </div>
       </footer>

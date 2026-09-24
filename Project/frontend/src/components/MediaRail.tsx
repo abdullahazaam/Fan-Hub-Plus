@@ -1,3 +1,4 @@
+import { CinematicImage } from './CinematicImage'
 import React, { useRef } from 'react'
 import type { MediaItem } from '../types'
 import { CardShell } from './CardShell'
@@ -21,7 +22,7 @@ export const MediaRail: React.FC<MediaRailProps> = ({
   const scroll = (direction: 'left' | 'right') => {
     if (scrollRef.current) {
       const offset = direction === 'left' ? -380 : 380
-      scrollRef.current.scrollBy({ left: offset, behavior: 'smooth' })
+      scrollRef.current.scrollBy({ left: offset, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' })
     }
   }
 
@@ -58,7 +59,7 @@ export const MediaRail: React.FC<MediaRailProps> = ({
             onClick={() => onSelectMedia(m)}
           >
             <div className="rail-thumbnail-box">
-              <img
+              <CinematicImage universe={m.mediaType}
                 src={m.thumbnailUrl || 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=800&q=80'}
                 alt={m.title}
                 className="rail-thumb-img"

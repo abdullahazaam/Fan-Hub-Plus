@@ -1,3 +1,4 @@
+import { CinematicImage } from './CinematicImage'
 import React from 'react'
 import { ArrowRightIcon } from './Icons'
 
@@ -18,7 +19,7 @@ export const ConceptHighlights: React.FC<ConceptHighlightsProps> = ({
         {/* Card 1: Global Fandom Worlds / Expo */}
         <article className="concept-card" onClick={onExploreWorld} role="button" tabIndex={0} onKeyDown={(e) => { if (e.key === 'Enter') onExploreWorld() }}>
           <div className="concept-card-media">
-            <img
+            <CinematicImage universe="events"
               src="https://images.unsplash.com/photo-1511578314322-379afb476865?w=800&q=80"
               alt="Global Fan Expo"
               className="concept-card-img"
@@ -39,7 +40,7 @@ export const ConceptHighlights: React.FC<ConceptHighlightsProps> = ({
         {/* Card 2: Characters Spotlight */}
         <article className="concept-card" onClick={onExploreCharacters} role="button" tabIndex={0} onKeyDown={(e) => { if (e.key === 'Enter') onExploreCharacters() }}>
           <div className="concept-card-media">
-            <img
+            <CinematicImage universe="character"
               src="https://images.unsplash.com/photo-1578632767115-351597cf2477?w=800&q=80"
               alt="Icons Across Worlds"
               className="concept-card-img"
@@ -60,7 +61,7 @@ export const ConceptHighlights: React.FC<ConceptHighlightsProps> = ({
         {/* Card 3: New Releases & Streams */}
         <article className="concept-card" onClick={onExploreMedia} role="button" tabIndex={0} onKeyDown={(e) => { if (e.key === 'Enter') onExploreMedia() }}>
           <div className="concept-card-media">
-            <img
+            <CinematicImage universe="video"
               src="https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=800&q=80"
               alt="What's New In Multiverse"
               className="concept-card-img"

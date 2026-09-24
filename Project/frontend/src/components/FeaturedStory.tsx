@@ -1,3 +1,4 @@
+import { CinematicImage } from './CinematicImage'
 import React from 'react'
 import type { ContentItem } from '../types'
 import { CardShell } from './CardShell'
@@ -19,15 +20,11 @@ export const FeaturedStory: React.FC<FeaturedStoryProps> = ({
   return (
     <CardShell className="featured-story-card" onClick={() => onSelect(item)}>
       <div className="story-image-canvas">
-        <img
+        <CinematicImage universe={item.categoryName}
           src={item.mediaUrl || item.thumbnailUrl}
           alt={item.title}
           className="story-main-img"
           loading="lazy"
-          onError={(e) => {
-            (e.target as HTMLImageElement).src =
-              'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=1600&q=85'
-          }}
         />
         <div className="story-image-gradient" />
         <div className="story-badge-cluster">

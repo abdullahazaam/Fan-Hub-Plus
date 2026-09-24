@@ -1,3 +1,4 @@
+import { CinematicImage } from './CinematicImage'
 import React from 'react'
 import { useAuth } from '../context/AuthContext'
 import type { ContentItem } from '../types'
@@ -37,15 +38,11 @@ export const ContentCard: React.FC<ContentCardProps> = ({
   return (
     <article className="content-card">
       <div className="card-media-wrapper" onClick={() => onSelect(item)}>
-        <img
+        <CinematicImage universe={item.categoryName}
           src={item.thumbnailUrl}
           alt={item.title}
           className="card-thumbnail"
           loading="lazy"
-          onError={(e) => {
-            (e.target as HTMLImageElement).src =
-              'https://images.unsplash.com/photo-1578632767115-351597cf2477?w=800&q=80'
-          }}
         />
         <div className="media-overlay" />
         <div className="card-floating-badges">
