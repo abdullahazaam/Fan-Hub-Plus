@@ -343,7 +343,7 @@ function AppContent() {
   const [itemToEdit, setItemToEdit] = useState<ContentItem | null>(null)
   const [charToEdit, setCharToEdit] = useState<Character | null>(null)
   const [mediaToEdit, setMediaToEdit] = useState<MediaItem | null>(null)
-  const [isAuthModalOpen, setIsAuthModalOpen] = useState<boolean>(false)
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState<boolean>(() => new URLSearchParams(window.location.hash.slice(1)).has('verify-email'))
   const [adminRefreshKey, setAdminRefreshKey] = useState<number>(0)
 
   // Toast feedback

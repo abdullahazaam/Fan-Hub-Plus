@@ -57,3 +57,5 @@ public record UpdateProfileDto(
     List<string>? FavoriteCategories = null
 );
 
+
+public record VerifyEmailDto(string Token);

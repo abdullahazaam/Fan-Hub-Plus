@@ -27,6 +27,10 @@ public class User
     public DateTime? LastLoginAt { get; set; }
     public DateTime? LastActiveAt { get; set; }
 
+    public bool EmailVerified { get; set; }
+    public string? EmailVerificationHash { get; set; }
+    public DateTime? EmailVerificationExpiresAt { get; set; }
+
     // Navigation
     public ICollection<PasswordResetToken> PasswordResetTokens { get; set; } = new List<PasswordResetToken>();
 }

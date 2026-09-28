@@ -89,18 +89,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const register = useCallback(async (form: RegisterForm) => {
-    const response = await apiRegister(form)
-    setStoredToken(response.token)
-    setUser({
-      userId: response.userId,
-      email: response.email,
-      username: response.username,
-      role: response.role,
-      displayName: response.displayName,
-      avatarUrl: response.avatarUrl,
-    })
-    const p = await apiGetMe()
-    setProfile(p)
+    await apiRegister(form)
+    // Registration never starts an authenticated session.
   }, [])
 
   const logout = useCallback(() => {

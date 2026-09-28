@@ -110,6 +110,7 @@ builder.Services.AddDbContext<FanHubDbContext>(options =>
 
 builder.Services.AddSingleton<TokenService>();
 builder.Services.AddSingleton<PasswordResetEmailSender>();
+builder.Services.AddSingleton<EmailVerificationService>();
 builder.Services.AddSingleton<UserActivityTracker>();
 
 var app = builder.Build();
@@ -467,7 +468,7 @@ app.MapDelete("/api/content/{id:int}", async (HttpContext ctx, FanHubDbContext d
 // ─────────────────────────────────────────────────────────────────────────────
 // Auth: Register
 // ─────────────────────────────────────────────────────────────────────────────
-app.MapPost("/api/auth/register", async (FanHubDbContext db, TokenService tokens, RegisterDto dto) =>
+app.MapPost("/api/auth/register", async (HttpContext ctx, FanHubDbContext db, EmailVerificationService verification, RegisterDto dto) =>
 {
     if (string.IsNullOrWhiteSpace(dto.Email) || string.IsNullOrWhiteSpace(dto.Password)
         || string.IsNullOrWhiteSpace(dto.Username))
@@ -475,6 +476,11 @@ app.MapPost("/api/auth/register", async (FanHubDbContext db, TokenService tokens
 
     if (dto.Password.Length < 8)
         return Results.BadRequest(new { message = "Password must be at least 8 characters." });
+
+    if (dto.Email.Length > 254 || !System.Net.Mail.MailAddress.TryCreate(dto.Email.Trim(), out var address) || address.Address != dto.Email.Trim())
+        return Results.BadRequest(new { message = "Enter a valid email address." });
+    if (IsRateLimited(forgotRateStore, "register:" + ctx.Connection.RemoteIpAddress, 300, 5))
+        return Results.Json(new { message = "Too many requests. Please try again later." }, statusCode: 429);
 
     var normalizedEmail = dto.Email.Trim().ToUpper();
     var normalizedUsername = dto.Username.Trim().ToLower();
@@ -502,15 +508,42 @@ app.MapPost("/api/auth/register", async (FanHubDbContext db, TokenService tokens
     db.Users.Add(user);
     await db.SaveChangesAsync();
 
-    var token = tokens.IssueToken(user);
-    return Results.Created("/api/auth/me", new AuthResponseDto(
-        token, user.Role, user.Id, user.Email,
-        user.Username, user.DisplayName, user.AvatarUrl));
+    await verification.SendAsync(user, db, ctx.RequestAborted);
+    return Results.Created("/api/auth/verify-email", new { message = "Please check your email to verify your account before signing in." });
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Auth: Login (rate-limited)
 // ─────────────────────────────────────────────────────────────────────────────
+app.MapPost("/api/auth/resend-verification", async (HttpContext ctx, FanHubDbContext db, EmailVerificationService verification, ForgotPasswordDto dto) =>
+{
+    if (IsRateLimited(forgotRateStore, "verify:" + ctx.Connection.RemoteIpAddress, 300, 5))
+        return Results.Json(new { message = "Too many requests. Please try again later." }, statusCode: 429);
+    if (!string.IsNullOrWhiteSpace(dto.Email) && dto.Email.Length <= 254)
+    {
+        var email = dto.Email.Trim().ToUpper();
+        var user = await db.Users.AsNoTracking().FirstOrDefaultAsync(u => u.NormalizedEmail == email && !u.EmailVerified);
+        if (user != null) await verification.SendAsync(user, db, ctx.RequestAborted);
+    }
+    return Results.Ok(new { message = "If your account needs verification, a verification email will be sent. Please wait a minute before resending." });
+});
+
+app.MapPost("/api/auth/verify-email", async (HttpContext ctx, FanHubDbContext db, VerifyEmailDto dto) =>
+{
+    if (IsRateLimited(forgotRateStore, "verify-token:" + ctx.Connection.RemoteIpAddress, 300, 20))
+        return Results.Json(new { message = "Too many requests. Please try again later." }, statusCode: 429);
+    if (string.IsNullOrWhiteSpace(dto.Token) || dto.Token.Length > 200)
+        return Results.BadRequest(new { message = "Invalid or expired verification link. Please resend verification email." });
+    var hash = PasswordHasher.HashToken(dto.Token);
+    var now = DateTime.UtcNow;
+    var changed = await db.Users.Where(u => !u.EmailVerified && u.EmailVerificationHash == hash && u.EmailVerificationExpiresAt > now)
+        .ExecuteUpdateAsync(s => s.SetProperty(u => u.EmailVerified, true)
+            .SetProperty(u => u.EmailVerificationHash, (string?)null)
+            .SetProperty(u => u.EmailVerificationExpiresAt, (DateTime?)null));
+    return changed == 1 ? Results.Ok(new { message = "Email verified. You can now sign in." }) :
+        Results.BadRequest(new { message = "Invalid, expired or already-used verification link. Please resend verification email if needed." });
+});
+
 app.MapPost("/api/auth/login", async (HttpContext ctx, FanHubDbContext db, TokenService tokens, LoginDto dto) =>
 {
     var ip = ctx.Connection.RemoteIpAddress?.ToString() ?? "unknown";
@@ -533,6 +566,9 @@ app.MapPost("/api/auth/login", async (HttpContext ctx, FanHubDbContext db, Token
 
     if (!passwordValid)
         return Results.Unauthorized();
+
+    if (!user!.EmailVerified)
+        return Results.Json(new { message = "Please verify your email first." }, statusCode: 403);
 
     var now = DateTime.UtcNow;
     user!.LastLoginAt = now;

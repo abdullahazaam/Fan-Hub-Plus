@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { apiForgotPassword, apiResetPassword } from '../api'
+import { useEffect, useRef, useState } from 'react'
+import { apiForgotPassword, apiResetPassword, apiResendVerification, apiVerifyEmail } from '../api'
 import { useAuth } from '../context/AuthContext'
 import type { ForgotPasswordResponse } from '../types'
 import { CloseIcon } from './Icons'
@@ -16,6 +16,8 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
   const { login, register } = useAuth()
   const [tab, setTab] = useState<Tab>('login')
   const [error, setError] = useState('')
+  const [notice, setNotice] = useState('')
+  const verificationStarted = useRef(false)
   const [loading, setLoading] = useState(false)
 
   // Login form
@@ -36,6 +38,27 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
   const [resetToken, setResetToken] = useState('')
   const [resetPassword, setResetPassword] = useState('')
   const [resetSuccess, setResetSuccess] = useState(false)
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.hash.slice(1))
+    const token = params.get('verify-email')
+    if (!token || verificationStarted.current) return
+    verificationStarted.current = true
+    window.history.replaceState(window.history.state, '', window.location.pathname + window.location.search)
+    setLoading(true)
+    apiVerifyEmail(token).then(result => { setNotice(result.message); setTab('login') })
+      .catch(err => setError(err instanceof Error ? err.message : 'Verification failed. Please resend verification email.'))
+      .finally(() => setLoading(false))
+  }, [])
+
+  async function resendVerification() {
+    const email = (loginEmail || regEmail).trim()
+    if (!email) { setError('Enter your email address first.'); return }
+    setLoading(true); setError('')
+    try { const result = await apiResendVerification(email); setNotice(result.message) }
+    catch (err) { setError(err instanceof Error ? err.message : 'Could not resend verification email.') }
+    finally { setLoading(false) }
+  }
 
   if (!isOpen) return null
 
@@ -69,8 +92,9 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
         password: regPassword,
         displayName: regDisplayName.trim(),
       })
-      onSuccess?.()
-      onClose()
+      setLoginEmail(regEmail.trim())
+      setNotice('Please check your email and click the verification link before signing in.')
+      setTab('login')
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Registration failed')
     } finally {
@@ -136,6 +160,8 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
         </div>
 
         {error && <div className="auth-error" role="alert">{error}</div>}
+        {notice && <p className="auth-success-text" role="status">{notice}</p>}
+        {tab === 'login' && <button type="button" className="auth-tab" disabled={loading} onClick={resendVerification}>Resend Verification Email</button>}
 
         {/* ── Login Tab ─────────────────────────────────────────────────── */}
         {tab === 'login' && (

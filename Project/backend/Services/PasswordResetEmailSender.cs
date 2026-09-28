@@ -7,7 +7,24 @@ namespace FanHubPlus.Services;
 public sealed class PasswordResetEmailSender(IConfiguration configuration)
 {
     // Standard ASP.NET configuration: Email__Host, Email__Password, etc.
-    public async Task SendAsync(string recipient, string token, CancellationToken cancellationToken)
+    public Task SendAsync(string recipient, string token, CancellationToken cancellationToken) =>
+        SendMessageAsync(recipient, "Reset your Fan Hub Plus password",
+            "We received a request to reset your Fan Hub Plus password.\n\nOpen Fan Hub Plus, choose Sign In, then Reset, and paste this token:\n\n" + token +
+            "\n\nThis token expires in 30 minutes and can be used only once. If you did not request this, ignore this email. Your password has not changed.", cancellationToken);
+
+    public Task SendVerificationAsync(string recipient, string token, CancellationToken cancellationToken)
+    {
+        var baseUrl = configuration["Email:VerificationBaseUrl"];
+        if (!Uri.TryCreate(baseUrl, UriKind.Absolute, out var uri) ||
+            (uri.Scheme != "https" && !(uri.Scheme == "http" && uri.IsLoopback)))
+            throw new InvalidOperationException("Email verification requires a configured HTTPS frontend URL.");
+        var link = new UriBuilder(uri) { Fragment = "verify-email=" + Uri.EscapeDataString(token), Query = "" }.Uri.AbsoluteUri;
+        return SendMessageAsync(recipient, "Verify your Fan Hub Plus email",
+            "Welcome to Fan Hub Plus. Verify your email to sign in:\n\n" + link +
+            "\n\nThis link expires in 30 minutes and can be used only once. If you did not create this account, ignore this email.", cancellationToken);
+    }
+
+    private async Task SendMessageAsync(string recipient, string subject, string body, CancellationToken cancellationToken)
     {
         var settings = configuration.GetSection("Email");
         var host = settings["Host"];
@@ -33,14 +50,11 @@ public sealed class PasswordResetEmailSender(IConfiguration configuration)
         }
         using var message = new MailMessage(new MailAddress(from, "Fan Hub Plus"), new MailAddress(recipient))
         {
-            Subject = "Reset your Fan Hub Plus password",
+            Subject = subject,
             BodyEncoding = Encoding.UTF8,
             SubjectEncoding = Encoding.UTF8,
             IsBodyHtml = false,
-            Body = "We received a request to reset your Fan Hub Plus password.\n\n" +
-                   "Open Fan Hub Plus, choose Sign In, then Reset, and paste this token:\n\n" + token +
-                   "\n\nThis token expires in 30 minutes and can be used only once. " +
-                   "If you did not request this, you can ignore this email. Your password has not changed."
+            Body = body
         };
         using var timeout = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
         timeout.CancelAfter(TimeSpan.FromSeconds(15));

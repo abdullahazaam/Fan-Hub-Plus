@@ -438,7 +438,7 @@ export async function removeBookmarkByItem(itemType: string, itemId: number): Pr
 }
 
 // ─── Auth API ───────────────────────────────────────────────────────────────
-export async function apiRegister(form: RegisterForm): Promise<AuthResponse> {
+export async function apiRegister(form: RegisterForm): Promise<{ message: string }> {
   const res = await fetch(`${BASE_URL}/api/auth/register`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -808,4 +808,11 @@ export async function getMediaCatalog(): Promise<MediaItem[]> {
   const pages = Math.ceil(first.totalCount / (first.pageSize || 12))
   const rest = await Promise.all(Array.from({length:Math.max(0,pages-1)},(_,index)=>getMediaList({page:index+2,pageSize:12})))
   return [first,...rest].flatMap(page=>page.items)
+}
+
+export async function apiResendVerification(email: string): Promise<{ message: string }> {
+  return handleResponse(await fetch(`${BASE_URL}/api/auth/resend-verification`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email }) }))
+}
+export async function apiVerifyEmail(token: string): Promise<{ message: string }> {
+  return handleResponse(await fetch(`${BASE_URL}/api/auth/verify-email`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ token }) }))
 }
