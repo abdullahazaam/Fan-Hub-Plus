@@ -68,8 +68,8 @@
   z-index: 10;
   background: radial-gradient(
     circle 360px at var(--mouse-x, 50%) var(--mouse-y, 50%),
-    rgba(229, 9, 20, 0.26) 0%,
-    rgba(229, 9, 20, 0.06) 50%,
+    transparent 0%,
+    transparent 50%,
     transparent 75%
   );
   opacity: var(--rim-opacity, 0);
@@ -79,8 +79,8 @@
 .theme-light .char-rim-light {
   background: radial-gradient(
     circle 360px at var(--mouse-x, 50%) var(--mouse-y, 50%),
-    rgba(220, 38, 38, 0.16) 0%,
-    rgba(220, 38, 38, 0.03) 50%,
+    transparent 0%,
+    transparent 50%,
     transparent 75%
   );
 }
