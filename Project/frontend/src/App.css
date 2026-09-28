@@ -9799,6 +9799,9 @@ article.content-card.chronicle-flip::after { display: none; }
  padding:10px 14px!important;
  margin:0!important;
  overflow:hidden!important;
+ border-top:none!important;
+ border:none!important;
+ box-shadow:none!important;
 }
 
 /* Ensure Releases and Events CTA buttons are neatly contained, have matching height, and rounded style */
@@ -9810,6 +9813,9 @@ article.content-card.chronicle-flip::after { display: none; }
  gap:8px!important;
  height:54px!important;
  max-height:54px!important;
+ border-top:none!important;
+ border:none!important;
+ box-shadow:none!important;
 }
 
 .portal-universe :is(.release-card,.event-card) :is(.btn-bookmark-action,.btn-external-ticket) {
@@ -9827,6 +9833,15 @@ article.content-card.chronicle-flip::after { display: none; }
  line-height:1!important;
  margin:0!important;
 }
+
+/* Eliminate any top seam lines, pseudo-borders, or inset outline artifacts on card bodies */
+.portal-universe :is(.merchandise-card,.release-card,.event-card) .srs-card-body,
+.portal-universe :is(.merchandise-card,.release-card,.event-card) .srs-card-body::before,
+.portal-universe :is(.merchandise-card,.release-card,.event-card) .srs-card-body::after {
+ border-top:none!important;
+ outline:none!important;
+}
+
 
 
 
