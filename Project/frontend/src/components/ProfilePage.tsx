@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 import { useAuth } from '../context/AuthContext'
 import type { Category, NavView, ProfileUpdateForm } from '../types'
 import { Breadcrumbs } from './Breadcrumbs'
 import { CheckIcon, ShieldIcon, StarIcon, UserIcon } from './Icons'
+import { apiUploadAvatar } from '../api'
 
 interface ProfilePageProps {
   categories: Category[]
@@ -32,11 +33,15 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
   const [displayName, setDisplayName] = useState(profile?.displayName ?? user?.displayName ?? user?.username ?? '')
   const [bio, setBio] = useState(profile?.bio ?? '')
   const [avatarUrl, setAvatarUrl] = useState(profile?.avatarUrl ?? user?.avatarUrl ?? '')
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null)
+  const [selectedFile, setSelectedFile] = useState<File | null>(null)
+  const [uploading, setUploading] = useState(false)
   const [favoriteCategories, setFavoriteCategories] = useState<string[]>(() => parseFavorites(profile))
 
   const [saving, setSaving] = useState(false)
   const [savedMessage, setSavedMessage] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     if (profile) {
@@ -58,6 +63,34 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
     })
   }
 
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    const validTypes = ['image/jpeg', 'image/png', 'image/webp']
+    if (!validTypes.includes(file.type)) {
+      setError('Please choose a valid JPG, PNG, or WebP image.')
+      return
+    }
+
+    if (file.size > 2 * 1024 * 1024) {
+      setError('Image must be 2MB or less.')
+      return
+    }
+
+    setError(null)
+    setSelectedFile(file)
+    const localUrl = URL.createObjectURL(file)
+    setPreviewUrl(localUrl)
+  }
+
+  const handleRemovePhoto = () => {
+    setSelectedFile(null)
+    setPreviewUrl(null)
+    setAvatarUrl('')
+    if (fileInputRef.current) fileInputRef.current.value = ''
+  }
+
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!user) return
@@ -67,16 +100,31 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
       setError(null)
       setSavedMessage(null)
 
+      let finalAvatarUrl = avatarUrl
+
+      if (selectedFile) {
+        setUploading(true)
+        try {
+          const res = await apiUploadAvatar(selectedFile)
+          finalAvatarUrl = res.avatarUrl
+          setAvatarUrl(res.avatarUrl)
+        } finally {
+          setUploading(false)
+        }
+      }
+
       const form: ProfileUpdateForm = {
         displayName: displayName.trim() || undefined,
         bio: bio.trim() || undefined,
-        avatarUrl: avatarUrl.trim() || undefined,
+        avatarUrl: finalAvatarUrl,
         favoriteCategory: favoriteCategories.join(', ') || undefined,
         favoriteCategories: favoriteCategories,
       }
 
       await updateProfile(form)
       await refreshProfile()
+      setSelectedFile(null)
+      setPreviewUrl(null)
       setSavedMessage('Operative profile updated and synchronized across the multiverse network.')
       setTimeout(() => setSavedMessage(null), 4000)
     } catch (err: unknown) {
@@ -89,6 +137,8 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
   const categoryNames = categories.length > 0
     ? categories.map((c) => c.name)
     : ['Anime', 'Gaming', 'Movies', 'TV Shows', 'K-Pop', 'Comics', 'Manga', 'Cosplay']
+
+  const activeAvatar = previewUrl || avatarUrl
 
   return (
     <div className="srs-page-container profile-page-view" aria-label="Operative Profile">
@@ -130,8 +180,8 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
             <div className="profile-identity-card glass-panel">
               <div className="profile-avatar-wrapper">
                 <div className="profile-avatar-large">
-                  {avatarUrl ? (
-                    <img src={avatarUrl} alt={displayName || user.username} className="avatar-img-cover" />
+                  {activeAvatar ? (
+                    <img src={activeAvatar} alt={displayName || user.username} className="avatar-img-cover" />
                   ) : (
                     <span className="avatar-letter-large">
                       {(displayName || user.username).charAt(0).toUpperCase()}
@@ -240,15 +290,43 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
                 </div>
 
                 <div className="form-group-full">
-                  <label className="srs-label">Avatar Image URL</label>
-                  <input
-                    type="url"
-                    className="srs-input"
-                    value={avatarUrl}
-                    onChange={(e) => setAvatarUrl(e.target.value)}
-                    placeholder="https://example.com/avatar.webp"
-                  />
-                  <span className="srs-hint">Direct link to a square PNG, WebP, or JPG image.</span>
+                  <label className="srs-label">Profile Photo</label>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', margin: '0.4rem 0 0.5rem', flexWrap: 'wrap' }}>
+                    <input
+                      type="file"
+                      ref={fileInputRef}
+                      accept="image/jpeg,image/png,image/webp"
+                      style={{ display: 'none' }}
+                      onChange={handleFileChange}
+                    />
+                    <button
+                      type="button"
+                      className="srs-btn-action"
+                      style={{ width: 'auto', padding: '0.5rem 1.15rem', fontSize: '0.85rem' }}
+                      onClick={() => fileInputRef.current?.click()}
+                    >
+                      {activeAvatar ? 'Change Photo' : 'Choose Photo'}
+                    </button>
+                    {activeAvatar && (
+                      <button
+                        type="button"
+                        className="fandom-selector-chip"
+                        style={{
+                          padding: '0.48rem 1rem',
+                          fontSize: '0.82rem',
+                          borderRadius: 'var(--radius-sm, 6px)',
+                          border: '1px solid rgba(220, 38, 38, 0.45)',
+                          background: 'rgba(220, 38, 38, 0.12)',
+                          color: '#f87171',
+                          cursor: 'pointer',
+                        }}
+                        onClick={handleRemovePhoto}
+                      >
+                        Remove Photo
+                      </button>
+                    )}
+                  </div>
+                  <span className="srs-hint">Select a JPG, PNG, or WebP photo (up to 2MB). Instant preview shown above.</span>
                 </div>
 
                 <div className="form-group-full">
@@ -289,9 +367,9 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
                   <button
                     type="submit"
                     className="srs-btn-action"
-                    disabled={saving}
+                    disabled={saving || uploading}
                   >
-                    {saving ? 'Synchronizing…' : 'Save Changes'}
+                    {uploading ? 'Uploading Photo…' : saving ? 'Synchronizing…' : 'Save Changes'}
                   </button>
                 </div>
               </form>
