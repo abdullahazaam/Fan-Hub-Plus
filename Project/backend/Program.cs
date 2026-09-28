@@ -1015,8 +1015,13 @@ app.MapPost("/api/bookmarks", async (HttpContext ctx, FanHubDbContext db, Create
     if (string.IsNullOrWhiteSpace(dto.ItemType) || dto.ItemId <= 0)
         return Results.BadRequest(new { message = "ItemType and valid ItemId are required." });
 
+    var typeLower = dto.ItemType.Trim().ToLower();
+    var isArticleType = typeLower == "article" || typeLower == "content";
+
     var existing = await db.UserBookmarks
-        .FirstOrDefaultAsync(b => b.UserId == userId && b.ItemType == dto.ItemType && b.ItemId == dto.ItemId);
+        .FirstOrDefaultAsync(b => b.UserId == userId &&
+            (b.ItemType.ToLower() == typeLower || (isArticleType && (b.ItemType.ToLower() == "article" || b.ItemType.ToLower() == "content"))) &&
+            b.ItemId == dto.ItemId);
 
     if (existing != null)
     {
@@ -1030,9 +1035,9 @@ app.MapPost("/api/bookmarks", async (HttpContext ctx, FanHubDbContext db, Create
         UserId = userId,
         ItemType = dto.ItemType.Trim(),
         ItemId = dto.ItemId,
-        ItemTitle = dto.ItemTitle.Trim(),
-        ItemSubtitle = dto.ItemSubtitle.Trim(),
-        ItemImageUrl = dto.ItemImageUrl.Trim(),
+        ItemTitle = dto.ItemTitle?.Trim() ?? string.Empty,
+        ItemSubtitle = dto.ItemSubtitle?.Trim() ?? string.Empty,
+        ItemImageUrl = dto.ItemImageUrl?.Trim() ?? string.Empty,
         CreatedAt = DateTime.UtcNow
     };
 
@@ -1062,8 +1067,13 @@ app.MapDelete("/api/bookmarks/item/{itemType}/{itemId:int}", async (HttpContext 
     var (isAuth, userId, _) = GetAuthInfo(ctx.User);
     if (!isAuth) return Results.Unauthorized();
 
+    var typeLower = itemType.Trim().ToLower();
+    var isArticleType = typeLower == "article" || typeLower == "content";
+
     var bookmark = await db.UserBookmarks
-        .FirstOrDefaultAsync(b => b.UserId == userId && b.ItemType.ToLower() == itemType.ToLower() && b.ItemId == itemId);
+        .FirstOrDefaultAsync(b => b.UserId == userId &&
+            (b.ItemType.ToLower() == typeLower || (isArticleType && (b.ItemType.ToLower() == "article" || b.ItemType.ToLower() == "content"))) &&
+            b.ItemId == itemId);
 
     if (bookmark is null) return Results.NotFound();
 
@@ -1072,6 +1082,628 @@ app.MapDelete("/api/bookmarks/item/{itemType}/{itemId:int}", async (HttpContext 
     return Results.NoContent();
 });
 
+// ─────────────────────────────────────────────────────────────────────────────
+// USER: Fan Submissions (submit and list personal)
+// ─────────────────────────────────────────────────────────────────────────────
+app.MapPost("/api/submissions", async (HttpContext ctx, FanHubDbContext db, ILogger<Program> logger, CreateFanSubmissionDto dto) =>
+{
+    var (isAuth, userId, _) = GetAuthInfo(ctx.User);
+
+    if (string.IsNullOrWhiteSpace(dto.Title) || string.IsNullOrWhiteSpace(dto.ContentText))
+        return Results.BadRequest(new { message = "Title and chronicle content are required." });
+
+    User? user = null;
+    if (isAuth && userId > 0)
+    {
+        user = await db.Users.FindAsync(userId);
+    }
+
+    var authorName = !string.IsNullOrWhiteSpace(dto.AuthorName) 
+        ? dto.AuthorName.Trim() 
+        : (user?.DisplayName ?? user?.Username ?? "Anonymous Operative");
+    var authorEmail = !string.IsNullOrWhiteSpace(dto.AuthorEmail) 
+        ? dto.AuthorEmail.Trim() 
+        : user?.Email;
+
+    var reqCatId = dto.CategoryId ?? 1;
+    var categoryExists = reqCatId > 0 && await db.Categories.AnyAsync(c => c.Id == reqCatId);
+    var categoryId = reqCatId;
+    if (!categoryExists)
+    {
+        var firstCat = await db.Categories.FirstOrDefaultAsync();
+        categoryId = firstCat?.Id ?? 1;
+    }
+
+    var cleanMediaUrl = string.IsNullOrWhiteSpace(dto.MediaUrl) ? null : dto.MediaUrl.Trim();
+
+    var submission = new FanSubmission
+    {
+        Title = dto.Title.Trim(),
+        AuthorName = authorName,
+        AuthorEmail = authorEmail,
+        UserId = isAuth ? userId : null,
+        CategoryId = categoryId,
+        FandomUniverse = string.IsNullOrWhiteSpace(dto.FandomUniverse) ? "Multiverse Archive" : dto.FandomUniverse.Trim(),
+        SubmissionType = string.IsNullOrWhiteSpace(dto.SubmissionType) ? "Article" : dto.SubmissionType.Trim(),
+        ContentText = dto.ContentText.Trim(),
+        MediaUrl = cleanMediaUrl,
+        Status = "Pending",
+        SubmittedAt = DateTime.UtcNow
+    };
+
+    try
+    {
+        db.FanSubmissions.Add(submission);
+        await db.SaveChangesAsync();
+        await db.Entry(submission).Reference(s => s.Category).LoadAsync();
+
+        return Results.Created($"/api/submissions/{submission.Id}", new FanSubmissionDto(
+            submission.Id, submission.Title, submission.AuthorName, submission.AuthorEmail, submission.UserId,
+            submission.CategoryId, submission.Category?.Name ?? string.Empty,
+            submission.FandomUniverse, submission.SubmissionType, submission.ContentText, submission.MediaUrl,
+            submission.Status, submission.AdminNotes, submission.SubmittedAt, submission.ReviewedAt));
+    }
+    catch (Exception ex)
+    {
+        logger.LogError(ex, "Failed to persist fan submission titled '{Title}'", dto.Title);
+        return Results.Json(new { message = $"Submission persistence error: {ex.Message}" }, statusCode: 500);
+    }
+});
+
+app.MapGet("/api/user/submissions", async (HttpContext ctx, FanHubDbContext db) =>
+{
+    var (isAuth, userId, _) = GetAuthInfo(ctx.User);
+    if (!isAuth) return Results.Unauthorized();
+
+    var user = await db.Users.FindAsync(userId);
+    var userEmail = user?.Email.ToLower();
+
+    var submissions = await db.FanSubmissions
+        .Include(s => s.Category)
+        .Where(s => s.UserId == userId || (userEmail != null && s.AuthorEmail != null && s.AuthorEmail.ToLower() == userEmail))
+        .OrderByDescending(s => s.SubmittedAt)
+        .Select(s => new FanSubmissionDto(
+            s.Id, s.Title, s.AuthorName, s.AuthorEmail, s.UserId,
+            s.CategoryId, s.Category != null ? s.Category.Name : string.Empty,
+            s.FandomUniverse, s.SubmissionType, s.ContentText, s.MediaUrl,
+            s.Status, s.AdminNotes, s.SubmittedAt, s.ReviewedAt))
+        .ToListAsync();
+
+    return Results.Ok(submissions);
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// ADMIN: Fan Submissions
+// ─────────────────────────────────────────────────────────────────────────────
+app.MapGet("/api/admin/submissions", async (HttpContext ctx, FanHubDbContext db, string? status, string? search, int page = 1, int pageSize = 10) =>
+{
+    var (isAuth, _, role) = GetAuthInfo(ctx.User);
+    if (!isAuth) return Results.Unauthorized();
+    if (role != "Admin") return Results.Json(new { message = "Forbidden: Admin role required." }, statusCode: 403);
+
+    page = Math.Max(1, page);
+    pageSize = Math.Clamp(pageSize, 1, 50);
+
+    var query = db.FanSubmissions.Include(s => s.Category).AsQueryable();
+
+    if (!string.IsNullOrWhiteSpace(status) && status != "All")
+    {
+        query = query.Where(s => s.Status.ToLower() == status.ToLower());
+    }
+
+    if (!string.IsNullOrWhiteSpace(search))
+    {
+        var term = search.Trim().ToLower();
+        query = query.Where(s => s.Title.ToLower().Contains(term) ||
+                                 s.AuthorName.ToLower().Contains(term) ||
+                                 s.FandomUniverse.ToLower().Contains(term));
+    }
+
+    query = query.OrderByDescending(s => s.SubmittedAt);
+
+    var totalCount = await query.CountAsync();
+    var items = await query.Skip((page - 1) * pageSize).Take(pageSize)
+        .Select(s => new FanSubmissionDto(
+            s.Id, s.Title, s.AuthorName, s.AuthorEmail, s.UserId,
+            s.CategoryId, s.Category != null ? s.Category.Name : string.Empty,
+            s.FandomUniverse, s.SubmissionType, s.ContentText, s.MediaUrl,
+            s.Status, s.AdminNotes, s.SubmittedAt, s.ReviewedAt))
+        .ToListAsync();
+
+    return Results.Ok(new PagedResult<FanSubmissionDto>(items, totalCount, page, pageSize));
+});
+
+app.MapGet("/api/admin/submissions/{id:int}", async (HttpContext ctx, FanHubDbContext db, int id) =>
+{
+    var (isAuth, _, role) = GetAuthInfo(ctx.User);
+    if (!isAuth) return Results.Unauthorized();
+    if (role != "Admin") return Results.Json(new { message = "Forbidden: Admin role required." }, statusCode: 403);
+
+    var s = await db.FanSubmissions.Include(x => x.Category).FirstOrDefaultAsync(x => x.Id == id);
+    if (s is null) return Results.NotFound();
+
+    return Results.Ok(new FanSubmissionDto(
+        s.Id, s.Title, s.AuthorName, s.AuthorEmail, s.UserId,
+        s.CategoryId, s.Category != null ? s.Category.Name : string.Empty,
+        s.FandomUniverse, s.SubmissionType, s.ContentText, s.MediaUrl,
+        s.Status, s.AdminNotes, s.SubmittedAt, s.ReviewedAt));
+});
+
+app.MapPut("/api/admin/submissions/{id:int}/status", async (HttpContext ctx, FanHubDbContext db, int id, UpdateSubmissionStatusDto dto) =>
+{
+    var (isAuth, _, role) = GetAuthInfo(ctx.User);
+    if (!isAuth) return Results.Unauthorized();
+    if (role != "Admin") return Results.Json(new { message = "Forbidden: Admin role required." }, statusCode: 403);
+
+    var s = await db.FanSubmissions.FirstOrDefaultAsync(x => x.Id == id);
+    if (s is null) return Results.NotFound();
+
+    s.Status = dto.Status;
+    s.AdminNotes = dto.AdminNotes ?? s.AdminNotes;
+    s.ReviewedAt = DateTime.UtcNow;
+
+    // Approved content should become available in the appropriate public content area (ContentItems / Fandom Chronicles)
+    if (dto.Status == "Approved")
+    {
+        var alreadyPublished = await db.ContentItems.AnyAsync(c => c.Title == s.Title && c.Author == s.AuthorName);
+        if (!alreadyPublished)
+        {
+            var content = new ContentItem
+            {
+                CategoryId = s.CategoryId,
+                Title = s.Title,
+                FandomUniverse = s.FandomUniverse,
+                ContentType = s.SubmissionType == "Art" ? "Gallery" : (s.SubmissionType == "Video" ? "Video" : "Article"),
+                Description = s.ContentText.Length > 200 ? s.ContentText.Substring(0, 197) + "..." : s.ContentText,
+                ContentText = s.ContentText,
+                ThumbnailUrl = !string.IsNullOrWhiteSpace(s.MediaUrl) 
+                    ? s.MediaUrl 
+                    : "https://images.unsplash.com/photo-1578632767115-351597cf2477?w=800&q=80",
+                MediaUrl = s.MediaUrl ?? string.Empty,
+                Author = s.AuthorName,
+                Tags = $"{s.FandomUniverse}, FanSubmission, Community",
+                PopularityScore = 85,
+                ReleaseDate = DateTime.UtcNow,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            };
+            db.ContentItems.Add(content);
+        }
+    }
+    else if (dto.Status == "Rejected")
+    {
+        // If rejected, remove any published lore from ContentItems
+        var publishedItems = await db.ContentItems
+            .Where(c => c.Title == s.Title && c.Author == s.AuthorName && c.Tags.Contains("FanSubmission"))
+            .ToListAsync();
+        if (publishedItems.Any())
+        {
+            db.ContentItems.RemoveRange(publishedItems);
+        }
+    }
+
+    await db.SaveChangesAsync();
+
+    return Results.Ok(new { message = $"Submission status updated to '{s.Status}'." });
+});
+
+app.MapDelete("/api/admin/submissions/{id:int}", async (HttpContext ctx, FanHubDbContext db, int id) =>
+{
+    var (isAuth, _, role) = GetAuthInfo(ctx.User);
+    if (!isAuth) return Results.Unauthorized();
+    if (role != "Admin") return Results.Json(new { message = "Forbidden: Admin role required." }, statusCode: 403);
+
+    var s = await db.FanSubmissions.FirstOrDefaultAsync(x => x.Id == id);
+    if (s is null) return Results.NotFound();
+
+    db.FanSubmissions.Remove(s);
+    await db.SaveChangesAsync();
+    return Results.NoContent();
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// ADMIN & PUBLIC: Feedback
+// ─────────────────────────────────────────────────────────────────────────────
+app.MapPost("/api/feedback", async (HttpContext ctx, FanHubDbContext db, CreateFeedbackDto dto) =>
+{
+    if (string.IsNullOrWhiteSpace(dto.Subject) || string.IsNullOrWhiteSpace(dto.Message))
+        return Results.BadRequest(new { message = "Subject and message are required." });
+
+    var item = new FeedbackItem
+    {
+        FeedbackType = string.IsNullOrWhiteSpace(dto.FeedbackType) ? "Query" : dto.FeedbackType.Trim(),
+        Subject = dto.Subject.Trim(),
+        Message = dto.Message.Trim(),
+        UserEmail = dto.UserEmail?.Trim(),
+        UserName = dto.UserName?.Trim(),
+        Status = "Open",
+        CreatedAt = DateTime.UtcNow
+    };
+
+    db.FeedbackItems.Add(item);
+    await db.SaveChangesAsync();
+
+    return Results.Created($"/api/feedback/{item.Id}", new FeedbackDto(
+        item.Id, item.FeedbackType, item.Subject, item.Message,
+        item.UserEmail, item.UserName, item.Status, item.CreatedAt));
+});
+
+app.MapGet("/api/admin/feedback", async (HttpContext ctx, FanHubDbContext db, string? type, string? status, string? search, int page = 1, int pageSize = 10) =>
+{
+    var (isAuth, _, role) = GetAuthInfo(ctx.User);
+    if (!isAuth) return Results.Unauthorized();
+    if (role != "Admin") return Results.Json(new { message = "Forbidden: Admin role required." }, statusCode: 403);
+
+    page = Math.Max(1, page);
+    pageSize = Math.Clamp(pageSize, 1, 50);
+
+    var query = db.FeedbackItems.AsQueryable();
+
+    if (!string.IsNullOrWhiteSpace(type) && type != "All")
+    {
+        query = query.Where(f => f.FeedbackType.ToLower() == type.ToLower());
+    }
+
+    if (!string.IsNullOrWhiteSpace(status) && status != "All")
+    {
+        query = query.Where(f => f.Status.ToLower() == status.ToLower());
+    }
+
+    if (!string.IsNullOrWhiteSpace(search))
+    {
+        var term = search.Trim().ToLower();
+        query = query.Where(f => f.Subject.ToLower().Contains(term) ||
+                                 f.Message.ToLower().Contains(term) ||
+                                 (f.UserName != null && f.UserName.ToLower().Contains(term)));
+    }
+
+    query = query.OrderByDescending(f => f.CreatedAt);
+
+    var totalCount = await query.CountAsync();
+    var items = await query.Skip((page - 1) * pageSize).Take(pageSize)
+        .Select(f => new FeedbackDto(
+            f.Id, f.FeedbackType, f.Subject, f.Message,
+            f.UserEmail, f.UserName, f.Status, f.CreatedAt))
+        .ToListAsync();
+
+    return Results.Ok(new PagedResult<FeedbackDto>(items, totalCount, page, pageSize));
+});
+
+app.MapPut("/api/admin/feedback/{id:int}/status", async (HttpContext ctx, FanHubDbContext db, int id, UpdateFeedbackStatusDto dto) =>
+{
+    var (isAuth, _, role) = GetAuthInfo(ctx.User);
+    if (!isAuth) return Results.Unauthorized();
+    if (role != "Admin") return Results.Json(new { message = "Forbidden: Admin role required." }, statusCode: 403);
+
+    var f = await db.FeedbackItems.FirstOrDefaultAsync(x => x.Id == id);
+    if (f is null) return Results.NotFound();
+
+    f.Status = dto.Status;
+    await db.SaveChangesAsync();
+
+    return Results.Ok(new { message = $"Feedback status updated to '{f.Status}'." });
+});
+
+app.MapDelete("/api/admin/feedback/{id:int}", async (HttpContext ctx, FanHubDbContext db, int id) =>
+{
+    var (isAuth, _, role) = GetAuthInfo(ctx.User);
+    if (!isAuth) return Results.Unauthorized();
+    if (role != "Admin") return Results.Json(new { message = "Forbidden: Admin role required." }, statusCode: 403);
+
+    var f = await db.FeedbackItems.FirstOrDefaultAsync(x => x.Id == id);
+    if (f is null) return Results.NotFound();
+
+    db.FeedbackItems.Remove(f);
+    await db.SaveChangesAsync();
+    return Results.NoContent();
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// ADMIN: Users Management
+// ─────────────────────────────────────────────────────────────────────────────
+app.MapGet("/api/admin/users", async (HttpContext ctx, FanHubDbContext db, string? search, string? roleFilter, int page = 1, int pageSize = 10) =>
+{
+    var (isAuth, _, role) = GetAuthInfo(ctx.User);
+    if (!isAuth) return Results.Unauthorized();
+    if (role != "Admin") return Results.Json(new { message = "Forbidden: Admin role required." }, statusCode: 403);
+
+    page = Math.Max(1, page);
+    pageSize = Math.Clamp(pageSize, 1, 50);
+
+    var query = db.Users.AsQueryable();
+
+    if (!string.IsNullOrWhiteSpace(roleFilter) && roleFilter != "All")
+    {
+        query = query.Where(u => u.Role == roleFilter);
+    }
+
+    if (!string.IsNullOrWhiteSpace(search))
+    {
+        var term = search.Trim().ToLower();
+        query = query.Where(u => u.Username.ToLower().Contains(term) ||
+                                 u.Email.ToLower().Contains(term) ||
+                                 (u.DisplayName != null && u.DisplayName.ToLower().Contains(term)));
+    }
+
+    query = query.OrderByDescending(u => u.CreatedAt);
+
+    var totalCount = await query.CountAsync();
+    var users = await query.Skip((page - 1) * pageSize).Take(pageSize)
+        .Select(u => new AdminUserDto(
+            u.Id, u.Username, u.Email, u.DisplayName ?? u.Username,
+            u.Role, u.AvatarUrl, u.FavoriteCategory,
+            db.UserBookmarks.Count(b => b.UserId == u.Id),
+            u.CreatedAt))
+        .ToListAsync();
+
+    return Results.Ok(new PagedResult<AdminUserDto>(users, totalCount, page, pageSize));
+});
+
+app.MapPut("/api/admin/users/{id:int}/role", async (HttpContext ctx, FanHubDbContext db, int id, UpdateUserRoleDto dto) =>
+{
+    var (isAuth, currentUserId, role) = GetAuthInfo(ctx.User);
+    if (!isAuth) return Results.Unauthorized();
+    if (role != "Admin") return Results.Json(new { message = "Forbidden: Admin role required." }, statusCode: 403);
+
+    if (id == currentUserId && dto.Role != "Admin")
+        return Results.BadRequest(new { message = "You cannot revoke your own Admin role." });
+
+    var targetUser = await db.Users.FirstOrDefaultAsync(u => u.Id == id);
+    if (targetUser is null) return Results.NotFound();
+
+    targetUser.Role = dto.Role == "Admin" ? "Admin" : "User";
+    targetUser.UpdatedAt = DateTime.UtcNow;
+    await db.SaveChangesAsync();
+
+    return Results.Ok(new { message = $"User '{targetUser.Username}' role updated to '{targetUser.Role}'." });
+});
+
+app.MapDelete("/api/admin/users/{id:int}", async (HttpContext ctx, FanHubDbContext db, int id) =>
+{
+    var (isAuth, currentUserId, role) = GetAuthInfo(ctx.User);
+    if (!isAuth) return Results.Unauthorized();
+    if (role != "Admin") return Results.Json(new { message = "Forbidden: Admin role required." }, statusCode: 403);
+
+    if (id == currentUserId)
+        return Results.BadRequest(new { message = "You cannot delete your own account." });
+
+    var targetUser = await db.Users.FirstOrDefaultAsync(u => u.Id == id);
+    if (targetUser is null) return Results.NotFound();
+
+    // Prevent deleting default dev admin
+    if (targetUser.NormalizedEmail == "ADMIN@FANHUBPLUS.LOCAL")
+        return Results.BadRequest(new { message = "The primary development Admin account cannot be deleted." });
+
+    db.Users.Remove(targetUser);
+    await db.SaveChangesAsync();
+    return Results.NoContent();
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// ADMIN: Multiverse Analytics & Telemetry
+// ─────────────────────────────────────────────────────────────────────────────
+app.MapGet("/api/admin/analytics", async (HttpContext ctx, FanHubDbContext db) =>
+{
+    var (isAuth, _, role) = GetAuthInfo(ctx.User);
+    if (!isAuth) return Results.Unauthorized();
+    if (role != "Admin") return Results.Json(new { message = "Forbidden: Admin role required." }, statusCode: 403);
+
+    var totalUsers = await db.Users.CountAsync();
+    var thirtyDaysAgo = DateTime.UtcNow.AddDays(-30);
+    var activeUsers = await db.Users.CountAsync(u => u.CreatedAt >= thirtyDaysAgo || u.UpdatedAt >= thirtyDaysAgo);
+    if (activeUsers == 0 && totalUsers > 0) activeUsers = totalUsers;
+
+    var totalContent = await db.ContentItems.CountAsync();
+    var totalCharacters = await db.Characters.CountAsync();
+    var totalMedia = await db.MediaItems.CountAsync();
+    var totalBookmarks = await db.UserBookmarks.CountAsync();
+    var totalSubmissions = await db.FanSubmissions.CountAsync();
+    var pendingSubmissions = await db.FanSubmissions.CountAsync(s => s.Status == "Pending");
+    var totalFeedback = await db.FeedbackItems.CountAsync();
+    var openFeedback = await db.FeedbackItems.CountAsync(f => f.Status == "Open");
+
+    var categories = await db.Categories.OrderBy(c => c.DisplayOrder).ToListAsync();
+    var categoryStats = new List<CategoryAnalyticsDto>();
+    foreach (var cat in categories)
+    {
+        var contentCount = await db.ContentItems.CountAsync(c => c.CategoryId == cat.Id);
+        var charCount = await db.Characters.CountAsync(c => c.CategoryId == cat.Id);
+        var mediaCount = await db.MediaItems.CountAsync(m => m.CategoryId == cat.Id);
+        categoryStats.Add(new CategoryAnalyticsDto(
+            cat.Id, cat.Name, cat.Slug,
+            contentCount, charCount, mediaCount,
+            contentCount + charCount + mediaCount));
+    }
+
+    var contentTypes = await db.ContentItems
+        .GroupBy(c => c.ContentType)
+        .Select(g => new { Type = g.Key, Count = g.Count() })
+        .ToDictionaryAsync(x => x.Type, x => x.Count);
+
+    var feedbackTypes = await db.FeedbackItems
+        .GroupBy(f => f.FeedbackType)
+        .Select(g => new { Type = g.Key, Count = g.Count() })
+        .ToDictionaryAsync(x => x.Type, x => x.Count);
+
+    var bookmarkTypes = await db.UserBookmarks
+        .GroupBy(b => b.ItemType)
+        .Select(g => new { Type = g.Key, Count = g.Count() })
+        .ToDictionaryAsync(x => x.Type, x => x.Count);
+
+    var topItems = await db.ContentItems
+        .Include(c => c.Category)
+        .OrderByDescending(c => c.PopularityScore)
+        .Take(5)
+        .Select(c => new PopularItemAnalyticsDto(
+            c.Id, c.Title, c.Category != null ? c.Category.Name : "General",
+            c.ContentType, c.PopularityScore))
+        .ToListAsync();
+
+    var popularFandomsRaw = await db.ContentItems
+        .Where(c => !string.IsNullOrEmpty(c.FandomUniverse))
+        .GroupBy(c => c.FandomUniverse)
+        .Select(g => new
+        {
+            FandomUniverse = g.Key,
+            ItemCount = g.Count(),
+            AvgPop = g.Average(c => (double)c.PopularityScore),
+            CategoryName = g.Select(c => c.Category != null ? c.Category.Name : "Multiverse").FirstOrDefault()
+        })
+        .OrderByDescending(f => f.ItemCount)
+        .Take(6)
+        .ToListAsync();
+
+    var popularFandoms = popularFandomsRaw.Select(f => new FandomPopularityDto(
+        f.FandomUniverse,
+        f.ItemCount,
+        (int)Math.Round(f.AvgPop),
+        f.CategoryName ?? "Multiverse"
+    )).ToList();
+
+    var result = new AdminAnalyticsDto(
+        totalUsers, activeUsers, totalContent, totalCharacters, totalMedia,
+        totalSubmissions, pendingSubmissions, totalFeedback, openFeedback, totalBookmarks,
+        categoryStats, contentTypes, feedbackTypes, topItems, bookmarkTypes, popularFandoms);
+
+    return Results.Ok(result);
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// PUBLIC: Merchandise Showcase
+// ─────────────────────────────────────────────────────────────────────────────
+app.MapGet("/api/merchandise", async (FanHubDbContext db, int? categoryId, string? tag, string? search, int page = 1, int pageSize = 12) =>
+{
+    page = Math.Max(1, page);
+    pageSize = Math.Clamp(pageSize, 1, 48);
+
+    var query = db.MerchandiseItems.Include(m => m.Category).AsQueryable();
+
+    if (categoryId.HasValue && categoryId.Value > 0)
+    {
+        query = query.Where(m => m.CategoryId == categoryId.Value);
+    }
+
+    if (!string.IsNullOrWhiteSpace(tag) && tag != "All")
+    {
+        query = query.Where(m => m.Tag.ToLower() == tag.ToLower());
+    }
+
+    if (!string.IsNullOrWhiteSpace(search))
+    {
+        var term = search.Trim().ToLower();
+        query = query.Where(m => m.Name.ToLower().Contains(term) ||
+                                 m.FandomUniverse.ToLower().Contains(term) ||
+                                 m.Description.ToLower().Contains(term));
+    }
+
+    query = query.OrderByDescending(m => m.CreatedAt);
+
+    var totalCount = await query.CountAsync();
+    var items = await query.Skip((page - 1) * pageSize).Take(pageSize)
+        .Select(m => new MerchandiseItemDto(
+            m.Id, m.Name, m.FandomUniverse, m.CategoryId,
+            m.Category != null ? m.Category.Name : "General",
+            m.Price, m.Currency, m.ImageUrl, m.Tag, m.Description, m.StockStatus, m.CreatedAt))
+        .ToListAsync();
+
+    return Results.Ok(new PagedResult<MerchandiseItemDto>(items, totalCount, page, pageSize));
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// PUBLIC: Upcoming Releases
+// ─────────────────────────────────────────────────────────────────────────────
+app.MapGet("/api/releases", async (FanHubDbContext db, int? categoryId, string? mediaType, string? search, int page = 1, int pageSize = 12) =>
+{
+    page = Math.Max(1, page);
+    pageSize = Math.Clamp(pageSize, 1, 48);
+
+    var query = db.UpcomingReleases.Include(r => r.Category).AsQueryable();
+
+    if (categoryId.HasValue && categoryId.Value > 0)
+    {
+        query = query.Where(r => r.CategoryId == categoryId.Value);
+    }
+
+    if (!string.IsNullOrWhiteSpace(mediaType) && mediaType != "All")
+    {
+        query = query.Where(r => r.MediaType.ToLower() == mediaType.ToLower());
+    }
+
+    if (!string.IsNullOrWhiteSpace(search))
+    {
+        var term = search.Trim().ToLower();
+        query = query.Where(r => r.Title.ToLower().Contains(term) ||
+                                 r.FandomUniverse.ToLower().Contains(term) ||
+                                 r.Platform.ToLower().Contains(term) ||
+                                 r.Synopsis.ToLower().Contains(term));
+    }
+
+    query = query.OrderBy(r => r.ReleaseDate);
+
+    var totalCount = await query.CountAsync();
+    var items = await query.Skip((page - 1) * pageSize).Take(pageSize)
+        .Select(r => new UpcomingReleaseDto(
+            r.Id, r.Title, r.FandomUniverse, r.CategoryId,
+            r.Category != null ? r.Category.Name : "General",
+            r.MediaType, r.ReleaseDate, r.ReleaseWindow, r.Platform,
+            r.ThumbnailUrl, r.Synopsis, r.HypeScore))
+        .ToListAsync();
+
+    return Results.Ok(new PagedResult<UpcomingReleaseDto>(items, totalCount, page, pageSize));
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// PUBLIC: Events Directory
+// ─────────────────────────────────────────────────────────────────────────────
+app.MapGet("/api/events", async (FanHubDbContext db, string? city, int? categoryId, string? search, DateTime? dateFrom, DateTime? dateTo, int page = 1, int pageSize = 12) =>
+{
+    page = Math.Max(1, page);
+    pageSize = Math.Clamp(pageSize, 1, 48);
+
+    var query = db.EventItems.Include(e => e.Category).AsQueryable();
+
+    if (!string.IsNullOrWhiteSpace(city) && city != "All")
+    {
+        query = query.Where(e => e.City.ToLower() == city.ToLower());
+    }
+
+    if (categoryId.HasValue && categoryId.Value > 0)
+    {
+        query = query.Where(e => e.CategoryId == categoryId.Value);
+    }
+
+    if (!string.IsNullOrWhiteSpace(search))
+    {
+        var term = search.Trim().ToLower();
+        query = query.Where(e => e.Title.ToLower().Contains(term) ||
+                                 e.FandomUniverse.ToLower().Contains(term) ||
+                                 e.Venue.ToLower().Contains(term) ||
+                                 e.Description.ToLower().Contains(term));
+    }
+
+    if (dateFrom.HasValue)
+    {
+        query = query.Where(e => e.EventDate >= dateFrom.Value);
+    }
+
+    if (dateTo.HasValue)
+    {
+        query = query.Where(e => e.EventDate <= dateTo.Value);
+    }
+
+    query = query.OrderBy(e => e.EventDate);
+
+    var totalCount = await query.CountAsync();
+    var items = await query.Skip((page - 1) * pageSize).Take(pageSize)
+        .Select(e => new EventItemDto(
+            e.Id, e.Title, e.FandomUniverse, e.CategoryId,
+            e.Category != null ? e.Category.Name : "General",
+            e.City, e.Venue, e.Coordinates, e.EventDate, e.EndDate,
+            e.ThumbnailUrl, e.Description, e.TicketUrl, e.Status))
+        .ToListAsync();
+
+    return Results.Ok(new PagedResult<EventItemDto>(items, totalCount, page, pageSize));
+});
 
 app.Run();
 

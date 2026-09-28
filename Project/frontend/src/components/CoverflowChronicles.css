@@ -1,0 +1,536 @@
+/* ==============================================================================
+   COVERFLOW CHRONICLES (HOME SECTION 5)
+   Exact match to the reference composition:
+   - 5 cards in cinematic Coverflow layout
+   - Center card large, elevated and dominant
+   - Side cards progressively smaller/receded with depth
+   - Real topic-accurate key artwork
+   - Fits comfortably in ONE desktop viewport at 100% zoom
+   - Smooth navigation controls, drag/swipe, and pagination
+   ============================================================================== */
+
+.coverflow-chronicles-section {
+  position: relative;
+  width: 100%;
+  margin: 28px 0 54px;
+}
+
+/* Header & Explore Button */
+.coverflow-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 24px;
+  gap: 16px;
+}
+
+.coverflow-explore-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: transparent;
+  border: none;
+  color: #f5f5f7;
+  font-family: var(--font-sans, sans-serif);
+  font-size: 0.88rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  cursor: pointer;
+  padding: 6px 0;
+  border-bottom: 1px solid rgba(229, 9, 20, 0.6);
+  transition: all 0.25s ease;
+  white-space: nowrap;
+}
+
+.coverflow-explore-btn:hover {
+  color: #ff4d4d;
+  border-bottom-color: #ff4d4d;
+  transform: translateX(3px);
+}
+
+:root[data-theme='light'] .coverflow-explore-btn,
+.light-mode .coverflow-explore-btn {
+  color: #171717;
+  border-bottom-color: rgba(220, 38, 38, 0.6);
+}
+
+:root[data-theme='light'] .coverflow-explore-btn:hover,
+.light-mode .coverflow-explore-btn:hover {
+  color: #dc2626;
+  border-bottom-color: #dc2626;
+}
+
+/* ==============================================================================
+   Coverflow Stage Container
+   ============================================================================== */
+.coverflow-stage {
+  position: relative;
+  width: 100%;
+  height: 480px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  outline: none;
+  box-sizing: border-box;
+}
+
+/* Navigation Arrow Buttons */
+.coverflow-nav-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(15, 12, 16, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  color: #ffffff;
+  cursor: pointer;
+  z-index: 10;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+  transition:
+    background 0.25s ease,
+    border-color 0.25s ease,
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.nav-btn-left {
+  left: 6px;
+}
+
+.nav-btn-right {
+  right: 6px;
+}
+
+.coverflow-nav-btn:hover {
+  background: rgba(229, 9, 20, 0.85);
+  border-color: rgba(255, 255, 255, 0.4);
+  transform: translateY(-50%) scale(1.08);
+  box-shadow: 0 0 20px rgba(229, 9, 20, 0.6);
+}
+
+.coverflow-nav-btn:active {
+  transform: translateY(-50%) scale(0.96);
+}
+
+:root[data-theme='light'] .coverflow-nav-btn,
+.light-mode .coverflow-nav-btn {
+  background: rgba(255, 250, 246, 0.88);
+  border-color: rgba(0, 0, 0, 0.12);
+  color: #171717;
+}
+
+:root[data-theme='light'] .coverflow-nav-btn:hover,
+.light-mode .coverflow-nav-btn:hover {
+  background: rgba(220, 38, 38, 0.88);
+  border-color: rgba(220, 38, 38, 0.5);
+  color: #ffffff;
+}
+
+/* ==============================================================================
+   Coverflow 5-Card Track
+   ============================================================================== */
+.coverflow-cards-track {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  width: 100%;
+  height: 100%;
+  position: relative;
+  box-sizing: border-box;
+}
+
+/* Card Shell */
+.coverflow-card {
+  position: relative;
+  border-radius: 18px;
+  overflow: hidden;
+  cursor: pointer;
+  outline: none;
+  user-select: none;
+  box-sizing: border-box;
+  will-change: transform, flex, filter;
+
+  /* Smooth Coverflow depth transition */
+  transition:
+    transform 0.55s cubic-bezier(0.2, 0.9, 0.2, 1),
+    flex 0.55s cubic-bezier(0.2, 0.9, 0.2, 1),
+    filter 0.45s ease,
+    border-color 0.35s ease,
+    box-shadow 0.45s ease;
+
+  background: #0d0a0d;
+}
+
+/* 1. Far Left & Far Right Cards (Receded / Smallest) */
+.coverflow-card.is-far-left,
+.coverflow-card.is-far-right {
+  flex: 0 0 200px;
+  height: 380px;
+  z-index: 2;
+  transform: scale(0.86);
+  filter: brightness(0.68) saturate(0.82);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.5);
+}
+
+/* 2. Mid Left & Mid Right Cards (Mid Depth) */
+.coverflow-card.is-mid-left,
+.coverflow-card.is-mid-right {
+  flex: 0 0 230px;
+  height: 420px;
+  z-index: 4;
+  transform: scale(0.93);
+  filter: brightness(0.84) saturate(0.92);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.6);
+}
+
+/* 3. Center Active Card (Dominant, Large, Elevated) */
+.coverflow-card.is-center {
+  flex: 0 0 310px;
+  height: 470px;
+  z-index: 6;
+  transform: scale(1);
+  filter: brightness(1) saturate(1.04);
+  border: 1.5px solid rgba(255, 60, 75, 0.88);
+  box-shadow:
+    0 24px 60px -8px rgba(0, 0, 0, 0.8),
+    0 0 0 1px rgba(229, 9, 20, 0.45),
+    0 0 34px rgba(229, 9, 20, 0.3),
+    inset 0 0 20px rgba(229, 9, 20, 0.14);
+}
+
+:root[data-theme='light'] .coverflow-card.is-center,
+.light-mode .coverflow-card.is-center {
+  border-color: rgba(220, 38, 38, 0.85);
+  box-shadow:
+    0 20px 48px -6px rgba(0, 0, 0, 0.22),
+    0 0 0 1px rgba(220, 38, 38, 0.4),
+    0 0 28px rgba(220, 38, 38, 0.2),
+    inset 0 0 16px rgba(220, 38, 38, 0.1);
+}
+
+/* Hover on side cards */
+.coverflow-card.card-side:hover {
+  filter: brightness(0.96) saturate(0.98);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+/* Media Stage & Full Bleed Image */
+.coverflow-media-stage {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.coverflow-bg-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 20%;
+  display: block;
+  transform: scale(1.02);
+  transition: transform 0.65s cubic-bezier(0.2, 0.9, 0.2, 1);
+}
+
+.coverflow-card.is-center .coverflow-bg-img {
+  transform: scale(1.05);
+}
+
+/* Bottom Dark Gradient Scrim */
+.coverflow-gradient-scrim {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    rgba(8, 7, 10, 0.05) 0%,
+    rgba(8, 7, 10, 0.18) 32%,
+    rgba(8, 7, 10, 0.74) 62%,
+    rgba(8, 7, 10, 0.94) 86%,
+    rgba(8, 7, 10, 0.99) 100%
+  );
+}
+
+:root[data-theme='light'] .coverflow-gradient-scrim,
+.light-mode .coverflow-gradient-scrim {
+  background: linear-gradient(
+    180deg,
+    rgba(15, 12, 16, 0.05) 0%,
+    rgba(15, 12, 16, 0.22) 32%,
+    rgba(15, 12, 16, 0.78) 62%,
+    rgba(12, 9, 12, 0.95) 86%,
+    rgba(10, 7, 10, 0.99) 100%
+  );
+}
+
+/* Category Badge (Top-Left) */
+.coverflow-category-tag {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  z-index: 4;
+  padding: 4px 10px;
+  border-radius: 6px;
+  background: rgba(85, 12, 18, 0.78);
+  border: 1px solid rgba(220, 38, 38, 0.45);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  font-family: var(--font-mono, monospace);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+}
+
+/* Bottom Content Pane */
+.coverflow-info-pane {
+  position: absolute;
+  inset-x: 0;
+  bottom: 0;
+  z-index: 4;
+  padding: 22px 18px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.coverflow-card.is-center .coverflow-info-pane {
+  padding: 24px 20px;
+  gap: 8px;
+}
+
+/* Card Title */
+.coverflow-card-title {
+  font-family: var(--font-display, 'Cinzel', serif, Georgia);
+  font-size: 1.02rem;
+  font-weight: 700;
+  line-height: 1.25;
+  color: #ffffff;
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.9);
+}
+
+.coverflow-card.is-center .coverflow-card-title {
+  font-size: clamp(1.25rem, 1.8vw, 1.48rem);
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+/* Card Description */
+.coverflow-card-desc {
+  font-family: var(--font-sans, sans-serif);
+  font-size: 0.8rem;
+  line-height: 1.45;
+  color: #cbd5e1;
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.8);
+}
+
+.coverflow-card.is-center .coverflow-card-desc {
+  font-size: 0.86rem;
+}
+
+/* Bottom Meta Bar (Date, Comments, Circular Arrow) */
+.coverflow-meta-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 6px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.coverflow-meta-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-family: var(--font-sans, sans-serif);
+  font-size: 0.74rem;
+  color: #94a3b8;
+}
+
+.meta-date,
+.meta-comments {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Circular Arrow CTA Button */
+.coverflow-arrow-cta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+/* Side Card CTA: Dark circle */
+.coverflow-arrow-cta.cta-side {
+  width: 32px;
+  height: 32px;
+  background: rgba(18, 14, 18, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+}
+
+.coverflow-card:hover .coverflow-arrow-cta.cta-side {
+  background: rgba(229, 9, 20, 0.7);
+  border-color: rgba(255, 255, 255, 0.4);
+  transform: scale(1.1);
+}
+
+/* Center Card CTA: Crimson glowing circle */
+.coverflow-arrow-cta.cta-active {
+  width: 38px;
+  height: 38px;
+  background: #e50914;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  color: #ffffff;
+  box-shadow: 0 0 16px rgba(229, 9, 20, 0.75);
+}
+
+.coverflow-arrow-cta.cta-active:hover {
+  background: #ff1a26;
+  transform: scale(1.1);
+  box-shadow: 0 0 22px rgba(229, 9, 20, 0.95);
+}
+
+/* ==============================================================================
+   Pagination Indicators (Bottom Center)
+   ============================================================================== */
+.coverflow-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 18px;
+}
+
+.coverflow-indicator-pill {
+  height: 4px;
+  border-radius: 4px;
+  border: none;
+  background: rgba(255, 255, 255, 0.25);
+  cursor: pointer;
+  padding: 0;
+  transition: all 0.35s cubic-bezier(0.2, 0.9, 0.2, 1);
+  width: 10px;
+}
+
+.coverflow-indicator-pill.active {
+  width: 30px;
+  background: #e50914;
+  box-shadow: 0 0 10px rgba(229, 9, 20, 0.7);
+}
+
+:root[data-theme='light'] .coverflow-indicator-pill,
+.light-mode .coverflow-indicator-pill {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+:root[data-theme='light'] .coverflow-indicator-pill.active,
+.light-mode .coverflow-indicator-pill.active {
+  background: #dc2626;
+  box-shadow: 0 0 10px rgba(220, 38, 38, 0.6);
+}
+
+/* ==============================================================================
+   Responsive Breakpoints
+   ============================================================================== */
+@media (max-width: 1200px) {
+  .coverflow-stage {
+    height: 460px;
+  }
+
+  .coverflow-card.is-far-left,
+  .coverflow-card.is-far-right {
+    flex: 0 0 180px;
+    height: 360px;
+  }
+
+  .coverflow-card.is-mid-left,
+  .coverflow-card.is-mid-right {
+    flex: 0 0 210px;
+    height: 400px;
+  }
+
+  .coverflow-card.is-center {
+    flex: 0 0 280px;
+    height: 450px;
+  }
+}
+
+@media (max-width: 900px) {
+  .coverflow-stage {
+    height: 430px;
+  }
+
+  /* On smaller screens, hide far cards or let track scroll */
+  .coverflow-card.is-far-left,
+  .coverflow-card.is-far-right {
+    display: none;
+  }
+
+  .coverflow-card.is-mid-left,
+  .coverflow-card.is-mid-right {
+    flex: 0 0 200px;
+    height: 380px;
+  }
+
+  .coverflow-card.is-center {
+    flex: 0 0 270px;
+    height: 420px;
+  }
+}
+
+@media (max-width: 640px) {
+  .coverflow-chronicles-section {
+    margin: 18px 0 36px;
+  }
+
+  .coverflow-stage {
+    height: 400px;
+  }
+
+  .coverflow-card.is-mid-left,
+  .coverflow-card.is-mid-right {
+    display: none;
+  }
+
+  .coverflow-card.is-center {
+    flex: 0 0 calc(100vw - 72px);
+    max-width: 340px;
+    height: 400px;
+  }
+
+  .coverflow-nav-btn {
+    width: 36px;
+    height: 36px;
+  }
+}

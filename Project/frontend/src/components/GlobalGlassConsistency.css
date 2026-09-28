@@ -1,0 +1,855 @@
+/* ==============================================================================
+   DARK MODE — GLOBAL GLASS CONSISTENCY ENGINE
+   Exact same glass level/style as the Releases filter panel:
+     background: rgba(19, 13, 21, 0.78);
+     border: 1px solid rgba(191, 61, 90, 0.25);
+     box-shadow: 0 12px 28px -22px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+     backdrop-filter: blur(14px);
+     -webkit-backdrop-filter: blur(14px);
+   Applied in DARK MODE ONLY to:
+   - All cards, boxes, panels, filters and tabs
+   - Header + Footer
+   - Forms, dropdowns and text containers
+   ============================================================================== */
+
+:root:not([data-theme='light']) .portal-universe:not(.theme-light),
+.portal-universe.theme-dark,
+:root[data-theme='dark'] .portal-universe,
+html:not([data-theme='light']) body:not(.theme-light) {
+  --release-glass-bg: rgba(19, 13, 21, 0.78);
+  --release-glass-field: rgba(9, 7, 13, 0.52);
+  --release-glass-border: rgba(191, 61, 90, 0.25);
+  --release-glass-border-strong: rgba(220, 38, 38, 0.65);
+  --release-glass-shadow: 0 12px 28px -22px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  --release-glass-shadow-elevated: 0 18px 40px -18px rgba(0, 0, 0, 0.85), 0 0 20px rgba(220, 38, 38, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  --release-glass-blur: blur(14px);
+  --release-glass-ink: #fff3ec;
+  --release-glass-muted: #d3c3cb;
+  --release-glass-dim: #9b8c95;
+}
+
+/* 1. HEADER (Cinematic Masthead) */
+:root:not([data-theme='light']) .portal-universe:not(.theme-light) .cinematic-header,
+.portal-universe.theme-dark .cinematic-header,
+:root:not([data-theme='light']) .cinematic-header:not(.theme-light) {
+  background: var(--release-glass-bg) !important;
+  border-bottom: 1px solid var(--release-glass-border) !important;
+  box-shadow: var(--release-glass-shadow) !important;
+  backdrop-filter: var(--release-glass-blur) !important;
+  -webkit-backdrop-filter: var(--release-glass-blur) !important;
+}
+
+/* Header Dropdowns & Search */
+:root:not([data-theme='light']) .portal-universe:not(.theme-light) :is(.nav-search-bar, .nav-search-input-wrapper, .more-dropdown, .profile-dropdown, .nav-dropdown-menu),
+.portal-universe.theme-dark :is(.nav-search-bar, .nav-search-input-wrapper, .more-dropdown, .profile-dropdown, .nav-dropdown-menu) {
+  background: var(--release-glass-bg) !important;
+  border: 1px solid var(--release-glass-border) !important;
+  box-shadow: var(--release-glass-shadow-elevated) !important;
+  backdrop-filter: var(--release-glass-blur) !important;
+  -webkit-backdrop-filter: var(--release-glass-blur) !important;
+}
+
+/* 2. FOOTER (Exact Releases Glass System) */
+:root:not([data-theme='light']) .portal-universe:not(.theme-light) .portal-footer,
+.portal-universe.theme-dark .portal-footer,
+:root:not([data-theme='light']) .portal-footer:not(.theme-light) {
+  background: var(--release-glass-bg) !important;
+  border-top: 1px solid var(--release-glass-border) !important;
+  box-shadow: 0 -12px 28px -22px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.12) !important;
+  backdrop-filter: var(--release-glass-blur) !important;
+  -webkit-backdrop-filter: var(--release-glass-blur) !important;
+}
+
+/* 3. ALL FILTER BARS, TABS & CONTROL STRIPS */
+:root:not([data-theme='light']) .portal-universe:not(.theme-light) :is(
+  .srs-filter-bar,
+  .srs-tab-bar,
+  .dashboard-tabs,
+  .srs-filter-chips-row,
+  .bookmark-type-filters,
+  .submissions-action-bar,
+  .srs-tags-row,
+  .events-calendar-row,
+  .media-format-selector,
+  .admin-table-controls,
+  .admin-tab-nav,
+  .fandom-tabs-wrap
+),
+.portal-universe.theme-dark :is(
+  .srs-filter-bar,
+  .srs-tab-bar,
+  .dashboard-tabs,
+  .srs-filter-chips-row,
+  .bookmark-type-filters,
+  .submissions-action-bar,
+  .srs-tags-row,
+  .events-calendar-row,
+  .media-format-selector,
+  .admin-table-controls,
+  .admin-tab-nav,
+  .fandom-tabs-wrap
+) {
+  background: var(--release-glass-bg) !important;
+  border: 1px solid var(--release-glass-border) !important;
+  box-shadow: var(--release-glass-shadow) !important;
+  backdrop-filter: var(--release-glass-blur) !important;
+  -webkit-backdrop-filter: var(--release-glass-blur) !important;
+  color: var(--release-glass-ink);
+}
+
+/* Individual tab buttons, filter chips, pill items */
+:root:not([data-theme='light']) .portal-universe:not(.theme-light) :is(
+  .srs-tab-btn,
+  .filter-chip,
+  .bmark-chip,
+  .events-cal-pill,
+  .btn-media-filter,
+  .font-btn,
+  .fandom-fav-btn,
+  .category-pill,
+  .admin-tab-btn,
+  .srs-badge-pill
+),
+.portal-universe.theme-dark :is(
+  .srs-tab-btn,
+  .filter-chip,
+  .bmark-chip,
+  .events-cal-pill,
+  .btn-media-filter,
+  .font-btn,
+  .fandom-fav-btn,
+  .category-pill,
+  .admin-tab-btn,
+  .srs-badge-pill
+) {
+  background: var(--release-glass-field) !important;
+  border: 1px solid var(--release-glass-border) !important;
+  box-shadow: none !important;
+  color: var(--release-glass-muted) !important;
+}
+
+:root:not([data-theme='light']) .portal-universe:not(.theme-light) :is(
+  .srs-pill:not(.active),
+  .srs-tag-chip:not(.active)
+),
+.portal-universe.theme-dark :is(
+  .srs-pill:not(.active),
+  .srs-tag-chip:not(.active)
+) {
+  background: var(--release-glass-field) !important;
+  border: 1px solid var(--release-glass-border) !important;
+  box-shadow: none !important;
+  color: var(--release-glass-muted) !important;
+}
+
+:root:not([data-theme='light']) .portal-universe:not(.theme-light) :is(
+  .srs-tab-btn:hover,
+  .filter-chip:hover,
+  .bmark-chip:hover,
+  .events-cal-pill:hover,
+  .btn-media-filter:hover,
+  .font-btn:hover,
+  .fandom-fav-btn:hover,
+  .srs-pill:hover,
+  .category-pill:hover,
+  .admin-tab-btn:hover
+),
+.portal-universe.theme-dark :is(
+  .srs-tab-btn:hover,
+  .filter-chip:hover,
+  .bmark-chip:hover,
+  .events-cal-pill:hover,
+  .btn-media-filter:hover,
+  .font-btn:hover,
+  .fandom-fav-btn:hover,
+  .srs-pill:hover,
+  .category-pill:hover,
+  .admin-tab-btn:hover
+) {
+  border-color: var(--release-glass-border-strong) !important;
+  color: var(--release-glass-ink) !important;
+  background: rgba(168, 28, 55, 0.22) !important;
+}
+
+/* 4. ALL CARDS & PANELS */
+:root:not([data-theme='light']) .portal-universe:not(.theme-light) :is(
+  .srs-card,
+  .bookmark-card,
+  .merchandise-card,
+  .release-card,
+  .event-card,
+  .catalog-legend,
+  .media-library-tile,
+  .chronicles-editorial-card,
+  .srs-history-card,
+  .dash-section-card,
+  .sitemap-card.glass-panel,
+  .content-card,
+  .events-radar-map-panel
+),
+.portal-universe.theme-dark :is(
+  .srs-card,
+  .bookmark-card,
+  .merchandise-card,
+  .release-card,
+  .event-card,
+  .catalog-legend,
+  .media-library-tile,
+  .chronicles-editorial-card,
+  .srs-history-card,
+  .dash-section-card,
+  .sitemap-card.glass-panel,
+  .content-card,
+  .events-radar-map-panel
+) {
+  background: var(--release-glass-bg) !important;
+  background-color: var(--release-glass-bg) !important;
+  border: 1px solid var(--release-glass-border) !important;
+  box-shadow: var(--release-glass-shadow) !important;
+  backdrop-filter: var(--release-glass-blur) !important;
+  -webkit-backdrop-filter: var(--release-glass-blur) !important;
+}
+
+:root:not([data-theme='light']) .portal-universe:not(.theme-light) :is(
+  .srs-card:hover,
+  .bookmark-card:hover,
+  .merchandise-card:hover,
+  .release-card:hover,
+  .event-card:hover,
+  .catalog-legend:hover,
+  .media-library-tile:hover,
+  .chronicles-editorial-card:hover,
+  .srs-history-card:hover,
+  .dash-section-card:hover,
+  .sitemap-card.glass-panel:hover
+),
+.portal-universe.theme-dark :is(
+  .srs-card:hover,
+  .bookmark-card:hover,
+  .merchandise-card:hover,
+  .release-card:hover,
+  .event-card:hover,
+  .catalog-legend:hover,
+  .media-library-tile:hover,
+  .chronicles-editorial-card:hover,
+  .srs-history-card:hover,
+  .dash-section-card:hover,
+  .sitemap-card.glass-panel:hover
+) {
+  border-color: var(--release-glass-border-strong) !important;
+  box-shadow: var(--release-glass-shadow-elevated) !important;
+}
+
+/* Card Body in dark mode */
+:root:not([data-theme='light']) .portal-universe:not(.theme-light) .srs-card-body,
+.portal-universe.theme-dark .srs-card-body {
+  background: var(--release-glass-bg) !important;
+  border-top: 1px solid var(--release-glass-border) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
+}
+
+/* 5. STAT BOXES & METRIC CONTAINERS */
+:root:not([data-theme='light']) .portal-universe:not(.theme-light) :is(
+  .dash-metric-card,
+  .profile-stat-box,
+  .stat-box,
+  .metrics-card,
+  .stat-item,
+  .srs-count-indicator,
+  .profile-summary-card,
+  .admin-stat-card,
+  .admin-metric-box
+),
+.portal-universe.theme-dark :is(
+  .dash-metric-card,
+  .profile-stat-box,
+  .stat-box,
+  .metrics-card,
+  .stat-item,
+  .srs-count-indicator,
+  .profile-summary-card,
+  .admin-stat-card,
+  .admin-metric-box
+) {
+  background: var(--release-glass-bg) !important;
+  border: 1px solid var(--release-glass-border) !important;
+  box-shadow: var(--release-glass-shadow) !important;
+  backdrop-filter: var(--release-glass-blur) !important;
+  -webkit-backdrop-filter: var(--release-glass-blur) !important;
+  color: var(--release-glass-ink);
+}
+
+/* 6. FORMS, DROPDOWNS & TEXT CONTAINERS */
+:root:not([data-theme='light']) .portal-universe:not(.theme-light) :is(
+  .srs-search-input-wrapper,
+  .events-date-picker-wrap,
+  .srs-input,
+  .srs-textarea,
+  .srs-select,
+  .form-control,
+  .admin-form-input,
+  .admin-form-select,
+  .admin-form-textarea,
+  .history-card-notes,
+  .release-specs-matrix,
+  .hype-meter-block,
+  .fandom-selector-container,
+  .auth-form-card,
+  .submission-form-container,
+  .feedback-form-container,
+  .admin-table-container,
+  .modal-content.glass-panel,
+  .srs-empty-box,
+  .empty-catalog-state,
+  .catalog-error-box
+),
+.portal-universe.theme-dark :is(
+  .srs-search-input-wrapper,
+  .events-date-picker-wrap,
+  .srs-input,
+  .srs-textarea,
+  .srs-select,
+  .form-control,
+  .admin-form-input,
+  .admin-form-select,
+  .admin-form-textarea,
+  .history-card-notes,
+  .release-specs-matrix,
+  .hype-meter-block,
+  .fandom-selector-container,
+  .auth-form-card,
+  .submission-form-container,
+  .feedback-form-container,
+  .admin-table-container,
+  .modal-content.glass-panel,
+  .srs-empty-box,
+  .empty-catalog-state,
+  .catalog-error-box
+) {
+  background: var(--release-glass-bg) !important;
+  border: 1px solid var(--release-glass-border) !important;
+  box-shadow: var(--release-glass-shadow) !important;
+  backdrop-filter: var(--release-glass-blur) !important;
+  -webkit-backdrop-filter: var(--release-glass-blur) !important;
+  color: var(--release-glass-ink);
+}
+
+/* Input inner fields inside forms */
+:root:not([data-theme='light']) .portal-universe:not(.theme-light) :is(
+  input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]):not([type="button"]),
+  textarea,
+  select
+),
+.portal-universe.theme-dark :is(
+  input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]):not([type="button"]),
+  textarea,
+  select
+) {
+  background: var(--release-glass-field) !important;
+  border-color: var(--release-glass-border) !important;
+  color: var(--release-glass-ink) !important;
+}
+
+:root:not([data-theme='light']) .portal-universe:not(.theme-light) :is(
+  input:focus,
+  textarea:focus,
+  select:focus
+),
+.portal-universe.theme-dark :is(
+  input:focus,
+  textarea:focus,
+  select:focus
+) {
+  border-color: var(--release-glass-border-strong) !important;
+  box-shadow: 0 0 14px rgba(220, 38, 38, 0.28) !important;
+}
+
+/* Select options */
+:root:not([data-theme='light']) .portal-universe:not(.theme-light) select option,
+.portal-universe.theme-dark select option {
+  background: #130d15 !important;
+  color: #fff3ec !important;
+}
+
+/* 7. GLOBAL PAGINATION (Matching Exact Releases Glass Engine) */
+:root:not([data-theme='light']) .portal-universe:not(.theme-light) :is(
+  .srs-pagination-controls,
+  .pagination-bar,
+  .srs-pagination-bar,
+  .admin-table-pagination
+),
+.portal-universe.theme-dark :is(
+  .srs-pagination-controls,
+  .pagination-bar,
+  .srs-pagination-bar,
+  .admin-table-pagination
+) {
+  background: var(--release-glass-bg) !important;
+  border: 1px solid var(--release-glass-border) !important;
+  box-shadow: var(--release-glass-shadow) !important;
+  backdrop-filter: var(--release-glass-blur) !important;
+  -webkit-backdrop-filter: var(--release-glass-blur) !important;
+}
+
+:root:not([data-theme='light']) .portal-universe:not(.theme-light) :is(
+  .srs-page-btn,
+  .btn-page-nav,
+  .btn-admin-pager
+),
+.portal-universe.theme-dark :is(
+  .srs-page-btn,
+  .btn-page-nav,
+  .btn-admin-pager
+) {
+  background: var(--release-glass-field) !important;
+  border: 1px solid var(--release-glass-border) !important;
+  color: var(--release-glass-ink) !important;
+}
+
+/* 8. HEADING & WRAPPER TRANSPARENCY SHIELD (No rectangular glass damage behind headings) */
+:root .portal-universe :is(
+  .srs-header-banner,
+  .explore-hero-strip,
+  .gateways-header,
+  .home-section-header,
+  .admin-console-header,
+  .breadcrumbs-container,
+  .breadcrumbs-list,
+  .page-eyebrow,
+  .explore-title,
+  .explore-subtitle,
+  .srs-main-heading,
+  .srs-main-subtext,
+  .portal-content-page,
+  .srs-section-container,
+  .srs-page-container,
+  .srs-page-inner,
+  .dashboard-page-main,
+  .profile-page-main,
+  .submissions-page-main,
+  .feedback-page-main,
+  .sitemap-page-main,
+  .explore-page-main,
+  .characters-page-main,
+  .media-page-main,
+  .admin-page-main
+) {
+  background: transparent !important;
+  background-color: transparent !important;
+  background-image: none !important;
+  border: none !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+:root .portal-universe :is(
+  .srs-header-banner,
+  .explore-hero-strip,
+  .gateways-header,
+  .home-section-header,
+  .admin-console-header,
+  .breadcrumbs-container,
+  .breadcrumbs-list
+)::after {
+  content: none !important;
+  display: none !important;
+  background: none !important;
+  box-shadow: none !important;
+}
+
+/* ==============================================================================
+   LIGHT MODE — GLOBAL GLASS CONSISTENCY ENGINE
+   Exact same glass level/style as finalized in Dark Mode, matching:
+     - Same opacity (0.78 background, 0.52 fields)
+     - Same blur (14px)
+     - Warm ivory/white tint instead of dark obsidian:
+       rgba(255, 252, 247, 0.78)
+     - Subtle crimson border: rgba(220, 38, 38, 0.22)
+     - Soft shine & elevated depth
+   ============================================================================== */
+
+:root[data-theme='light'] .portal-universe,
+.portal-universe.theme-light,
+:root[data-theme='light'] body,
+html[data-theme='light'] body,
+body.theme-light {
+  --release-glass-bg-light: rgba(255, 252, 247, 0.78);
+  --release-glass-field-light: rgba(247, 242, 235, 0.52);
+  --release-glass-border-light: rgba(220, 38, 38, 0.22);
+  --release-glass-border-strong-light: rgba(220, 38, 38, 0.60);
+  --release-glass-shadow-light: 0 12px 28px -22px rgba(90, 20, 30, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.95);
+  --release-glass-shadow-elevated-light: 0 18px 40px -18px rgba(90, 20, 30, 0.25), 0 0 18px rgba(220, 38, 38, 0.12), inset 0 1px 0 rgba(255, 255, 255, 1);
+  --release-glass-blur-light: blur(14px);
+  --release-glass-ink-light: #181216;
+  --release-glass-muted-light: #52434a;
+  --release-glass-dim-light: #7c6c74;
+}
+
+/* 1. LIGHT MODE HEADER */
+:root[data-theme='light'] .cinematic-header,
+.portal-universe.theme-light .cinematic-header,
+.cinematic-header.theme-light {
+  background: var(--release-glass-bg-light) !important;
+  border-bottom: 1px solid var(--release-glass-border-light) !important;
+  box-shadow: var(--release-glass-shadow-light) !important;
+  backdrop-filter: var(--release-glass-blur-light) !important;
+  -webkit-backdrop-filter: var(--release-glass-blur-light) !important;
+}
+
+:root[data-theme='light'] :is(.nav-search-bar, .nav-search-input-wrapper, .more-dropdown, .profile-dropdown, .nav-dropdown-menu),
+.portal-universe.theme-light :is(.nav-search-bar, .nav-search-input-wrapper, .more-dropdown, .profile-dropdown, .nav-dropdown-menu) {
+  background: var(--release-glass-bg-light) !important;
+  border: 1px solid var(--release-glass-border-light) !important;
+  box-shadow: var(--release-glass-shadow-elevated-light) !important;
+  backdrop-filter: var(--release-glass-blur-light) !important;
+  -webkit-backdrop-filter: var(--release-glass-blur-light) !important;
+  color: var(--release-glass-ink-light) !important;
+}
+
+/* 2. LIGHT MODE FOOTER */
+:root[data-theme='light'] .portal-footer,
+.portal-universe.theme-light .portal-footer,
+.portal-footer.theme-light {
+  background: var(--release-glass-bg-light) !important;
+  border-top: 1px solid var(--release-glass-border-light) !important;
+  box-shadow: 0 -12px 28px -22px rgba(90, 20, 30, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.95) !important;
+  backdrop-filter: var(--release-glass-blur-light) !important;
+  -webkit-backdrop-filter: var(--release-glass-blur-light) !important;
+}
+
+/* 3. LIGHT MODE FILTER BARS, TABS & CONTROL STRIPS */
+:root[data-theme='light'] :is(
+  .srs-filter-bar,
+  .srs-tab-bar,
+  .dashboard-tabs,
+  .srs-filter-chips-row,
+  .bookmark-type-filters,
+  .submissions-action-bar,
+  .srs-tags-row,
+  .events-calendar-row,
+  .media-format-selector,
+  .admin-table-controls,
+  .admin-tab-nav,
+  .fandom-tabs-wrap
+),
+.portal-universe.theme-light :is(
+  .srs-filter-bar,
+  .srs-tab-bar,
+  .dashboard-tabs,
+  .srs-filter-chips-row,
+  .bookmark-type-filters,
+  .submissions-action-bar,
+  .srs-tags-row,
+  .events-calendar-row,
+  .media-format-selector,
+  .admin-table-controls,
+  .admin-tab-nav,
+  .fandom-tabs-wrap
+) {
+  background: var(--release-glass-bg-light) !important;
+  border: 1px solid var(--release-glass-border-light) !important;
+  box-shadow: var(--release-glass-shadow-light) !important;
+  backdrop-filter: var(--release-glass-blur-light) !important;
+  -webkit-backdrop-filter: var(--release-glass-blur-light) !important;
+  color: var(--release-glass-ink-light) !important;
+}
+
+/* Light mode individual tab buttons, filter chips, pill items */
+:root[data-theme='light'] :is(
+  .srs-tab-btn,
+  .filter-chip,
+  .bmark-chip,
+  .events-cal-pill,
+  .btn-media-filter,
+  .font-btn,
+  .fandom-fav-btn,
+  .category-pill,
+  .admin-tab-btn,
+  .srs-badge-pill,
+  .srs-pill:not(.active),
+  .srs-tag-chip:not(.active)
+),
+.portal-universe.theme-light :is(
+  .srs-tab-btn,
+  .filter-chip,
+  .bmark-chip,
+  .events-cal-pill,
+  .btn-media-filter,
+  .font-btn,
+  .fandom-fav-btn,
+  .category-pill,
+  .admin-tab-btn,
+  .srs-badge-pill,
+  .srs-pill:not(.active),
+  .srs-tag-chip:not(.active)
+) {
+  background: var(--release-glass-field-light) !important;
+  border: 1px solid var(--release-glass-border-light) !important;
+  box-shadow: none !important;
+  color: var(--release-glass-muted-light) !important;
+}
+
+:root[data-theme='light'] :is(
+  .srs-tab-btn:hover,
+  .filter-chip:hover,
+  .bmark-chip:hover,
+  .events-cal-pill:hover,
+  .btn-media-filter:hover,
+  .font-btn:hover,
+  .fandom-fav-btn:hover,
+  .srs-pill:hover,
+  .category-pill:hover,
+  .admin-tab-btn:hover
+),
+.portal-universe.theme-light :is(
+  .srs-tab-btn:hover,
+  .filter-chip:hover,
+  .bmark-chip:hover,
+  .events-cal-pill:hover,
+  .btn-media-filter:hover,
+  .font-btn:hover,
+  .fandom-fav-btn:hover,
+  .srs-pill:hover,
+  .category-pill:hover,
+  .admin-tab-btn:hover
+) {
+  border-color: var(--release-glass-border-strong-light) !important;
+  color: var(--release-glass-ink-light) !important;
+  background: rgba(220, 38, 38, 0.10) !important;
+}
+
+/* 4. LIGHT MODE ALL CARDS & PANELS */
+:root[data-theme='light'] :is(
+  .srs-card,
+  .bookmark-card,
+  .merchandise-card,
+  .release-card,
+  .event-card,
+  .catalog-legend,
+  .media-library-tile,
+  .chronicles-editorial-card,
+  .srs-history-card,
+  .dash-section-card,
+  .sitemap-card.glass-panel,
+  .content-card,
+  .events-radar-map-panel
+),
+.portal-universe.theme-light :is(
+  .srs-card,
+  .bookmark-card,
+  .merchandise-card,
+  .release-card,
+  .event-card,
+  .catalog-legend,
+  .media-library-tile,
+  .chronicles-editorial-card,
+  .srs-history-card,
+  .dash-section-card,
+  .sitemap-card.glass-panel,
+  .content-card,
+  .events-radar-map-panel
+) {
+  background: var(--release-glass-bg-light) !important;
+  background-color: var(--release-glass-bg-light) !important;
+  border: 1px solid var(--release-glass-border-light) !important;
+  box-shadow: var(--release-glass-shadow-light) !important;
+  backdrop-filter: var(--release-glass-blur-light) !important;
+  -webkit-backdrop-filter: var(--release-glass-blur-light) !important;
+}
+
+:root[data-theme='light'] :is(
+  .srs-card:hover,
+  .bookmark-card:hover,
+  .merchandise-card:hover,
+  .release-card:hover,
+  .event-card:hover,
+  .catalog-legend:hover,
+  .media-library-tile:hover,
+  .chronicles-editorial-card:hover,
+  .srs-history-card:hover,
+  .dash-section-card:hover,
+  .sitemap-card.glass-panel:hover
+),
+.portal-universe.theme-light :is(
+  .srs-card:hover,
+  .bookmark-card:hover,
+  .merchandise-card:hover,
+  .release-card:hover,
+  .event-card:hover,
+  .catalog-legend:hover,
+  .media-library-tile:hover,
+  .chronicles-editorial-card:hover,
+  .srs-history-card:hover,
+  .dash-section-card:hover,
+  .sitemap-card.glass-panel:hover
+) {
+  border-color: var(--release-glass-border-strong-light) !important;
+  box-shadow: var(--release-glass-shadow-elevated-light) !important;
+}
+
+/* Light mode Card Body */
+:root[data-theme='light'] .srs-card-body,
+.portal-universe.theme-light .srs-card-body {
+  background: var(--release-glass-bg-light) !important;
+  border-top: 1px solid var(--release-glass-border-light) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.85) !important;
+}
+
+/* 5. LIGHT MODE STAT BOXES & METRIC CONTAINERS */
+:root[data-theme='light'] :is(
+  .dash-metric-card,
+  .profile-stat-box,
+  .stat-box,
+  .metrics-card,
+  .stat-item,
+  .srs-count-indicator,
+  .profile-summary-card,
+  .admin-stat-card,
+  .admin-metric-box
+),
+.portal-universe.theme-light :is(
+  .dash-metric-card,
+  .profile-stat-box,
+  .stat-box,
+  .metrics-card,
+  .stat-item,
+  .srs-count-indicator,
+  .profile-summary-card,
+  .admin-stat-card,
+  .admin-metric-box
+) {
+  background: var(--release-glass-bg-light) !important;
+  border: 1px solid var(--release-glass-border-light) !important;
+  box-shadow: var(--release-glass-shadow-light) !important;
+  backdrop-filter: var(--release-glass-blur-light) !important;
+  -webkit-backdrop-filter: var(--release-glass-blur-light) !important;
+  color: var(--release-glass-ink-light);
+}
+
+/* 6. LIGHT MODE FORMS, DROPDOWNS & TEXT CONTAINERS */
+:root[data-theme='light'] :is(
+  .srs-search-input-wrapper,
+  .events-date-picker-wrap,
+  .srs-input,
+  .srs-textarea,
+  .srs-select,
+  .form-control,
+  .admin-form-input,
+  .admin-form-select,
+  .admin-form-textarea,
+  .history-card-notes,
+  .release-specs-matrix,
+  .hype-meter-block,
+  .fandom-selector-container,
+  .auth-form-card,
+  .submission-form-container,
+  .feedback-form-container,
+  .admin-table-container,
+  .modal-content.glass-panel,
+  .srs-empty-box,
+  .empty-catalog-state,
+  .catalog-error-box
+),
+.portal-universe.theme-light :is(
+  .srs-search-input-wrapper,
+  .events-date-picker-wrap,
+  .srs-input,
+  .srs-textarea,
+  .srs-select,
+  .form-control,
+  .admin-form-input,
+  .admin-form-select,
+  .admin-form-textarea,
+  .history-card-notes,
+  .release-specs-matrix,
+  .hype-meter-block,
+  .fandom-selector-container,
+  .auth-form-card,
+  .submission-form-container,
+  .feedback-form-container,
+  .admin-table-container,
+  .modal-content.glass-panel,
+  .srs-empty-box,
+  .empty-catalog-state,
+  .catalog-error-box
+) {
+  background: var(--release-glass-bg-light) !important;
+  border: 1px solid var(--release-glass-border-light) !important;
+  box-shadow: var(--release-glass-shadow-light) !important;
+  backdrop-filter: var(--release-glass-blur-light) !important;
+  -webkit-backdrop-filter: var(--release-glass-blur-light) !important;
+  color: var(--release-glass-ink-light);
+}
+
+:root[data-theme='light'] :is(
+  input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]):not([type="button"]),
+  textarea,
+  select
+),
+.portal-universe.theme-light :is(
+  input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]):not([type="button"]),
+  textarea,
+  select
+) {
+  background: var(--release-glass-field-light) !important;
+  border-color: var(--release-glass-border-light) !important;
+  color: var(--release-glass-ink-light) !important;
+}
+
+:root[data-theme='light'] :is(
+  input:focus,
+  textarea:focus,
+  select:focus
+),
+.portal-universe.theme-light :is(
+  input:focus,
+  textarea:focus,
+  select:focus
+) {
+  border-color: var(--release-glass-border-strong-light) !important;
+  box-shadow: 0 0 14px rgba(220, 38, 38, 0.18) !important;
+}
+
+:root[data-theme='light'] select option,
+.portal-universe.theme-light select option {
+  background: #fffcf7 !important;
+  color: #181216 !important;
+}
+
+/* 7. LIGHT MODE GLOBAL PAGINATION */
+:root[data-theme='light'] :is(
+  .srs-pagination-controls,
+  .pagination-bar,
+  .srs-pagination-bar,
+  .admin-table-pagination
+),
+.portal-universe.theme-light :is(
+  .srs-pagination-controls,
+  .pagination-bar,
+  .srs-pagination-bar,
+  .admin-table-pagination
+) {
+  background: var(--release-glass-bg-light) !important;
+  border: 1px solid var(--release-glass-border-light) !important;
+  box-shadow: var(--release-glass-shadow-light) !important;
+  backdrop-filter: var(--release-glass-blur-light) !important;
+  -webkit-backdrop-filter: var(--release-glass-blur-light) !important;
+}
+
+:root[data-theme='light'] :is(
+  .srs-page-btn,
+  .btn-page-nav,
+  .btn-admin-pager
+),
+.portal-universe.theme-light :is(
+  .srs-page-btn,
+  .btn-page-nav,
+  .btn-admin-pager
+) {
+  background: var(--release-glass-field-light) !important;
+  border: 1px solid var(--release-glass-border-light) !important;
+  color: var(--release-glass-ink-light) !important;
+}
+
+

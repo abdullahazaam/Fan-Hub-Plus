@@ -1,4 +1,4 @@
-﻿{
+{
   "$schema": "https://json.schemastore.org/launchsettings.json",
   "profiles": {
     "http": {
@@ -7,7 +7,10 @@
       "launchBrowser": false,
       "applicationUrl": "http://localhost:5075",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "FAN_HUB_JWT_KEY": "FanHubPlus-Dev-Secret-2026-MinimumThirtyTwoChars!",
+        "DEV_ADMIN_PASSWORD": "Admin@12345",
+        "DEV_USER_PASSWORD": "User@12345"
       }
     },
     "https": {
@@ -16,7 +19,10 @@
       "launchBrowser": false,
       "applicationUrl": "https://localhost:7121;http://localhost:5075",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "FAN_HUB_JWT_KEY": "FanHubPlus-Dev-Secret-2026-MinimumThirtyTwoChars!",
+        "DEV_ADMIN_PASSWORD": "Admin@12345",
+        "DEV_USER_PASSWORD": "User@12345"
       }
     }
   }

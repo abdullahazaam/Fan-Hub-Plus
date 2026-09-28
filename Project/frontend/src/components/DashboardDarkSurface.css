@@ -1,0 +1,256 @@
+
+/* ==============================================================================
+   PERSONAL ARCHIVE / DASHBOARD DARK SURFACE UNIFICATION
+   Deep obsidian surface + subtle crimson border across all tabs, filter sections,
+   controls, and text panels to match top stat cards and prevent bleed-through.
+   ============================================================================== */
+.portal-universe :is(.dashboard-page-view, .dashboard-container, .dashboard-modal) {
+  --dash-obsidian-surface: rgba(13, 16, 23, 0.94);
+  --dash-obsidian-card: rgba(13, 16, 23, 0.92);
+  --dash-obsidian-field: rgba(18, 22, 32, 0.95);
+  --dash-crimson-border: rgba(220, 38, 38, 0.32);
+  --dash-crimson-border-strong: rgba(220, 38, 38, 0.55);
+  --dash-ink: #ffffff;
+  --dash-muted: #D8D8DC;
+  --dash-dim: #9ca3af;
+}
+
+.portal-universe.theme-light :is(.dashboard-page-view, .dashboard-container, .dashboard-modal),
+[data-theme='light'] .portal-universe :is(.dashboard-page-view, .dashboard-container, .dashboard-modal) {
+  --dash-obsidian-surface: rgba(248, 245, 240, 0.96);
+  --dash-obsidian-card: rgba(255, 255, 255, 0.94);
+  --dash-obsidian-field: rgba(240, 236, 230, 0.96);
+  --dash-crimson-border: rgba(220, 38, 38, 0.28);
+  --dash-crimson-border-strong: rgba(220, 38, 38, 0.50);
+  --dash-ink: #171717;
+  --dash-muted: #454545;
+  --dash-dim: #6b7280;
+}
+
+/* Stat Cards & Header Banner */
+:is(.dashboard-page-view, .dashboard-container, .dashboard-modal) .dash-metric-card {
+  background: var(--dash-obsidian-card) !important;
+  border: 1px solid var(--dash-crimson-border) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.45) !important;
+}
+
+:is(.dashboard-page-view, .dashboard-container, .dashboard-modal) .dash-metrics-bar {
+  margin-bottom: 1.5rem;
+}
+
+/* Tab Navigation Strip */
+:is(.dashboard-page-view, .dashboard-container, .dashboard-modal) .srs-tab-bar,
+:is(.dashboard-page-view, .dashboard-container, .dashboard-modal) .dashboard-tabs {
+  background: var(--dash-obsidian-surface) !important;
+  border: 1px solid var(--dash-crimson-border) !important;
+  border-radius: var(--radius-md) !important;
+  padding: 0.55rem 0.75rem !important;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.45) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+  gap: 0.65rem !important;
+}
+
+:is(.dashboard-page-view, .dashboard-container, .dashboard-modal) .srs-tab-btn {
+  background: var(--dash-obsidian-field) !important;
+  border: 1px solid var(--dash-crimson-border) !important;
+  color: var(--dash-muted) !important;
+  font-weight: 700 !important;
+  box-shadow: none !important;
+}
+
+:is(.dashboard-page-view, .dashboard-container, .dashboard-modal) .srs-tab-btn:hover {
+  border-color: var(--dash-crimson-border-strong) !important;
+  color: var(--dash-ink) !important;
+  background: rgba(220, 38, 38, 0.15) !important;
+}
+
+:is(.dashboard-page-view, .dashboard-container, .dashboard-modal) .srs-tab-btn.active {
+  background: var(--accent-crimson) !important;
+  border-color: var(--accent-crimson) !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 16px var(--accent-crimson-glow) !important;
+}
+
+/* Filter Strip (Sector Chips Row) */
+:is(.dashboard-page-view, .dashboard-container, .dashboard-modal) .srs-filter-chips-row,
+:is(.dashboard-page-view, .dashboard-container, .dashboard-modal) .bookmark-type-filters {
+  background: var(--dash-obsidian-surface) !important;
+  border: 1px solid var(--dash-crimson-border) !important;
+  border-radius: var(--radius-md) !important;
+  padding: 0.85rem 1.25rem !important;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.45) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+  margin-bottom: 1.5rem !important;
+}
+
+:is(.dashboard-page-view, .dashboard-container, .dashboard-modal) .filter-chips-label {
+  color: var(--dash-muted) !important;
+  font-weight: 800 !important;
+}
+
+:is(.dashboard-page-view, .dashboard-container, .dashboard-modal) :is(.filter-chip, .bmark-chip) {
+  background: var(--dash-obsidian-field) !important;
+  border: 1px solid var(--dash-crimson-border) !important;
+  color: var(--dash-muted) !important;
+  font-weight: 700 !important;
+}
+
+:is(.dashboard-page-view, .dashboard-container, .dashboard-modal) :is(.filter-chip, .bmark-chip):hover {
+  border-color: var(--dash-crimson-border-strong) !important;
+  color: var(--dash-ink) !important;
+  background: rgba(220, 38, 38, 0.15) !important;
+}
+
+:is(.dashboard-page-view, .dashboard-container, .dashboard-modal) :is(.filter-chip.active, .bmark-chip.active) {
+  background: var(--accent-crimson) !important;
+  border-color: var(--accent-crimson) !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 14px var(--accent-crimson-glow) !important;
+}
+
+/* Action Bar in Lore Submissions */
+:is(.dashboard-page-view, .dashboard-container, .dashboard-modal) .submissions-action-bar {
+  background: var(--dash-obsidian-surface) !important;
+  border: 1px solid var(--dash-crimson-border) !important;
+  border-radius: var(--radius-md) !important;
+  padding: 1.25rem 1.5rem !important;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.45) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+  margin-bottom: 1.5rem !important;
+}
+
+:is(.dashboard-page-view, .dashboard-container, .dashboard-modal) .submissions-action-text h3 {
+  color: var(--dash-ink) !important;
+  margin: 0 0 0.35rem 0 !important;
+  font-weight: 800 !important;
+}
+
+:is(.dashboard-page-view, .dashboard-container, .dashboard-modal) .submissions-action-text p {
+  color: var(--dash-muted) !important;
+  margin: 0 !important;
+}
+
+/* History Cards (Lore Submissions) */
+:is(.dashboard-page-view, .dashboard-container, .dashboard-modal) .srs-history-card {
+  background: var(--dash-obsidian-card) !important;
+  border: 1px solid var(--dash-crimson-border) !important;
+  border-radius: var(--radius-lg) !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+}
+
+:is(.dashboard-page-view, .dashboard-container, .dashboard-modal) .srs-history-card:hover {
+  border-color: var(--dash-crimson-border-strong) !important;
+}
+
+:is(.dashboard-page-view, .dashboard-container, .dashboard-modal) .history-card-notes {
+  background: var(--dash-obsidian-field) !important;
+  border: 1px solid var(--dash-crimson-border) !important;
+  border-radius: var(--radius-sm) !important;
+  padding: 0.85rem 1rem !important;
+}
+
+:is(.dashboard-page-view, .dashboard-container, .dashboard-modal) .history-card-heading {
+  color: var(--dash-ink) !important;
+}
+
+:is(.dashboard-page-view, .dashboard-container, .dashboard-modal) :is(.history-card-universe, .history-card-snippet, .notes-text) {
+  color: var(--dash-muted) !important;
+}
+
+/* Preferences Sections */
+:is(.dashboard-page-view, .dashboard-container, .dashboard-modal) .dash-section-card {
+  background: var(--dash-obsidian-card) !important;
+  border: 1px solid var(--dash-crimson-border) !important;
+  border-radius: var(--radius-lg) !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+  padding: 2rem !important;
+}
+
+:is(.dashboard-page-view, .dashboard-container, .dashboard-modal) .dash-section-card .section-head h4 {
+  color: var(--dash-ink) !important;
+}
+
+:is(.dashboard-page-view, .dashboard-container, .dashboard-modal) .dash-section-card .section-head p {
+  color: var(--dash-muted) !important;
+}
+
+:is(.dashboard-page-view, .dashboard-container, .dashboard-modal) .pref-row {
+  border-top: 1px solid var(--dash-crimson-border) !important;
+}
+
+:is(.dashboard-page-view, .dashboard-container, .dashboard-modal) .pref-title {
+  color: var(--dash-ink) !important;
+}
+
+:is(.dashboard-page-view, .dashboard-container, .dashboard-modal) .pref-desc {
+  color: var(--dash-muted) !important;
+}
+
+:is(.dashboard-page-view, .dashboard-container, .dashboard-modal) .font-btn {
+  background: var(--dash-obsidian-field) !important;
+  border: 1px solid var(--dash-crimson-border) !important;
+  color: var(--dash-muted) !important;
+}
+
+:is(.dashboard-page-view, .dashboard-container, .dashboard-modal) .font-btn:hover {
+  border-color: var(--dash-crimson-border-strong) !important;
+  color: var(--dash-ink) !important;
+}
+
+:is(.dashboard-page-view, .dashboard-container, .dashboard-modal) .font-btn.active {
+  background: var(--accent-crimson) !important;
+  border-color: var(--accent-crimson) !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 12px var(--accent-crimson-glow) !important;
+}
+
+:is(.dashboard-page-view, .dashboard-container, .dashboard-modal) .fandom-fav-btn {
+  background: var(--dash-obsidian-field) !important;
+  border: 1px solid var(--dash-crimson-border) !important;
+  color: var(--dash-ink) !important;
+}
+
+:is(.dashboard-page-view, .dashboard-container, .dashboard-modal) .fandom-fav-btn:hover {
+  border-color: var(--dash-crimson-border-strong) !important;
+  background: rgba(220, 38, 38, 0.15) !important;
+}
+
+:is(.dashboard-page-view, .dashboard-container, .dashboard-modal) .fandom-fav-btn.selected {
+  border-color: var(--accent-crimson) !important;
+  background: rgba(220, 38, 38, 0.22) !important;
+  box-shadow: 0 0 14px var(--accent-crimson-glow) !important;
+}
+
+/* Empty State / Auth Required Box in Dashboard */
+:is(.dashboard-page-view, .dashboard-container, .dashboard-modal) :is(.srs-empty-box, .empty-catalog-state) {
+  background: var(--dash-obsidian-card) !important;
+  border: 1px solid var(--dash-crimson-border) !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+}
+
+:is(.dashboard-page-view, .dashboard-container, .dashboard-modal) :is(.srs-empty-box, .empty-catalog-state) h3 {
+  color: var(--dash-ink) !important;
+}
+
+:is(.dashboard-page-view, .dashboard-container, .dashboard-modal) :is(.srs-empty-box, .empty-catalog-state) p {
+  color: var(--dash-muted) !important;
+}
+
+:is(.dashboard-page-view, .dashboard-container, .dashboard-modal) .srs-loading-box {
+  background: var(--dash-obsidian-card) !important;
+  border: 1px solid var(--dash-crimson-border) !important;
+  border-radius: var(--radius-md) !important;
+  color: var(--dash-muted) !important;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.45) !important;
+}

@@ -26,3 +26,43 @@ body {
   min-height: 100vh;
   width: 100%;
 }
+
+/* WCAG Accessible Font Scaling */
+html {
+  font-size: 16px;
+  --font-scale: 1;
+}
+
+html[data-font-size="small"] {
+  font-size: 13.5px;
+  --font-scale: 0.85;
+}
+
+html[data-font-size="normal"] {
+  font-size: 16px;
+  --font-scale: 1;
+}
+
+html[data-font-size="large"] {
+  font-size: 19px;
+  --font-scale: 1.18;
+}
+
+/* Keyboard Usability & Focus Visible Rings */
+:focus-visible {
+  outline: 2px solid #dc2626 !important;
+  outline-offset: 2px !important;
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+[role="button"]:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid #dc2626 !important;
+  outline-offset: 2px !important;
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.35) !important;
+}
+

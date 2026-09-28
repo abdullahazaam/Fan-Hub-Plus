@@ -4,7 +4,41 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>frontend</title>
+    <title>Fan Hub Plus</title>
+    <link rel="preload" href="/background.mp4" as="video" type="video/mp4" />
+    <link rel="preload" href="/hero_dark.png" as="image" />
+    <link rel="preload" href="/hero_light.png" as="image" />
+    <style>
+      html, body {
+        margin: 0;
+        padding: 0;
+        min-height: 100vh;
+        background-color: #07080a;
+        background-image: radial-gradient(ellipse at 65% 25%, rgba(185, 28, 28, 0.16) 0%, #07080a 70%);
+        background-attachment: fixed;
+        color: #e5e7eb;
+        font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      }
+      html[data-theme='light'], html[data-theme='light'] body {
+        background-color: #f7f4ee;
+        background-image: radial-gradient(ellipse at 65% 25%, rgba(220, 38, 38, 0.08) 0%, #f7f4ee 70%);
+        background-attachment: fixed;
+        color: #1f2937;
+      }
+      #root {
+        min-height: 100vh;
+      }
+    </style>
+    <script>
+      (function() {
+        try {
+          var t = localStorage.getItem('fhp_theme') || 'dark';
+          document.documentElement.setAttribute('data-theme', t);
+          var f = localStorage.getItem('fhp_font_size') || 'normal';
+          document.documentElement.setAttribute('data-font-size', f);
+        } catch(e) {}
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

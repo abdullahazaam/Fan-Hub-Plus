@@ -6,6 +6,14 @@ export default defineConfig({
   plugins: [react()],
   server: {
     port: 5173,
+    allowedHosts: ['.ngrok-free.dev', '.ngrok-free.app', '.ngrok.io'],
+    hmr: {
+      clientPort: 443,
+    },
+    watch: {
+      usePolling: true,
+      interval: 800,
+    },
     proxy: {
       '/api': {
         target: 'http://localhost:5075',

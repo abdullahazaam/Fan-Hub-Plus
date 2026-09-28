@@ -1,0 +1,209 @@
+/* ==============================================================================
+   GLOBAL PAGINATION VISIBILITY & CONTRAST SYSTEM
+   Applied across ALL paginated pages (Vault, Releases, Events, Chronicles,
+   Characters, Media, Admin tables, etc.).
+   Deep obsidian solid surface + subtle crimson border/shadow + sharp contrast.
+   ============================================================================== */
+
+:root {
+  --pager-obsidian-surface: #0a0c12;
+  --pager-obsidian-card: #0d1017;
+  --pager-obsidian-field: #12151e;
+  --pager-crimson-border: rgba(220, 38, 38, 0.38);
+  --pager-crimson-border-hover: rgba(220, 38, 38, 0.75);
+  --pager-crimson-glow: rgba(220, 38, 38, 0.35);
+  --pager-ink: #ffffff;
+  --pager-muted: #dcd9e2;
+  --pager-dim: #9e9ba6;
+  --pager-shadow: 0 10px 30px -4px rgba(0, 0, 0, 0.85), 0 0 16px rgba(220, 38, 38, 0.16);
+}
+
+:root[data-theme='light'],
+.theme-light {
+  --pager-obsidian-surface: #fbf8f2;
+  --pager-obsidian-card: #ffffff;
+  --pager-obsidian-field: #f3efe6;
+  --pager-crimson-border: rgba(220, 38, 38, 0.32);
+  --pager-crimson-border-hover: rgba(220, 38, 38, 0.8);
+  --pager-crimson-glow: rgba(220, 38, 38, 0.25);
+  --pager-ink: #110e13;
+  --pager-muted: #3a3239;
+  --pager-dim: #60565e;
+  --pager-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.14), 0 0 12px rgba(220, 38, 38, 0.12);
+}
+
+/* 1. Global Pagination Containers: SRS Pages (Merchandise, Releases, Events) */
+.srs-pagination-controls {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 1.25rem !important;
+  margin: 3rem auto 1.5rem !important;
+  padding: 0.85rem 1.75rem !important;
+  max-width: 520px !important;
+  width: fit-content !important;
+  border-radius: var(--radius-full, 9999px) !important;
+  background: var(--pager-obsidian-surface) !important;
+  background-color: var(--pager-obsidian-surface) !important;
+  border: 1px solid var(--pager-crimson-border) !important;
+  box-shadow: var(--pager-shadow) !important;
+  position: relative !important;
+  z-index: 5 !important;
+  box-sizing: border-box !important;
+}
+
+/* 2. Global Pagination Containers: Chronicles, Characters, Media (App.tsx pagination-bar) */
+.pagination-bar,
+.srs-pagination-bar {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 1.25rem !important;
+  margin: 3rem auto 1.5rem !important;
+  padding: 0.85rem 1.75rem !important;
+  max-width: 520px !important;
+  width: fit-content !important;
+  border-radius: var(--radius-full, 9999px) !important;
+  background: var(--pager-obsidian-surface) !important;
+  background-color: var(--pager-obsidian-surface) !important;
+  border: 1px solid var(--pager-crimson-border) !important;
+  box-shadow: var(--pager-shadow) !important;
+  position: relative !important;
+  z-index: 5 !important;
+  box-sizing: border-box !important;
+}
+
+/* 3. Page Indicator / Text: High Contrast & Clarity */
+.srs-page-indicator,
+.page-indicator {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 0.35rem !important;
+  font-size: 0.88rem !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.04em !important;
+  color: var(--pager-muted) !important;
+  white-space: nowrap !important;
+  user-select: none !important;
+}
+
+.srs-page-indicator strong,
+.page-indicator strong {
+  color: var(--pager-ink) !important;
+  font-weight: 850 !important;
+}
+
+/* 4. Navigation Buttons: Previous & Next */
+.srs-page-btn,
+.btn-page-nav {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 0.5rem !important;
+  padding: 0.5rem 1.35rem !important;
+  border-radius: var(--radius-full, 9999px) !important;
+  background: var(--pager-obsidian-field) !important;
+  border: 1px solid var(--pager-crimson-border) !important;
+  color: var(--pager-ink) !important;
+  font-size: 0.84rem !important;
+  font-weight: 750 !important;
+  letter-spacing: 0.03em !important;
+  cursor: pointer !important;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  outline: none !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3) !important;
+  text-decoration: none !important;
+  user-select: none !important;
+}
+
+/* Hover State */
+.srs-page-btn:hover:not(:disabled),
+.btn-page-nav:hover:not(:disabled) {
+  background: var(--accent-crimson, #dc2626) !important;
+  border-color: var(--accent-crimson, #dc2626) !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 16px var(--pager-crimson-glow) !important;
+  transform: translateY(-1px) !important;
+}
+
+/* Active Click State */
+.srs-page-btn:active:not(:disabled),
+.btn-page-nav:active:not(:disabled) {
+  transform: translateY(0) !important;
+}
+
+/* Disabled State */
+.srs-page-btn:disabled,
+.btn-page-nav:disabled {
+  opacity: 0.32 !important;
+  cursor: not-allowed !important;
+  pointer-events: none !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+  background: rgba(18, 22, 32, 0.4) !important;
+  color: var(--pager-dim) !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+:root[data-theme='light'] .srs-page-btn:disabled,
+:root[data-theme='light'] .btn-page-nav:disabled,
+.theme-light .srs-page-btn:disabled,
+.theme-light .btn-page-nav:disabled {
+  border-color: rgba(0, 0, 0, 0.08) !important;
+  background: rgba(240, 236, 230, 0.5) !important;
+  color: var(--pager-dim) !important;
+}
+
+/* 5. Focus-visible Accessibility */
+.srs-page-btn:focus-visible,
+.btn-page-nav:focus-visible,
+.btn-admin-pager:focus-visible {
+  outline: 2px solid var(--accent-crimson, #dc2626) !important;
+  outline-offset: 3px !important;
+}
+
+/* 6. Admin Table Pagination */
+.admin-table-pagination {
+  background: var(--pager-obsidian-surface) !important;
+  border: 1px solid var(--pager-crimson-border) !important;
+  border-radius: var(--radius-md, 8px) !important;
+  padding: 0.85rem 1.25rem !important;
+  box-shadow: var(--pager-shadow) !important;
+  color: var(--pager-muted) !important;
+}
+
+.admin-pagination-info {
+  color: var(--pager-muted) !important;
+  font-weight: 600 !important;
+}
+
+.admin-pagination-info strong {
+  color: var(--pager-ink) !important;
+  font-weight: 800 !important;
+}
+
+.btn-admin-pager {
+  background: var(--pager-obsidian-field) !important;
+  border: 1px solid var(--pager-crimson-border) !important;
+  color: var(--pager-ink) !important;
+  font-weight: 700 !important;
+}
+
+.btn-admin-pager:hover:not(:disabled) {
+  background: var(--accent-crimson, #dc2626) !important;
+  border-color: var(--accent-crimson, #dc2626) !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 12px var(--pager-crimson-glow) !important;
+}
+
+.btn-admin-pager:disabled {
+  opacity: 0.32 !important;
+  cursor: not-allowed !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+:root[data-theme='light'] .btn-admin-pager:disabled,
+.theme-light .btn-admin-pager:disabled {
+  border-color: rgba(0, 0, 0, 0.08) !important;
+}

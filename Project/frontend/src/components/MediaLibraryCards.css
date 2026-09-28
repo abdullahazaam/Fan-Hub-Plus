@@ -1,0 +1,16 @@
+﻿.media-page-main .media-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
+.media-library-tile{position:relative;isolation:isolate;aspect-ratio:16/11;min-width:0;overflow:hidden;border:1px solid #d3435b77;border-radius:16px;background:#130c12;box-shadow:0 14px 24px -17px #000b}
+.media-library-tile>img{position:absolute;width:100%;height:100%;object-fit:cover;transition:transform .65s}
+.media-library-shade{position:absolute;inset:0;background:linear-gradient(#08040c66,transparent 25%,#08040c55 50%,#08040cf2)}
+.media-library-top{position:absolute;top:14px;left:14px;right:14px;display:flex;justify-content:space-between;font-size:9px;font-weight:800;letter-spacing:.06em;color:#fff4ec}
+.media-library-top>*{padding:5px 7px;background:#0b080ca6;border:1px solid #ffffff25;border-radius:4px}
+.media-library-link{position:absolute;inset:0;z-index:2;display:grid;place-items:center;color:#fff}
+.media-library-link>span{display:grid;place-items:center;width:52px;height:52px;border:1px solid #ff97a5;border-radius:50%;background:#170b168c;backdrop-filter:blur(6px);box-shadow:0 0 22px #d3183644}
+.media-library-copy{position:absolute;bottom:18px;left:18px;right:48px;color:#fff5ee;pointer-events:none}.media-library-copy h3{font-size:clamp(15px,1.35vw,21px);line-height:1.23;color:inherit;margin:0 0 9px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}.media-library-copy>span{display:flex;align-items:center;gap:5px;color:#ffd090;font-size:12px}.media-library-copy small{color:#ead8d5}
+.media-library-bookmark{position:absolute;bottom:17px;right:13px;z-index:3;border:1px solid #fff4;border-radius:8px;padding:7px;color:#fff;background:#170b1699;cursor:pointer}
+.media-library-admin{position:absolute;z-index:3;top:48px;right:13px;display:flex;gap:5px}.media-library-admin button{background:#170b16cc;color:white;border:1px solid #fff3;border-radius:4px;padding:5px;cursor:pointer}
+.media-library-link:focus-visible{outline:2px solid #ff8094;outline-offset:-4px;border-radius:16px}
+@media(hover:hover){.media-library-tile:hover>img{transform:scale(1.045)}}
+@media(max-width:1000px){.media-page-main .media-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:600px){.media-page-main .media-grid{grid-template-columns:minmax(0,1fr)}.media-library-tile{aspect-ratio:16/11}}
+@media(prefers-reduced-motion:reduce){.media-library-tile>img{transition:none}}

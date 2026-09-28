@@ -9,9 +9,10 @@ type Tab = 'login' | 'register' | 'forgot' | 'reset'
 interface AuthModalProps {
   isOpen: boolean
   onClose: () => void
+  onSuccess?: () => void
 }
 
-export function AuthModal({ isOpen, onClose }: AuthModalProps) {
+export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
   const { login, register } = useAuth()
   const [tab, setTab] = useState<Tab>('login')
   const [error, setError] = useState('')
@@ -47,6 +48,7 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
     setLoading(true)
     try {
       await login(loginEmail.trim(), loginPassword)
+      onSuccess?.()
       onClose()
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Login failed')
@@ -79,6 +81,7 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
         password: regPassword,
         displayName: regDisplayName.trim(),
       })
+      onSuccess?.()
       onClose()
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Registration failed')

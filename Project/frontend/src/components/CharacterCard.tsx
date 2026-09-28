@@ -1,4 +1,4 @@
-import React, { useRef, useCallback, useEffect, useState } from 'react'
+import React from 'react'
 import { useAuth } from '../context/AuthContext'
 import type { Character } from '../types'
 import { ArrowRightIcon, BookmarkIcon, EditIcon, StarIcon } from './Icons'
@@ -24,14 +24,14 @@ const JohnnyInsigniaIcon: React.FC = () => (
 const GojoInsigniaIcon: React.FC = () => (
   <svg width="52" height="52" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
     <circle cx="32" cy="32" r="27" stroke="rgba(220, 38, 38, 0.3)" strokeWidth="1" strokeDasharray="4 2" />
-    <circle cx="32" cy="32" r="20" stroke="rgba(99, 102, 241, 0.45)" strokeWidth="1.2" />
+    <circle cx="32" cy="32" r="20" stroke="rgba(190, 83, 62, 0.45)" strokeWidth="1.2" />
     <path d="M24 32C24 28 20 25 16 25C12 25 8 28 8 32C8 36 12 39 16 39C20 39 24 36 28 32L36 32C40 28 44 25 48 25C52 25 56 28 56 32C56 36 52 39 48 39C44 39 40 36 36 32" stroke="#dc2626" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
     <line x1="32" y1="5" x2="32" y2="12" stroke="#dc2626" strokeWidth="1.8" strokeLinecap="round" />
     <line x1="32" y1="52" x2="32" y2="59" stroke="#dc2626" strokeWidth="1.8" strokeLinecap="round" />
-    <line x1="9" y1="18" x2="15" y2="22" stroke="rgba(99, 102, 241, 0.85)" strokeWidth="1.5" strokeLinecap="round" />
-    <line x1="49" y1="42" x2="55" y2="46" stroke="rgba(99, 102, 241, 0.85)" strokeWidth="1.5" strokeLinecap="round" />
-    <line x1="9" y1="46" x2="15" y2="42" stroke="rgba(99, 102, 241, 0.85)" strokeWidth="1.5" strokeLinecap="round" />
-    <line x1="49" y1="22" x2="55" y2="18" stroke="rgba(99, 102, 241, 0.85)" strokeWidth="1.5" strokeLinecap="round" />
+    <line x1="9" y1="18" x2="15" y2="22" stroke="rgba(190, 83, 62, 0.85)" strokeWidth="1.5" strokeLinecap="round" />
+    <line x1="49" y1="42" x2="55" y2="46" stroke="rgba(190, 83, 62, 0.85)" strokeWidth="1.5" strokeLinecap="round" />
+    <line x1="9" y1="46" x2="15" y2="42" stroke="rgba(190, 83, 62, 0.85)" strokeWidth="1.5" strokeLinecap="round" />
+    <line x1="49" y1="22" x2="55" y2="18" stroke="rgba(190, 83, 62, 0.85)" strokeWidth="1.5" strokeLinecap="round" />
     <circle cx="32" cy="32" r="3" fill="#dc2626" />
   </svg>
 )
@@ -83,7 +83,7 @@ const getDossierMetadata = (name: string, universe?: string) => {
       specKey: 'TECHNIQUE',
       specVal: 'LIMITLESS // SIX EYES ACTIVE',
       dotColor: '#dc2626',
-      glowColor: 'rgba(99, 102, 241, 0.2)',
+      glowColor: 'rgba(190, 83, 62, 0.2)',
       icon: <GojoInsigniaIcon />
     }
   }
@@ -122,7 +122,7 @@ export interface CharacterCardProps {
   isPrototype?: boolean
 }
 
-export const CharacterCard: React.FC<CharacterCardProps> = ({
+const CharacterCardComponent: React.FC<CharacterCardProps> = ({
   character,
   onSelect,
   onEdit,
@@ -132,9 +132,6 @@ export const CharacterCard: React.FC<CharacterCardProps> = ({
 }) => {
   const { user } = useAuth()
   const isAdmin = user?.role === 'Admin'
-  const cardRef = useRef<HTMLDivElement>(null)
-  const frameRef = useRef<number | null>(null)
-  const [isInteracting, setIsInteracting] = useState(false)
 
   const isPrototypeCard = isPrototype || character.id < 0 || character.fandomUniverse?.includes('Prototype')
   const dossierMeta = getDossierMetadata(character.name, character.fandomUniverse)
@@ -153,80 +150,8 @@ export const CharacterCard: React.FC<CharacterCardProps> = ({
     ? '/vanguard_nexus_bg.jpg'
     : (character.bannerUrl || 'https://images.unsplash.com/photo-1519501025264-65ba15a82390?w=1600&q=80')
 
-  // Smooth pointer-following physics with requestAnimationFrame
-  const handlePointerMove = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
-    if (e.pointerType === 'touch') return
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
-
-    const card = cardRef.current
-    if (!card) return
-
-    if (frameRef.current) cancelAnimationFrame(frameRef.current)
-
-    frameRef.current = requestAnimationFrame(() => {
-      const rect = card.getBoundingClientRect()
-      // Normalized coordinates (-0.5 to 0.5)
-      const nx = (e.clientX - rect.left) / rect.width - 0.5
-      const ny = (e.clientY - rect.top) / rect.height - 0.5
-
-      // Realistic subtle 3D pitch/yaw (max ~7.5 degrees)
-      const rotX = -ny * 13
-      const rotY = nx * 13
-
-      // Multi-layer parallax shifts:
-      // Background layer shifts opposite to pointer (-14px max)
-      const bgX = -nx * 15
-      const bgY = -ny * 15
-
-      // Foreground portrait / insignia pops forward and tracks pointer (+20px max)
-      const fgX = nx * 22
-      const fgY = ny * 22
-
-      // Pointer highlight percentage
-      const mouseX = ((e.clientX - rect.left) / rect.width) * 100
-      const mouseY = ((e.clientY - rect.top) / rect.height) * 100
-
-      card.style.setProperty('--rot-x', `${rotX.toFixed(2)}deg`)
-      card.style.setProperty('--rot-y', `${rotY.toFixed(2)}deg`)
-      card.style.setProperty('--bg-shift-x', `${bgX.toFixed(2)}px`)
-      card.style.setProperty('--bg-shift-y', `${bgY.toFixed(2)}px`)
-      card.style.setProperty('--fg-shift-x', `${fgX.toFixed(2)}px`)
-      card.style.setProperty('--fg-shift-y', `${fgY.toFixed(2)}px`)
-      card.style.setProperty('--mouse-x', `${mouseX.toFixed(1)}%`)
-      card.style.setProperty('--mouse-y', `${mouseY.toFixed(1)}%`)
-      card.style.setProperty('--rim-opacity', '1')
-    })
-  }, [])
-
-  const handlePointerEnter = useCallback(() => {
-    setIsInteracting(true)
-  }, [])
-
-  const handlePointerLeave = useCallback(() => {
-    setIsInteracting(false)
-    const card = cardRef.current
-    if (!card) return
-
-    if (frameRef.current) cancelAnimationFrame(frameRef.current)
-
-    // Smoothly return to rest state
-    card.style.setProperty('--rot-x', '0deg')
-    card.style.setProperty('--rot-y', '0deg')
-    card.style.setProperty('--bg-shift-x', '0px')
-    card.style.setProperty('--bg-shift-y', '0px')
-    card.style.setProperty('--fg-shift-x', '0px')
-    card.style.setProperty('--fg-shift-y', '0px')
-    card.style.setProperty('--rim-opacity', '0')
-  }, [])
-
-  useEffect(() => {
-    return () => {
-      if (frameRef.current) cancelAnimationFrame(frameRef.current)
-    }
-  }, [])
-
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' || e.key === ' ') {
+    if (e.target === e.currentTarget && (e.key === 'Enter' || e.key === ' ')) {
       e.preventDefault()
       onSelect(character)
     }
@@ -235,15 +160,11 @@ export const CharacterCard: React.FC<CharacterCardProps> = ({
   return (
     <div className={`character-card-outer ${isPrototypeCard ? 'is-prototype-card' : ''}`}>
       <article
-        ref={cardRef}
-        className={`character-card ${isInteracting ? 'is-hovering' : ''} ${isSuitableAvatar ? 'has-popout-asset' : 'has-dossier-composition'} dossier-theme-${dossierMeta.theme}`}
-        onPointerMove={handlePointerMove}
-        onPointerEnter={handlePointerEnter}
-        onPointerLeave={handlePointerLeave}
+        className={`character-card ${isSuitableAvatar ? 'has-popout-asset' : 'has-dossier-composition'} dossier-theme-${dossierMeta.theme}`}
         onClick={() => onSelect(character)}
         onKeyDown={handleKeyDown}
         tabIndex={0}
-        role="region"
+        role="button"
         aria-label={`Character dossier for ${character.name}`}
       >
         {/* Subtle Fandom-Colored Rim Light Layer */}
@@ -395,3 +316,5 @@ export const CharacterCard: React.FC<CharacterCardProps> = ({
     </div>
   )
 }
+
+export const CharacterCard = React.memo(CharacterCardComponent)

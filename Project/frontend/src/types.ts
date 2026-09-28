@@ -173,10 +173,10 @@ export interface RegisterForm {
 }
 
 export interface ProfileUpdateForm {
-  displayName: string
-  bio: string
-  avatarUrl: string
-  favoriteCategory: string
+  displayName?: string
+  bio?: string
+  avatarUrl?: string
+  favoriteCategory?: string
 }
 
 export interface ForgotPasswordForm {
@@ -195,3 +195,175 @@ export interface ForgotPasswordResponse {
   devResetToken?: string
   devExpiresAt?: string
 }
+
+// ─── Admin Feature Types ───────────────────────────────────────────────────
+export interface FanSubmission {
+  id: number
+  title: string
+  authorName: string
+  authorEmail?: string | null
+  userId?: number | null
+  categoryId: number
+  categoryName: string
+  fandomUniverse: string
+  submissionType: string
+  contentText: string
+  mediaUrl?: string | null
+  status: 'Pending' | 'Approved' | 'Rejected' | string
+  adminNotes?: string | null
+  submittedAt: string
+  reviewedAt?: string | null
+}
+
+export interface FeedbackItem {
+  id: number
+  feedbackType: 'Bug' | 'Suggestion' | 'Query' | string
+  subject: string
+  message: string
+  userEmail?: string | null
+  userName?: string | null
+  status: 'Open' | 'In Review' | 'Resolved' | string
+  createdAt: string
+}
+
+export interface AdminUser {
+  id: number
+  username: string
+  email: string
+  displayName: string
+  role: 'Admin' | 'User'
+  avatarUrl?: string | null
+  favoriteCategory?: string | null
+  bookmarksCount: number
+  createdAt: string
+}
+
+export interface CategoryAnalytics {
+  categoryId: number
+  categoryName: string
+  slug: string
+  contentCount: number
+  characterCount: number
+  mediaCount: number
+  totalItems: number
+}
+
+export interface PopularItemAnalytics {
+  id: number
+  title: string
+  categoryName: string
+  type: string
+  popularity: number
+}
+
+export interface FandomPopularity {
+  fandomUniverse: string
+  itemCount: number
+  averagePopularity: number
+  primaryCategory: string
+}
+
+export interface AdminAnalytics {
+  totalUsers: number
+  activeUsers: number
+  totalContent: number
+  totalCharacters: number
+  totalMedia: number
+  totalSubmissions: number
+  pendingSubmissions: number
+  totalFeedback: number
+  openFeedback: number
+  totalBookmarks: number
+  categoryStats: CategoryAnalytics[]
+  contentTypeBreakdown: Record<string, number>
+  feedbackTypeBreakdown: Record<string, number>
+  topPopularItems: PopularItemAnalytics[]
+  bookmarkTypeBreakdown?: Record<string, number>
+  popularFandoms?: FandomPopularity[]
+}
+
+// ─── Merchandise Types ──────────────────────────────────────────────────────
+export interface MerchandiseItem {
+  id: number
+  name: string
+  fandomUniverse: string
+  categoryId: number
+  categoryName: string
+  price: number
+  currency: string
+  imageUrl: string
+  tag: string // Limited Edition, Pre-Order, Collectible, Official Artifact
+  description: string
+  stockStatus: string // In Stock, Pre-Order, Limited Stock
+  createdAt: string
+}
+
+// ─── Upcoming Release Types ─────────────────────────────────────────────────
+export interface UpcomingRelease {
+  id: number
+  title: string
+  fandomUniverse: string
+  categoryId: number
+  categoryName: string
+  mediaType: string // Anime, Gaming, Movies, TV Shows, Comics, Merchandise
+  releaseDate: string
+  releaseWindow: string
+  platform: string
+  thumbnailUrl: string
+  synopsis: string
+  hypeScore: number
+}
+
+// ─── Event Types ────────────────────────────────────────────────────────────
+export interface EventItem {
+  id: number
+  title: string
+  fandomUniverse: string
+  categoryId: number
+  categoryName: string
+  city: string // Tokyo, Los Angeles, Seoul, London, Paris, New York, Online
+  venue: string
+  coordinates: string
+  eventDate: string
+  endDate?: string | null
+  thumbnailUrl: string
+  description: string
+  ticketUrl: string
+  status: string // Tickets Available, Selling Fast, Free Entry, Virtual Stream
+}
+
+export interface FanSubmissionFormData {
+  title: string
+  authorName?: string
+  authorEmail?: string
+  categoryId: number
+  fandomUniverse: string
+  submissionType: string
+  contentText: string
+  mediaUrl?: string
+}
+
+export interface FeedbackFormData {
+  feedbackType: 'Bug' | 'Suggestion' | 'Query' | string
+  subject: string
+  message: string
+  userEmail?: string
+  userName?: string
+}
+
+export type NavView =
+  | 'home'
+  | 'explore'
+  | 'characters'
+  | 'media'
+  | 'merchandise'
+  | 'releases'
+  | 'events'
+  | 'sitemap'
+  | 'feedback'
+  | 'profile'
+  | 'dashboard'
+  | 'submissions'
+  | 'admin'
+
+

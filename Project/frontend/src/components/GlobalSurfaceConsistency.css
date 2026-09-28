@@ -1,0 +1,278 @@
+/* ==============================================================================
+   GLOBAL SURFACE CONSISTENCY & UNIFICATION SYSTEM
+   Applied globally across ALL pages (Home, Chronicles, Characters, Media,
+   Merchandise Vault, Upcoming Releases, Events, Dashboard, Submissions,
+   Feedback, Sitemap, and Admin Console).
+   Surface Language:
+   - Deep Obsidian Solid Surface + Subtle Crimson Tint/Border + Soft Shine/Depth
+   - Reduced glass/transparency so backgrounds show through LESS
+   - Footer feels premium/shiny with specular top highlight, matching the cards
+   - Supported in both Dark & Light themes
+   ============================================================================== */
+
+:root {
+  --portal-obsidian-surface: rgba(11, 14, 20, 0.94);
+  --portal-obsidian-card: rgba(13, 16, 23, 0.92);
+  --portal-obsidian-field: rgba(18, 22, 32, 0.96);
+  --portal-obsidian-footer: linear-gradient(180deg, #100a12 0%, #0d070e 55%, #08040a 100%);
+  --portal-crimson-border: rgba(220, 38, 38, 0.35);
+  --portal-crimson-border-strong: rgba(220, 38, 38, 0.65);
+  --portal-crimson-tint: rgba(220, 38, 38, 0.04);
+  --portal-crimson-glow: rgba(220, 38, 38, 0.28);
+  --portal-specular-shine: inset 0 1px 0 rgba(255, 255, 255, 0.12), inset 0 0 20px rgba(220, 38, 38, 0.05);
+  --portal-card-shadow: 0 14px 34px -8px rgba(0, 0, 0, 0.82), 0 4px 12px rgba(0, 0, 0, 0.6);
+  --portal-ink: #ffffff;
+  --portal-muted: #d8d8dc;
+  --portal-dim: #9ca3af;
+}
+
+:root[data-theme='light'],
+.portal-universe.theme-light,
+.theme-light {
+  --portal-obsidian-surface: rgba(248, 245, 239, 0.96);
+  --portal-obsidian-card: rgba(255, 255, 255, 0.95);
+  --portal-obsidian-field: rgba(240, 236, 229, 0.96);
+  --portal-obsidian-footer: linear-gradient(180deg, #faf6ee 0%, #f4eee2 55%, #ece4d5 100%);
+  --portal-crimson-border: rgba(220, 38, 38, 0.28);
+  --portal-crimson-border-strong: rgba(220, 38, 38, 0.55);
+  --portal-crimson-tint: rgba(220, 38, 38, 0.03);
+  --portal-crimson-glow: rgba(220, 38, 38, 0.18);
+  --portal-specular-shine: inset 0 1px 0 rgba(255, 255, 255, 0.95), inset 0 0 18px rgba(220, 38, 38, 0.04);
+  --portal-card-shadow: 0 12px 28px -6px rgba(0, 0, 0, 0.12), 0 3px 8px rgba(0, 0, 0, 0.06);
+  --portal-ink: #171717;
+  --portal-muted: #454545;
+  --portal-dim: #6b7280;
+}
+
+/* ==============================================================================
+   1. TABS & FILTER STRIPS (Global)
+   ============================================================================== */
+.srs-filter-bar,
+.srs-tab-bar,
+.dashboard-tabs,
+.srs-filter-chips-row,
+.bookmark-type-filters,
+.srs-tags-row,
+.events-calendar-row,
+.media-format-selector,
+.submissions-action-bar,
+.admin-table-controls {
+  background: var(--portal-obsidian-surface) !important;
+  background-color: var(--portal-obsidian-surface) !important;
+  border: 1px solid var(--portal-crimson-border) !important;
+  border-radius: var(--radius-lg, 14px) !important;
+  box-shadow: var(--portal-card-shadow), var(--portal-specular-shine) !important;
+  backdrop-filter: blur(18px) !important;
+  -webkit-backdrop-filter: blur(18px) !important;
+  position: relative !important;
+}
+
+/* Filter pills, tab buttons, chips inside filter bars */
+.srs-pill,
+.srs-tab-btn,
+.filter-chip,
+.bmark-chip,
+.btn-media-filter,
+.events-cal-pill,
+.font-btn,
+.fandom-fav-btn {
+  background: var(--portal-obsidian-field) !important;
+  border: 1px solid var(--portal-crimson-border) !important;
+  color: var(--portal-muted) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06) !important;
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.srs-pill:hover,
+.srs-tab-btn:hover,
+.filter-chip:hover,
+.bmark-chip:hover,
+.btn-media-filter:hover,
+.events-cal-pill:hover,
+.font-btn:hover,
+.fandom-fav-btn:hover {
+  border-color: var(--portal-crimson-border-strong) !important;
+  color: var(--portal-ink) !important;
+  background: rgba(220, 38, 38, 0.16) !important;
+}
+
+.srs-pill.active,
+.srs-tab-btn.active,
+.filter-chip.active,
+.bmark-chip.active,
+.btn-media-filter.active,
+.events-cal-pill.active,
+.font-btn.active,
+.fandom-fav-btn.selected {
+  background: var(--accent-crimson, #dc2626) !important;
+  border-color: var(--accent-crimson, #dc2626) !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 16px var(--portal-crimson-glow) !important;
+}
+
+/* Search input wrappers inside filter bars */
+.srs-search-input-wrapper,
+.events-date-picker-wrap {
+  background: var(--portal-obsidian-field) !important;
+  border: 1px solid var(--portal-crimson-border) !important;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.4) !important;
+}
+
+.srs-search-input-wrapper:focus-within,
+.events-date-picker-wrap:focus-within {
+  border-color: var(--accent-crimson, #dc2626) !important;
+  box-shadow: 0 0 12px var(--portal-crimson-glow), inset 0 1px 2px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* ==============================================================================
+   2. STAT BOXES & METRIC CARDS (Global)
+   ============================================================================== */
+.dash-metric-card,
+.profile-stat-box,
+.stat-box,
+.metrics-card,
+.stat-item,
+.srs-count-indicator,
+.srs-history-card,
+.dash-section-card {
+  background: var(--portal-obsidian-card) !important;
+  background-color: var(--portal-obsidian-card) !important;
+  border: 1px solid var(--portal-crimson-border) !important;
+  border-radius: var(--radius-md, 12px) !important;
+  box-shadow: var(--portal-card-shadow), var(--portal-specular-shine) !important;
+  backdrop-filter: blur(18px) !important;
+  -webkit-backdrop-filter: blur(18px) !important;
+}
+
+.dash-metric-card:hover,
+.profile-stat-box:hover,
+.srs-history-card:hover,
+.dash-section-card:hover {
+  border-color: var(--portal-crimson-border-strong) !important;
+}
+
+/* ==============================================================================
+   3. CONTENT CARDS (Global Vault, Releases, Events, Chronicles, Characters, Media)
+   ============================================================================== */
+.srs-card,
+.bookmark-card,
+.content-card,
+.merchandise-card,
+.release-card,
+.event-card,
+.catalog-legend,
+.media-library-tile,
+.chronicles-editorial-card,
+.sitemap-card.glass-panel {
+  background: var(--portal-obsidian-card) !important;
+  background-color: var(--portal-obsidian-card) !important;
+  border: 1px solid var(--portal-crimson-border) !important;
+  box-shadow: var(--portal-card-shadow), var(--portal-specular-shine) !important;
+  backdrop-filter: blur(18px) !important;
+  -webkit-backdrop-filter: blur(18px) !important;
+}
+
+.srs-card:hover,
+.bookmark-card:hover,
+.content-card:hover,
+.merchandise-card:hover,
+.release-card:hover,
+.event-card:hover,
+.catalog-legend:hover,
+.media-library-tile:hover,
+.chronicles-editorial-card:hover {
+  border-color: var(--portal-crimson-border-strong) !important;
+  box-shadow: 0 18px 42px -6px rgba(0, 0, 0, 0.88), 0 0 20px var(--portal-crimson-glow), var(--portal-specular-shine) !important;
+}
+
+/* Reduced card body transparency so background visuals don't overpower text */
+.srs-card-body {
+  background: rgba(12, 15, 22, 0.94) !important;
+  border-top: 1px solid var(--portal-crimson-border) !important;
+  box-shadow: var(--portal-specular-shine) !important;
+}
+
+.theme-light .srs-card-body,
+[data-theme='light'] .srs-card-body {
+  background: rgba(255, 255, 255, 0.96) !important;
+  border-top: 1px solid var(--portal-crimson-border) !important;
+}
+
+/* Empty State / Auth Containers */
+.srs-empty-box,
+.empty-catalog-state,
+.catalog-error-box {
+  background: var(--portal-obsidian-card) !important;
+  border: 1px solid var(--portal-crimson-border) !important;
+  box-shadow: var(--portal-card-shadow), var(--portal-specular-shine) !important;
+  backdrop-filter: blur(18px) !important;
+  -webkit-backdrop-filter: blur(18px) !important;
+}
+
+/* ==============================================================================
+   4. PREMIUM FOOTER (Solid Obsidian + Crimson Tint + Specular Glow)
+   Transforms the flat rough black into a sleek, dimensional cinematic anchor.
+   ============================================================================== */
+.portal-footer {
+  position: relative !important;
+  z-index: 10 !important;
+  margin-top: auto !important;
+  background: var(--portal-obsidian-footer) !important;
+  border-top: 1px solid var(--portal-crimson-border) !important;
+  box-shadow: 0 -16px 48px rgba(0, 0, 0, 0.85), inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 0 32px var(--portal-crimson-glow) !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+}
+
+/* Radiant accent line atop footer */
+.footer-top-accent-line {
+  height: 2px !important;
+  width: 100% !important;
+  background: linear-gradient(90deg, transparent 0%, rgba(220, 38, 38, 0.3) 12%, #dc2626 50%, rgba(220, 38, 38, 0.3) 88%, transparent 100%) !important;
+  box-shadow: 0 0 14px rgba(220, 38, 38, 0.5) !important;
+}
+
+/* Subtle cinematic depth gradient within footer container */
+.portal-footer::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(ellipse at 50% 0%, rgba(220, 38, 38, 0.08) 0%, transparent 60%),
+              radial-gradient(circle at 90% 20%, rgba(220, 38, 38, 0.04) 0%, transparent 40%);
+  opacity: 0.85;
+}
+
+.portal-footer.theme-light,
+[data-theme='light'] .portal-footer {
+  background: var(--portal-obsidian-footer) !important;
+  border-top: 1px solid var(--portal-crimson-border) !important;
+  box-shadow: 0 -10px 32px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.9), 0 0 20px var(--portal-crimson-glow) !important;
+}
+
+.portal-footer.theme-light::before,
+[data-theme='light'] .portal-footer::before {
+  background: radial-gradient(ellipse at 50% 0%, rgba(220, 38, 38, 0.05) 0%, transparent 60%);
+}
+
+/* Footer interactive links hover effect */
+.footer-link-btn {
+  transition: color 0.2s ease, transform 0.2s ease !important;
+}
+
+.footer-link-btn:hover {
+  color: var(--accent-crimson, #dc2626) !important;
+  transform: translateX(2px) !important;
+}
+
+/* Specs badge in footer */
+.footer-specs-badge {
+  border-top: 1px solid var(--portal-crimson-border) !important;
+  padding-top: 1.25rem !important;
+}
+
+/* Footer bottom strip */
+.footer-bottom-strip {
+  border-top: 1px solid rgba(220, 38, 38, 0.18) !important;
+  padding-top: 1.25rem !important;
+}

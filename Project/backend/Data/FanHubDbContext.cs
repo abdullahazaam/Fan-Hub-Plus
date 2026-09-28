@@ -17,6 +17,11 @@ public class FanHubDbContext : DbContext
     public DbSet<MediaItem> MediaItems => Set<MediaItem>();
     public DbSet<MediaRating> MediaRatings => Set<MediaRating>();
     public DbSet<UserBookmark> UserBookmarks => Set<UserBookmark>();
+    public DbSet<FanSubmission> FanSubmissions => Set<FanSubmission>();
+    public DbSet<FeedbackItem> FeedbackItems => Set<FeedbackItem>();
+    public DbSet<MerchandiseItem> MerchandiseItems => Set<MerchandiseItem>();
+    public DbSet<UpcomingRelease> UpcomingReleases => Set<UpcomingRelease>();
+    public DbSet<EventItem> EventItems => Set<EventItem>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -41,8 +46,8 @@ public class FanHubDbContext : DbContext
             entity.Property(c => c.FandomUniverse).IsRequired().HasMaxLength(150);
             entity.Property(c => c.ContentType).IsRequired().HasMaxLength(50);
             entity.Property(c => c.Description).HasMaxLength(1000);
-            entity.Property(c => c.ThumbnailUrl).HasMaxLength(1000);
-            entity.Property(c => c.MediaUrl).HasMaxLength(1000);
+            entity.Property(c => c.ThumbnailUrl).HasColumnType("nvarchar(max)");
+            entity.Property(c => c.MediaUrl).HasColumnType("nvarchar(max)");
             entity.Property(c => c.Author).HasMaxLength(100);
             entity.Property(c => c.Tags).HasMaxLength(300);
 
@@ -176,6 +181,44 @@ public class FanHubDbContext : DbContext
 
             // A user can bookmark a specific item of a type only once
             entity.HasIndex(b => new { b.UserId, b.ItemType, b.ItemId }).IsUnique();
+        });
+
+        // FanSubmission Configuration
+        modelBuilder.Entity<FanSubmission>(entity =>
+        {
+            entity.HasKey(s => s.Id);
+            entity.Property(s => s.Title).IsRequired().HasMaxLength(500);
+            entity.Property(s => s.AuthorName).IsRequired().HasMaxLength(250);
+            entity.Property(s => s.AuthorEmail).HasMaxLength(256);
+            entity.Property(s => s.FandomUniverse).IsRequired().HasMaxLength(250);
+            entity.Property(s => s.SubmissionType).IsRequired().HasMaxLength(100);
+            entity.Property(s => s.MediaUrl).HasColumnType("nvarchar(max)");
+            entity.Property(s => s.Status).IsRequired().HasMaxLength(50).HasDefaultValue("Pending");
+            entity.Property(s => s.AdminNotes).HasColumnType("nvarchar(max)");
+
+            entity.HasOne(s => s.Category)
+                  .WithMany()
+                  .HasForeignKey(s => s.CategoryId)
+                  .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasIndex(s => s.Status);
+            entity.HasIndex(s => s.CategoryId);
+            entity.HasIndex(s => s.SubmittedAt);
+        });
+
+        // FeedbackItem Configuration
+        modelBuilder.Entity<FeedbackItem>(entity =>
+        {
+            entity.HasKey(f => f.Id);
+            entity.Property(f => f.FeedbackType).IsRequired().HasMaxLength(50);
+            entity.Property(f => f.Subject).IsRequired().HasMaxLength(250);
+            entity.Property(f => f.UserEmail).HasMaxLength(256);
+            entity.Property(f => f.UserName).HasMaxLength(150);
+            entity.Property(f => f.Status).IsRequired().HasMaxLength(50).HasDefaultValue("Open");
+
+            entity.HasIndex(f => f.FeedbackType);
+            entity.HasIndex(f => f.Status);
+            entity.HasIndex(f => f.CreatedAt);
         });
     }
 }

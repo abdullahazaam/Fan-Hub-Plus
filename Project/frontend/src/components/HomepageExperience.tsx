@@ -58,7 +58,7 @@ export function HomepageExperience({ children }: { children: ReactNode }) {
     function invalidate() { if (!frame && richMotion() && !document.hidden) frame=requestAnimationFrame(render) }
     const move = (event: PointerEvent) => {
       if (!richMotion()) return
-      const card=(event.target as Element).closest<HTMLElement>('.featured-story-card, .character-spotlight-card')
+      const card=(event.target as Element).closest<HTMLElement>('.featured-story-card, .character-spotlight-card, .rail-item-card')
       if (!card) { x=y=0; invalidate(); return }
       if (target && target!==card) { target.style.removeProperty('--scene-x'); target.style.removeProperty('--scene-y') }
       target=card
