@@ -82,5 +82,8 @@ scratch/
 *.pubxml
 *.pubxml.user
 *.sql
+*.bacpac
 publish/
 **/publish/
+logs/
+**/logs/

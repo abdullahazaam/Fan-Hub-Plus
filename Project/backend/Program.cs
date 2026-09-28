@@ -8,6 +8,13 @@ using FanHubPlus.Services;
 using Microsoft.EntityFrameworkCore;
 
 // ─────────────────────────────────────────────────────────────────────────────
+// Enable fully managed networking for Microsoft.Data.SqlClient on Windows.
+// This prevents BadImageFormatException when IIS worker processes attempt to load
+// architecture-dependent native SNI dlls.
+// ─────────────────────────────────────────────────────────────────────────────
+AppContext.SetSwitch("Switch.Microsoft.Data.SqlClient.UseManagedNetworkingOnWindows", true);
+
+// ─────────────────────────────────────────────────────────────────────────────
 // Custom assembly resolver for local runtime assemblies (offline lib/ folder)
 // ─────────────────────────────────────────────────────────────────────────────
 AppDomain.CurrentDomain.AssemblyResolve += (sender, args) =>
