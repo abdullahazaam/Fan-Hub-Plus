@@ -27,7 +27,10 @@ import type {
   UserProfile,
 } from './types'
 
-const BASE_URL = ''
+export const BASE_URL: string = (
+  import.meta.env.VITE_API_BASE_URL ||
+  'https://fan-hub-plus-api.runasp.net'
+).replace(/\/+$/, '')
 
 // Token storage key
 const TOKEN_KEY = 'fhp_auth_token'

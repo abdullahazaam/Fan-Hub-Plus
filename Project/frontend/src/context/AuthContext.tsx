@@ -1,6 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useState } from 'react'
 import type { ReactNode } from 'react'
 import {
+  BASE_URL,
   apiGetMe,
   apiLogin,
   apiRegister,
@@ -38,7 +39,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const token = getStoredToken()
       if (!token) return
       lastSent = Date.now()
-      void fetch('/api/auth/activity', { method: 'POST', headers: { Authorization: `Bearer ${token}` } }).catch(() => {})
+      void fetch(`${BASE_URL}/api/auth/activity`, { method: 'POST', headers: { Authorization: `Bearer ${token}` } }).catch(() => {})
     }
     const events = ['pointerdown', 'keydown', 'scroll'] as const
     events.forEach(event => window.addEventListener(event, activity, { passive: true }))
