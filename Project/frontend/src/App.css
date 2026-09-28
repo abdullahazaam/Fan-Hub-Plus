@@ -9772,12 +9772,33 @@ article.content-card.chronicle-flip::after { display: none; }
  position:absolute;top:25%;right:0;bottom:0;left:0;z-index:3;
  transform:none!important;translate:none!important;
  transition:top .65s cubic-bezier(.22,.8,.2,1);
+ padding-bottom:56px!important;
 }
 @media(hover:hover) and (pointer:fine){
  .portal-universe :is(.merchandise-card,.release-card,.event-card):is(.merchandise-card,.release-card,.event-card):is(.merchandise-card,.release-card,.event-card):hover>.srs-card-body{top:50%}
 }
 .portal-universe :is(.merchandise-card,.release-card,.event-card):is(.merchandise-card,.release-card,.event-card):is(.merchandise-card,.release-card,.event-card):focus-within>.srs-card-body{top:50%}
 @media(prefers-reduced-motion:reduce){.portal-universe :is(.merchandise-card,.release-card,.event-card):is(.merchandise-card,.release-card,.event-card):is(.merchandise-card,.release-card,.event-card)>.srs-card-body{transition:none}}
+
+/* Lock bottom CTA/action bar permanently to bottom of card on hover */
+.portal-universe :is(.merchandise-card,.release-card,.event-card) .srs-card-footer {
+ position:absolute!important;
+ bottom:0!important;
+ left:0!important;
+ right:0!important;
+ width:100%!important;
+ box-sizing:border-box!important;
+ z-index:10!important;
+ background:var(--folder-surface)!important;
+ backdrop-filter:blur(12px)!important;
+ -webkit-backdrop-filter:blur(12px)!important;
+ transform:none!important;
+ translate:none!important;
+ pointer-events:auto!important;
+ padding:10px 16px!important;
+ margin:0!important;
+}
+
 
 
 
@@ -10103,6 +10124,35 @@ article.content-card.chronicle-flip::after { display: none; }
   box-shadow: none !important;
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
+}
+
+
+body {
+  --sb-track-color: #380808;
+  --sb-thumb-color: #ff0000;
+  --sb-size: 11px;
+}
+
+body::-webkit-scrollbar {
+  width: var(--sb-size)
+}
+
+body::-webkit-scrollbar-track {
+  background: var(--sb-track-color);
+  border-radius: 30px;
+}
+
+body::-webkit-scrollbar-thumb {
+  background: var(--sb-thumb-color);
+  border-radius: 30px;
+  
+}
+
+@supports not selector(::-webkit-scrollbar) {
+  body {
+    scrollbar-color: var(--sb-thumb-color)
+                     var(--sb-track-color);
+  }
 }
 
 /* DARK MODE: soft black/obsidian fade matching Home Hero */
