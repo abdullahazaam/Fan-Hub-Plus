@@ -150,29 +150,34 @@ export const EventsDirectory: React.FC<EventsDirectoryProps> = ({
         dateTo = `${customDate}T23:59:59Z`
       }
 
-      const res = await api.getEvents({
+      let res = await api.getEvents({
         city: cityFilter !== 'All' ? cityFilter : undefined,
         categoryId: selectedCategoryId || undefined,
         search: search.trim() || undefined,
         dateFrom,
         dateTo,
-        page,
-        pageSize,
+        page: userLocation ? 1 : page,
+        pageSize: userLocation ? 100 : pageSize,
       })
 
-      // If userLocation is active, sort items by distance
+      // When Locate Near Me (GPS) is active: filter strictly to within 40 km radius
       let items = res.items
+      let computedTotal = res.totalCount
+
       if (userLocation) {
-        items = [...items].sort((a, b) => {
-          const coordsA = parseCoordinates(a.coordinates)
-          const coordsB = parseCoordinates(b.coordinates)
-          if (!coordsA && !coordsB) return 0
-          if (!coordsA) return 1
-          if (!coordsB) return -1
+        items = items.filter((item) => {
+          const coords = parseCoordinates(item.coordinates)
+          if (!coords || (coords[0] === 0 && coords[1] === 0)) return false
+          const dist = getHaversineDistanceKm(userLocation.lat, userLocation.lng, coords[0], coords[1])
+          return dist <= 40
+        }).sort((a, b) => {
+          const coordsA = parseCoordinates(a.coordinates)!
+          const coordsB = parseCoordinates(b.coordinates)!
           const distA = getHaversineDistanceKm(userLocation.lat, userLocation.lng, coordsA[0], coordsA[1])
           const distB = getHaversineDistanceKm(userLocation.lat, userLocation.lng, coordsB[0], coordsB[1])
           return distA - distB
         })
+        computedTotal = items.length
       }
 
       const mapped = items.map((item) => ({
@@ -181,7 +186,7 @@ export const EventsDirectory: React.FC<EventsDirectoryProps> = ({
       }))
 
       setEvents(mapped)
-      setTotalCount(res.totalCount)
+      setTotalCount(computedTotal)
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Failed to retrieve event radar data.')
     } finally {
@@ -413,7 +418,7 @@ export const EventsDirectory: React.FC<EventsDirectoryProps> = ({
         setUserLocation({ lat, lng })
         setGeoStatus('active')
         setGeoNotice({
-          text: `GPS Locked: Sector [${lat.toFixed(3)}, ${lng.toFixed(3)}]. Events sorted by proximity to you.`,
+          text: `GPS Locked: Sector [${lat.toFixed(3)}, ${lng.toFixed(3)}]. Showing events within 40 km radius.`,
           type: 'success',
         })
 
@@ -785,11 +790,28 @@ export const EventsDirectory: React.FC<EventsDirectoryProps> = ({
       ) : events.length === 0 ? (
         <div className="srs-empty-box glass-panel">
           <div className="srs-empty-icon"><CompassIcon size={40} /></div>
-          <h3>No Gatherings Located in this Sector</h3>
-          <p>Try switching to another city, adjusting the date calendar, or resetting filters.</p>
+          <h3>
+            {userLocation
+              ? 'No events found within 40 km of your location.'
+              : 'No Gatherings Located in this Sector'}
+          </h3>
+          <p>
+            {userLocation
+              ? 'There are currently no scheduled gatherings within a 40 km radius of your GPS position.'
+              : 'Try switching to another city, adjusting the date calendar, or resetting filters.'}
+          </p>
           <button
             className="srs-btn-action"
             onClick={() => {
+              if (userLocation) {
+                setUserLocation(null)
+                setGeoStatus('idle')
+                setGeoNotice(null)
+                if (userMarkerRef.current && leafletMapRef.current) {
+                  userMarkerRef.current.remove()
+                  userMarkerRef.current = null
+                }
+              }
               setCityFilter('All')
               setSelectedCategoryId(null)
               setDateFilter('all')
@@ -798,9 +820,10 @@ export const EventsDirectory: React.FC<EventsDirectoryProps> = ({
               setPage(1)
             }}
           >
-            Reset Filters
+            {userLocation ? 'Clear GPS & Reset' : 'Reset Filters'}
           </button>
         </div>
+
       ) : (
         <>
           <div className="srs-cards-grid events-grid">
