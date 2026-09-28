@@ -5,9 +5,17 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Fan Hub Plus</title>
-    <link rel="preload" href="/background.mp4" as="video" type="video/mp4" />
-    <link rel="preload" href="/hero_dark.png" as="image" />
-    <link rel="preload" href="/hero_light.png" as="image" />
+    <!-- Critical Above-The-Fold Preloads: Hero Operative, Environments & 8 Realm Cards -->
+    <link rel="preload" href="/hero_dark.png" as="image" fetchpriority="high" />
+    <link rel="preload" href="/fh-operative.png" as="image" fetchpriority="high" />
+    <link rel="preload" href="/realms/gaming.jpg" as="image" />
+    <link rel="preload" href="/realms/anime.jpg" as="image" />
+    <link rel="preload" href="/realms/comics.jpg" as="image" />
+    <link rel="preload" href="/realms/manga.jpg" as="image" />
+    <link rel="preload" href="/realms/movies.jpg" as="image" />
+    <link rel="preload" href="/realms/tv-shows.jpg" as="image" />
+    <link rel="preload" href="/realms/k-pop.jpg" as="image" />
+    <link rel="preload" href="/realms/cosplay.jpg" as="image" />
     <style>
       html, body {
         margin: 0;

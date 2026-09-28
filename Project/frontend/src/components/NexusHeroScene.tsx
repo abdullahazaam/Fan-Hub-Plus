@@ -54,13 +54,23 @@ export default function NexusHeroScene({theme,onSelect,selected}:HeroSceneProps)
     }));background.position.set(937.5,419.5,-30)
     const pending:Promise<unknown>[]=[]
     const portalUniforms={darkEnvironment,lightEnvironment,themeBlend,clock:{value:0},charge:{value:0},center:{value:new THREE.Vector2(HERO_WORLD.portalX,839-HERO_WORLD.portalY)}}
-    // Both themes stay resident; switches never dispose or reload scene layers.
-    pending.push(Promise.allSettled(['dark','light'].map(name=>texture(`/hero_${name}.png`).then(t=>{
-      if(name==='dark')darkEnvironment.value=t;else lightEnvironment.value=t
+    // Load current active theme first for near-instant hero presentation, then lazy load alternate theme
+    const activeTheme = themeRef.current === 'light' ? 'light' : 'dark'
+    const altTheme = activeTheme === 'light' ? 'dark' : 'light'
+
+    const activeTexturePromise = texture(`/hero_${activeTheme}.png`).then(t=>{
+      if(activeTheme==='dark')darkEnvironment.value=t;else lightEnvironment.value=t
       if(!darkEnvironment.value)darkEnvironment.value=t
       if(!lightEnvironment.value)lightEnvironment.value=t
       invalidate()
-    }))).then(()=>{if(!darkEnvironment.value&&!lightEnvironment.value)throw new Error('Hero environments unavailable')}))
+    })
+    pending.push(activeTexturePromise)
+
+    // Load alternate theme in background without blocking initial scene activation
+    texture(`/hero_${altTheme}.png`).then(t=>{
+      if(altTheme==='dark')darkEnvironment.value=t;else lightEnvironment.value=t
+      invalidate()
+    }).catch(()=>{})
     const groups:THREE.Group[]=[],depths=HERO_REALMS.map(()=>0),cardRims:THREE.MeshStandardMaterial[]=[],cardGlows:THREE.ShaderMaterial[]=[],cardGlass:{value:number}[]=[]
     function roundedShape(w:number,h:number,r:number){const s=new THREE.Shape(),x=-w/2,y=-h/2;s.moveTo(x+r,y);s.lineTo(x+w-r,y);s.quadraticCurveTo(x+w,y,x+w,y+r);s.lineTo(x+w,y+h-r);s.quadraticCurveTo(x+w,y+h,x+w-r,y+h);s.lineTo(x+r,y+h);s.quadraticCurveTo(x,y+h,x,y+h-r);s.lineTo(x,y+r);s.quadraticCurveTo(x,y,x+r,y);return s}
     HERO_REALMS.forEach((realm,i)=>{
@@ -413,7 +423,7 @@ export default function NexusHeroScene({theme,onSelect,selected}:HeroSceneProps)
     const observer=new IntersectionObserver(([entry])=>{visible=entry.isIntersecting;if(visible)invalidate();else{cancelAnimationFrame(frame);frame=0}},{rootMargin:'300px 0px'});observer.observe(wrap)
     wrap.addEventListener('pointermove',move,{passive:true});wrap.addEventListener('pointerleave',leave);document.addEventListener('visibilitychange',visibility);reduced.addEventListener('change',leave);fine.addEventListener('change',leave);canvas.addEventListener('webglcontextlost',loss);canvas.addEventListener('webglcontextrestored',restore)
     resize();camera.updateMatrixWorld(true)
-    Promise.all(pending).then(()=>{if(!disposed&&!lost){renderer!.render(scene,camera);setReady(true);invalidate()}}).catch(()=>{})
+    Promise.allSettled(pending).then(()=>{if(!disposed&&!lost){renderer!.render(scene,camera);setReady(true);invalidate()}}).catch(()=>{})
     return()=>{disposed=true;cancelAnimationFrame(frame);resizeObserver.disconnect();observer.disconnect();invalidateRef.current=()=>{};wrap.removeEventListener('pointermove',move);wrap.removeEventListener('pointerleave',leave);document.removeEventListener('visibilitychange',visibility);reduced.removeEventListener('change',leave);fine.removeEventListener('change',leave);canvas.removeEventListener('webglcontextlost',loss);canvas.removeEventListener('webglcontextrestored',restore);geometries.forEach(g=>g.dispose());materials.forEach(m=>m.dispose());textures.forEach(t=>t.dispose());renderer?.dispose();if(!canvas.isConnected)renderer?.forceContextLoss()}
   },[])
   return <div ref={wrapRef} className={`fh-scene ${ready?'fh-scene-ready':''}`}>

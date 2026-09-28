@@ -395,9 +395,10 @@ function AppContent() {
   // Load Content (Stale-While-Revalidate: keep existing cards visible during background fetch)
   const loadContent = useCallback(async (force = false) => {
     try {
-      if (contentItems.length === 0 || force) {
-        setLoading(true)
-      }
+      setContentItems((prev) => {
+        if (prev.length === 0 || force) setLoading(true)
+        return prev
+      })
       setError(null)
       const data = await api.getContentList({
         search: debouncedSearch,
@@ -413,20 +414,24 @@ function AppContent() {
       setContentItems(data.items)
       setTotalCount(data.totalCount)
     } catch (err: unknown) {
-      if (contentItems.length === 0) {
-        setError(err instanceof Error ? err.message : 'Error retrieving fandom catalog.')
-      }
+      setContentItems((prev) => {
+        if (prev.length === 0) {
+          setError(err instanceof Error ? err.message : 'Error retrieving fandom catalog.')
+        }
+        return prev
+      })
     } finally {
       setLoading(false)
     }
-  }, [debouncedSearch, selectedCategoryId, contentType, genre, releaseYear, minPopularity, sortBy, page, pageSize, contentItems.length])
+  }, [debouncedSearch, selectedCategoryId, contentType, genre, releaseYear, minPopularity, sortBy, page, pageSize])
 
   // Load Characters (Stale-While-Revalidate: keep existing cards visible)
   const loadCharacters = useCallback(async (force = false) => {
     try {
-      if (characters.length === 0 || force) {
-        setLoading(true)
-      }
+      setCharacters((prev) => {
+        if (prev.length === 0 || force) setLoading(true)
+        return prev
+      })
       setError(null)
       if(currentView==='characters'){
         const first=await api.getCharacters({page:1,pageSize:12})
@@ -445,20 +450,24 @@ function AppContent() {
       setCharacters(data.items)
       setTotalCharacters(data.totalCount)
     } catch (err: unknown) {
-      if (characters.length === 0) {
-        setError(err instanceof Error ? err.message : 'Error retrieving character dossiers.')
-      }
+      setCharacters((prev) => {
+        if (prev.length === 0) {
+          setError(err instanceof Error ? err.message : 'Error retrieving character dossiers.')
+        }
+        return prev
+      })
     } finally {
       setLoading(false)
     }
-  }, [debouncedSearch, selectedCategoryId, sortBy, charPage, pageSize, characters.length, currentView])
+  }, [debouncedSearch, selectedCategoryId, sortBy, charPage, pageSize, currentView])
 
   // Load Media (Stale-While-Revalidate: keep existing cards visible)
   const loadMedia = useCallback(async (force = false) => {
     try {
-      if (mediaItems.length === 0 || force) {
-        setLoading(true)
-      }
+      setMediaItems((prev) => {
+        if (prev.length === 0 || force) setLoading(true)
+        return prev
+      })
       setError(null)
       const data = await api.getMediaList({
         mediaType: mediaFormatFilter,
@@ -470,20 +479,21 @@ function AppContent() {
       setMediaItems(data.items)
       setTotalMedia(data.totalCount)
     } catch (err: unknown) {
-      if (mediaItems.length === 0) {
-        setError(err instanceof Error ? err.message : 'Error retrieving multimedia streams.')
-      }
+      setMediaItems((prev) => {
+        if (prev.length === 0) {
+          setError(err instanceof Error ? err.message : 'Error retrieving multimedia streams.')
+        }
+        return prev
+      })
     } finally {
       setLoading(false)
     }
-  }, [mediaFormatFilter, selectedCategoryId, debouncedSearch, mediaPage, pageSize, mediaItems.length])
+  }, [mediaFormatFilter, selectedCategoryId, debouncedSearch, mediaPage, pageSize])
 
-  // Fetch relevant content based on active view
+  // Fetch relevant content based on active view (parallelized for instant responses)
   useEffect(() => {
     if (currentView === 'home') {
-      loadContent()
-      loadCharacters()
-      loadMedia()
+      Promise.allSettled([loadContent(), loadCharacters(), loadMedia()])
     } else if (currentView === 'explore') {
       loadContent()
     } else if (currentView === 'characters') {
@@ -491,9 +501,7 @@ function AppContent() {
     } else if (currentView === 'media') {
       loadMedia()
     } else if (currentView === 'admin') {
-      loadContent()
-      loadCharacters()
-      loadMedia()
+      Promise.allSettled([loadContent(), loadCharacters(), loadMedia()])
     }
   }, [currentView, debouncedSearch, selectedCategoryId, contentType, genre, releaseYear, minPopularity, sortBy, page, charPage, mediaPage, mediaFormatFilter])
 

@@ -1,9 +1,8 @@
-import React, { lazy, Suspense } from 'react'
+import React, { Suspense } from 'react'
 import type { Category } from '../types'
 import { HeroSceneFallback } from './NexusHeroFallback'
+import HeroScene from './NexusHeroScene'
 import './NexusGateHero.css'
-
-const HeroScene = lazy(() => import('./NexusHeroScene'))
 interface NexusGateHeroProps {
   onExploreClick: () => void
   theme: 'dark' | 'light'

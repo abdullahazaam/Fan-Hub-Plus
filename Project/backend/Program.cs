@@ -236,9 +236,11 @@ app.MapGet("/api/health", () => Results.Ok(new
 // ─────────────────────────────────────────────────────────────────────────────
 // Categories (public read)
 // ─────────────────────────────────────────────────────────────────────────────
-app.MapGet("/api/categories", async (FanHubDbContext db) =>
+app.MapGet("/api/categories", async (HttpContext ctx, FanHubDbContext db) =>
 {
+    ctx.Response.Headers.CacheControl = "public, max-age=300, stale-while-revalidate=600";
     var categories = await db.Categories
+        .AsNoTracking()
         .OrderBy(c => c.DisplayOrder)
         .Select(c => new
         {
@@ -259,6 +261,7 @@ app.MapGet("/api/categories", async (FanHubDbContext db) =>
 // Content Listing – public read
 // ─────────────────────────────────────────────────────────────────────────────
 app.MapGet("/api/content", async (
+    HttpContext ctx,
     FanHubDbContext db,
     string? search,
     int? categoryId,
@@ -270,10 +273,11 @@ app.MapGet("/api/content", async (
     int page = 1,
     int pageSize = 12) =>
 {
+    ctx.Response.Headers.CacheControl = "public, max-age=120, stale-while-revalidate=300";
     if (page < 1) page = 1;
     if (pageSize < 1 || pageSize > 50) pageSize = 12;
 
-    var query = db.ContentItems.Include(c => c.Category).AsQueryable();
+    var query = db.ContentItems.AsNoTracking().Include(c => c.Category).AsQueryable();
 
     if (!string.IsNullOrWhiteSpace(search))
     {
@@ -833,6 +837,7 @@ app.MapPost("/api/profile/avatar", async (HttpContext ctx, FanHubDbContext db) =
 // CHARACTERS: Public Browse & Detail
 // ─────────────────────────────────────────────────────────────────────────────
 app.MapGet("/api/characters", async (
+    HttpContext ctx,
     FanHubDbContext db,
     string? search,
     int? categoryId,
@@ -840,10 +845,11 @@ app.MapGet("/api/characters", async (
     int page = 1,
     int pageSize = 12) =>
 {
+    ctx.Response.Headers.CacheControl = "public, max-age=120, stale-while-revalidate=300";
     if (page < 1) page = 1;
     if (pageSize < 1 || pageSize > 50) pageSize = 12;
 
-    var query = db.Characters.Include(c => c.Category).AsQueryable();
+    var query = db.Characters.AsNoTracking().Include(c => c.Category).AsQueryable();
 
     if (!string.IsNullOrWhiteSpace(search))
     {
@@ -996,8 +1002,12 @@ app.MapGet("/api/media", async (
     if (pageSize < 1 || pageSize > 50) pageSize = 12;
 
     var (isAuth, currentUserId, _) = GetAuthInfo(ctx.User);
+    if (!isAuth)
+    {
+        ctx.Response.Headers.CacheControl = "public, max-age=120, stale-while-revalidate=300";
+    }
 
-    var query = db.MediaItems.Include(m => m.Category).Include(m => m.Ratings).AsQueryable();
+    var query = db.MediaItems.AsNoTracking().Include(m => m.Category).Include(m => m.Ratings).AsQueryable();
 
     if (!string.IsNullOrWhiteSpace(mediaType) && !mediaType.Equals("all", StringComparison.OrdinalIgnoreCase))
         query = query.Where(m => m.MediaType.ToLower() == mediaType.ToLower());

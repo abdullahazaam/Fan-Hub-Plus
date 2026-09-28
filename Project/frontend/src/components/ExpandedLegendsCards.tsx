@@ -203,6 +203,7 @@ export const ExpandedLegendsCards: React.FC<ExpandedLegendsCardsProps> = ({
                   alt={legend.name}
                   className="legend-bg-image"
                   loading="lazy"
+                  decoding="async"
                 />
                 <div className="legend-vignette-overlay" />
                 <div
