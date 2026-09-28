@@ -255,7 +255,6 @@ export const UpcomingReleases: React.FC<UpcomingReleasesProps> = ({
 
                   {/* Body */}
                   <div className="srs-card-body">
-                    <div className="folder-slide-window"><div className="folder-slide-panel">
                     <div className="srs-card-meta-line">
                       <span className="srs-meta-category">{release.categoryName}</span>
                       <span className="srs-meta-universe">{release.fandomUniverse}</span>
@@ -263,7 +262,6 @@ export const UpcomingReleases: React.FC<UpcomingReleasesProps> = ({
 
                     <h3 className="srs-card-title">{release.title}</h3>
 
-                    <div className="folder-retract-details">
                     <p className="srs-card-description">{release.synopsis}</p>
 
                     {/* Platform & Date Matrix */}
@@ -293,9 +291,6 @@ export const UpcomingReleases: React.FC<UpcomingReleasesProps> = ({
                     </div>
 
                     {/* Footer Actions */}
-                    </div>
-
-                    </div></div>
                     <div className="srs-card-footer">
                       <button
                         type="button"

@@ -9181,7 +9181,7 @@ article.content-card.chronicle-flip::after { display: none; }
 .portal-universe .merchandise-card.merchandise-card .srs-card-media-wrap::after{background:linear-gradient(0deg,#9c17351a,transparent 25%);pointer-events:none}
 .portal-universe .merchandise-card.merchandise-card .srs-card-body{position:relative;isolation:isolate;background:transparent;transform:none;color:var(--folder-ink)}
 .portal-universe .merchandise-card.merchandise-card .srs-card-body::before{content:'';position:absolute;inset:-20px 0 0;z-index:-1;pointer-events:none;background:linear-gradient(125deg,#e93d5110,transparent 50%),var(--folder-surface);clip-path:polygon(0 0,35% 0,43% 18px,100% 18px,100% 100%,0 100%);border-top:1px solid var(--folder-edge);box-shadow:inset 0 1px #ffffff18;transition:transform .5s cubic-bezier(.2,.75,.2,1)}
-.portal-universe .merchandise-card.merchandise-card .srs-card-body::after{content:'';position:absolute;top:-12px;left:18px;width:35px;height:2px;background:#ca304b;box-shadow:0 0 7px #d62b4233;pointer-events:none}
+.portal-universe .merchandise-card.merchandise-card .srs-card-body::after{content:'';position:absolute;top:-12px;left:18px;width:35px;height:2px;display:none!important}
 .portal-universe .merchandise-card.merchandise-card .srs-card-title{color:var(--folder-ink)}
 .portal-universe .merchandise-card.merchandise-card :is(.srs-card-description,.srs-meta-universe,.srs-currency-code){color:var(--folder-muted)}
 .portal-universe .merchandise-card.merchandise-card .srs-card-footer{display:flex;align-items:center;justify-content:space-between;gap:8px;border-top:1px solid var(--folder-edge)}
@@ -9220,7 +9220,7 @@ article.content-card.chronicle-flip::after { display: none; }
  transition:top .65s cubic-bezier(.22,.8,.2,1);overflow-y:auto;scrollbar-width:thin;
 }
 .portal-universe .merchandise-card.merchandise-card.merchandise-card .srs-card-body::before{display:none}
-.portal-universe .merchandise-card.merchandise-card.merchandise-card .srs-card-body::after{top:7px;left:18px;width:30px;height:2px;background:#d23550;box-shadow:none}
+.portal-universe .merchandise-card.merchandise-card.merchandise-card .srs-card-body::after{top:7px;left:18px;width:30px;height:2px;display:none!important}
 .portal-universe .merchandise-card.merchandise-card.merchandise-card .srs-card-title{font-size:16px;line-height:1.25;letter-spacing:-.02em;transform:none}
 .portal-universe .merchandise-card.merchandise-card.merchandise-card .srs-card-description{font-size:12px;line-height:1.45;flex-shrink:0}
 .portal-universe .merchandise-card.merchandise-card.merchandise-card .srs-card-footer{margin-top:auto;padding-top:10px;flex-shrink:0;gap:6px}
@@ -9278,7 +9278,7 @@ article.content-card.chronicle-flip::after { display: none; }
 .portal-universe :is(.release-card,.event-card):is(.release-card,.event-card) .srs-card-media-wrap::after{background:linear-gradient(0deg,#9c17351a,transparent 25%);pointer-events:none}
 .portal-universe :is(.release-card,.event-card):is(.release-card,.event-card) .srs-card-body{position:relative;isolation:isolate;background:transparent;transform:none;color:var(--folder-ink)}
 .portal-universe :is(.release-card,.event-card):is(.release-card,.event-card) .srs-card-body::before{content:'';position:absolute;inset:-20px 0 0;z-index:-1;pointer-events:none;background:linear-gradient(125deg,#e93d5110,transparent 50%),var(--folder-surface);clip-path:polygon(0 0,35% 0,43% 18px,100% 18px,100% 100%,0 100%);border-top:1px solid var(--folder-edge);box-shadow:inset 0 1px #ffffff18;transition:transform .5s cubic-bezier(.2,.75,.2,1)}
-.portal-universe :is(.release-card,.event-card):is(.release-card,.event-card) .srs-card-body::after{content:'';position:absolute;top:-12px;left:18px;width:35px;height:2px;background:#ca304b;box-shadow:0 0 7px #d62b4233;pointer-events:none}
+.portal-universe :is(.release-card,.event-card):is(.release-card,.event-card) .srs-card-body::after{content:'';position:absolute;top:-12px;left:18px;width:35px;height:2px;display:none!important}
 .portal-universe :is(.release-card,.event-card):is(.release-card,.event-card) .srs-card-title{color:var(--folder-ink)}
 .portal-universe :is(.release-card,.event-card):is(.release-card,.event-card) :is(.srs-card-description,.srs-meta-universe,.srs-currency-code){color:var(--folder-muted)}
 .portal-universe :is(.release-card,.event-card):is(.release-card,.event-card) .srs-card-footer{display:flex;align-items:center;justify-content:space-between;gap:8px;border-top:1px solid var(--folder-edge)}
@@ -9317,7 +9317,7 @@ article.content-card.chronicle-flip::after { display: none; }
  transition:top .65s cubic-bezier(.22,.8,.2,1);overflow-y:auto;scrollbar-width:thin;
 }
 .portal-universe :is(.release-card,.event-card):is(.release-card,.event-card):is(.release-card,.event-card) .srs-card-body::before{display:none}
-.portal-universe :is(.release-card,.event-card):is(.release-card,.event-card):is(.release-card,.event-card) .srs-card-body::after{top:7px;left:18px;width:30px;height:2px;background:#d23550;box-shadow:none}
+.portal-universe :is(.release-card,.event-card):is(.release-card,.event-card):is(.release-card,.event-card) .srs-card-body::after{top:7px;left:18px;width:30px;height:2px;display:none!important}
 .portal-universe :is(.release-card,.event-card):is(.release-card,.event-card):is(.release-card,.event-card) .srs-card-title{font-size:16px;line-height:1.25;letter-spacing:-.02em;transform:none}
 .portal-universe :is(.release-card,.event-card):is(.release-card,.event-card):is(.release-card,.event-card) .srs-card-description{font-size:12px;line-height:1.45;flex-shrink:0}
 .portal-universe :is(.release-card,.event-card):is(.release-card,.event-card):is(.release-card,.event-card) .srs-card-footer{margin-top:auto;padding-top:10px;flex-shrink:0;gap:6px}
@@ -10160,31 +10160,3 @@ article.content-card.chronicle-flip::after { display: none; }
 .site-atmosphere-layer .atmosphere-global-light-bg{opacity:0;transition:opacity .5s ease}
 .site-atmosphere-layer.theme-light .atmosphere-global-light-bg{opacity:1}
 @media(prefers-reduced-motion:reduce){.site-atmosphere-layer .atmosphere-global-light-bg{transition:none}}
-
-/* Three-layer collector cards: image, retracting middle, stationary actions. */
-.portal-universe .srs-card:is(.merchandise-card,.release-card,.event-card){transform:none!important;translate:none!important;rotate:none!important}
-.portal-universe .srs-card:is(.merchandise-card,.release-card,.event-card)>.srs-card-body{
- top:25%!important;bottom:0!important;transform:none!important;translate:none!important;transition:none!important;
- display:flex;flex-direction:column;background:transparent!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;box-shadow:none!important;
-}
-.portal-universe .srs-card:is(.merchandise-card,.release-card,.event-card)>.srs-card-body::before,
-.portal-universe .srs-card:is(.merchandise-card,.release-card,.event-card)>.srs-card-body::after{display:none!important}
-.portal-universe .srs-card:is(.merchandise-card,.release-card,.event-card) .folder-slide-window{flex:1;min-height:0;overflow:hidden;position:relative;isolation:isolate}
-.portal-universe .srs-card:is(.merchandise-card,.release-card,.event-card) .folder-slide-panel{
- height:100%;display:flex;flex-direction:column;position:relative;
- background:var(--folder-surface);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
- border-top:1px solid var(--folder-edge);border-radius:12px 12px 0 0;
- box-shadow:inset 0 1px #ffffff14;transform:translateY(0);
- transition:transform .6s cubic-bezier(.22,.8,.2,1);
-}
-.portal-universe .srs-card:is(.merchandise-card,.release-card,.event-card) .folder-retract-details{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center}
-.portal-universe .srs-card:is(.merchandise-card,.release-card,.event-card) .srs-card-footer{
- margin-top:auto;flex-shrink:0;position:relative;z-index:4;background:var(--folder-surface);
- transform:none!important;translate:none!important;opacity:1!important;pointer-events:auto!important;
- box-shadow:0 12px 0 12px var(--folder-surface);
-}
-@media(hover:hover) and (pointer:fine){
- .portal-universe .srs-card:is(.merchandise-card,.release-card,.event-card):hover .folder-slide-panel{transform:translateY(-102%)}
- .portal-universe .srs-card:is(.merchandise-card,.release-card,.event-card):hover .folder-slide-panel:focus-within{transform:translateY(0)}
-}
-@media(prefers-reduced-motion:reduce){.portal-universe .srs-card:is(.merchandise-card,.release-card,.event-card) .folder-slide-panel{transition:none}}

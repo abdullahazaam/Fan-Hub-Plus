@@ -232,7 +232,6 @@ export const MerchandiseShowcase: React.FC<MerchandiseShowcaseProps> = ({
 
                   {/* Card Content Body */}
                   <div className="srs-card-body">
-                    <div className="folder-slide-window"><div className="folder-slide-panel">
                     <div className="srs-card-meta-line">
                       <span className="srs-meta-category">{item.categoryName}</span>
                       <span className="srs-meta-universe">{item.fandomUniverse}</span>
@@ -247,12 +246,8 @@ export const MerchandiseShowcase: React.FC<MerchandiseShowcaseProps> = ({
                       {item.name}
                     </h3>
 
-                    <div className="folder-retract-details">
                     <p className="srs-card-description">{item.description}</p>
 
-                    </div>
-
-                    </div></div>
                     <div className="srs-card-footer">
                       <div className="srs-price-tag">
                         <span className="srs-currency">$</span>

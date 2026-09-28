@@ -859,7 +859,6 @@ export const EventsDirectory: React.FC<EventsDirectoryProps> = ({
 
                   {/* Body */}
                   <div className="srs-card-body">
-                    <div className="folder-slide-window"><div className="folder-slide-panel">
                     <div className="srs-card-meta-line">
                       <span className="srs-meta-category">{item.categoryName}</span>
                       <span className="srs-meta-universe">{item.fandomUniverse}</span>
@@ -867,7 +866,6 @@ export const EventsDirectory: React.FC<EventsDirectoryProps> = ({
 
                     <h3 className="srs-card-title">{item.title}</h3>
 
-                    <div className="folder-retract-details">
                     <p className="srs-card-description">{item.description}</p>
 
                     {/* Venue & Geolocation Coordinates */}
@@ -888,9 +886,6 @@ export const EventsDirectory: React.FC<EventsDirectoryProps> = ({
                     </div>
 
                     {/* Card Actions */}
-                    </div>
-
-                    </div></div>
                     <div className="srs-card-footer">
                       <button
                         type="button"
