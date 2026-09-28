@@ -44,13 +44,16 @@ public record UserProfileDto(
     string Bio,
     string AvatarUrl,
     string FavoriteCategory,
+    List<string> FavoriteCategories,
     DateTime CreatedAt
 );
 
 // ---------- Update Profile ----------
 public record UpdateProfileDto(
-    string DisplayName,
-    string Bio,
-    string AvatarUrl,
-    string FavoriteCategory
+    string? DisplayName,
+    string? Bio,
+    string? AvatarUrl,
+    string? FavoriteCategory,
+    List<string>? FavoriteCategories = null
 );
+

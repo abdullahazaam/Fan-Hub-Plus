@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import * as THREE from 'three'
 import { HeroFallbackArtwork } from './NexusHeroFallback'
 import { CARD, HERO_REALMS, HERO_WORLD, OPERATIVE, OPERATIVE_CONTACTS, heroView, realmPoints, type HeroSceneProps } from './NexusHeroLayout'
@@ -13,6 +13,13 @@ export default function NexusHeroScene({theme,onSelect,selected}:HeroSceneProps)
   const [ready,setReady]=useState(false)
   const themeRef=useRef(theme)
   useEffect(()=>{themeRef.current=theme;invalidateRef.current()},[theme])
+  useLayoutEffect(()=>{
+    const svg=svgRef.current!,wrap=wrapRef.current!
+    const resize=()=>{const {width,height}=wrap.getBoundingClientRect();if(!width||!height)return;const v=heroView(width,height);svg.setAttribute('viewBox',`${v.x} ${v.y} ${v.width} ${v.height}`)}
+    resize()
+    const observer=new ResizeObserver(resize);observer.observe(wrap)
+    return()=>observer.disconnect()
+  },[])
   const activate=(index:number)=>{activeRef.current=index;invalidateRef.current()}
   useEffect(()=>{
     const wrap=wrapRef.current!,svg=svgRef.current!,canvas=canvasRef.current!
@@ -32,7 +39,7 @@ export default function NexusHeroScene({theme,onSelect,selected}:HeroSceneProps)
     invalidateRef.current=invalidate
     function resize(){const {width,height}=wrap.getBoundingClientRect();if(!width||!height)return;view=heroView(width,height);svg.setAttribute('viewBox',`${view.x} ${view.y} ${view.width} ${view.height}`);camera.left=view.x;camera.right=view.x+view.width;camera.top=839-view.y;camera.bottom=839-view.y-view.height;camera.updateProjectionMatrix();renderer?.setPixelRatio(Math.min(devicePixelRatio, width<860?1.5:2));renderer?.setSize(width,height,false);invalidate()}
     const resizeObserver=new ResizeObserver(resize);resizeObserver.observe(wrap);resize()
-    try {renderer=new THREE.WebGLRenderer({canvas,alpha:true,antialias:true,powerPreference:'high-performance',preserveDrawingBuffer:true});renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.setClearColor(0x000000,0)} catch {return()=>resizeObserver.disconnect()}
+    try {renderer=new THREE.WebGLRenderer({canvas,alpha:true,antialias:true,powerPreference:'high-performance',preserveDrawingBuffer:false});renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.setClearColor(0x000000,0)} catch {return()=>resizeObserver.disconnect()}
     scene.add(new THREE.AmbientLight(0xffffff,2))
     const rimLight=new THREE.DirectionalLight(0xff443d,3);rimLight.position.set(900,700,700);scene.add(rimLight)
     const themeBlend={value:themeRef.current==='light'?1:0}
@@ -406,7 +413,7 @@ export default function NexusHeroScene({theme,onSelect,selected}:HeroSceneProps)
     const observer=new IntersectionObserver(([entry])=>{visible=entry.isIntersecting;if(visible)invalidate();else{cancelAnimationFrame(frame);frame=0}},{rootMargin:'300px 0px'});observer.observe(wrap)
     wrap.addEventListener('pointermove',move,{passive:true});wrap.addEventListener('pointerleave',leave);document.addEventListener('visibilitychange',visibility);reduced.addEventListener('change',leave);fine.addEventListener('change',leave);canvas.addEventListener('webglcontextlost',loss);canvas.addEventListener('webglcontextrestored',restore)
     resize();camera.updateMatrixWorld(true)
-    Promise.all(pending).then(()=>{if(!disposed&&!lost){setReady(true);invalidate()}}).catch(()=>{})
+    Promise.all(pending).then(()=>{if(!disposed&&!lost){renderer!.render(scene,camera);setReady(true);invalidate()}}).catch(()=>{})
     return()=>{disposed=true;cancelAnimationFrame(frame);resizeObserver.disconnect();observer.disconnect();invalidateRef.current=()=>{};wrap.removeEventListener('pointermove',move);wrap.removeEventListener('pointerleave',leave);document.removeEventListener('visibilitychange',visibility);reduced.removeEventListener('change',leave);fine.removeEventListener('change',leave);canvas.removeEventListener('webglcontextlost',loss);canvas.removeEventListener('webglcontextrestored',restore);geometries.forEach(g=>g.dispose());materials.forEach(m=>m.dispose());textures.forEach(t=>t.dispose());renderer?.dispose();if(!canvas.isConnected)renderer?.forceContextLoss()}
   },[])
   return <div ref={wrapRef} className={`fh-scene ${ready?'fh-scene-ready':''}`}>

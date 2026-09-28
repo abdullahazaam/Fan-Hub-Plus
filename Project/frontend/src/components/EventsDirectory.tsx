@@ -19,7 +19,11 @@ interface EventsDirectoryProps {
   bookmarkedIds: Set<number>
   onOpenAuth: () => void
   isAuthenticated: boolean
+  theme?: 'dark' | 'light'
 }
+
+const ESRI_DARK_TILES = 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}'
+const ESRI_LIGHT_TILES = 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}'
 
 // City coordinates mapping for map navigation
 const CITY_COORDINATES: Record<string, [number, number]> = {
@@ -61,6 +65,7 @@ export const EventsDirectory: React.FC<EventsDirectoryProps> = ({
   bookmarkedIds,
   onOpenAuth,
   isAuthenticated,
+  theme,
 }) => {
   const [events, setEvents] = useState<EventItem[]>([])
   const [totalCount, setTotalCount] = useState<number>(0)
@@ -87,6 +92,7 @@ export const EventsDirectory: React.FC<EventsDirectoryProps> = ({
   // Map DOM and Leaflet references
   const mapContainerRef = useRef<HTMLDivElement>(null)
   const leafletMapRef = useRef<L.Map | null>(null)
+  const tileLayerRef = useRef<L.TileLayer | null>(null)
   const markersLayerRef = useRef<L.LayerGroup | null>(null)
   const userMarkerRef = useRef<L.Marker | null>(null)
 
@@ -203,11 +209,13 @@ export const EventsDirectory: React.FC<EventsDirectoryProps> = ({
         attributionControl: false,
       })
 
-      // ESRI World Dark Gray Canvas (clean, dark, high performance, no API key required)
-      L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
+      // ESRI World Canvas tiles: Dark Gray for dark theme, Light Gray / Ivory for light theme
+      const isLight = theme === 'light' || (typeof document !== 'undefined' && document.documentElement.getAttribute('data-theme') === 'light')
+      const tileLayer = L.tileLayer(isLight ? ESRI_LIGHT_TILES : ESRI_DARK_TILES, {
         maxZoom: 16,
         attribution: 'Esri, HERE, Garmin, © OpenStreetMap contributors',
       }).addTo(map)
+      tileLayerRef.current = tileLayer
 
       const markersGroup = L.layerGroup().addTo(map)
       markersLayerRef.current = markersGroup
@@ -224,11 +232,36 @@ export const EventsDirectory: React.FC<EventsDirectoryProps> = ({
       if (leafletMapRef.current) {
         leafletMapRef.current.remove()
         leafletMapRef.current = null
+        tileLayerRef.current = null
         markersLayerRef.current = null
         userMarkerRef.current = null
       }
     }
   }, [])
+
+  // ─── Switch Map Tiles on Theme Change ────────────────────────────────────
+  useEffect(() => {
+    const updateMapTiles = (t?: string | null) => {
+      if (!tileLayerRef.current) return
+      const isLight = t === 'light' || (!t && (theme === 'light' || (typeof document !== 'undefined' && document.documentElement.getAttribute('data-theme') === 'light')))
+      const targetUrl = isLight ? ESRI_LIGHT_TILES : ESRI_DARK_TILES
+      tileLayerRef.current.setUrl(targetUrl)
+    }
+
+    updateMapTiles(theme)
+
+    const observer = new MutationObserver(() => {
+      const currentAttr = document.documentElement.getAttribute('data-theme')
+      updateMapTiles(currentAttr)
+    })
+
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['data-theme'],
+    })
+
+    return () => observer.disconnect()
+  }, [theme])
 
   // ─── Focus Event Card Action ─────────────────────────────────────────────
   const focusEventCard = (eventId: number) => {
@@ -833,6 +866,8 @@ export const EventsDirectory: React.FC<EventsDirectoryProps> = ({
 
                     <h3 className="srs-card-title">{item.title}</h3>
 
+                    <p className="srs-card-description">{item.description}</p>
+
                     {/* Venue & Geolocation Coordinates */}
                     <div className="event-venue-block">
                       <div className="event-location-row">
@@ -849,8 +884,6 @@ export const EventsDirectory: React.FC<EventsDirectoryProps> = ({
                         )}
                       </div>
                     </div>
-
-                    <p className="srs-card-description">{item.description}</p>
 
                     {/* Card Actions */}
                     <div className="srs-card-footer">
@@ -879,7 +912,7 @@ export const EventsDirectory: React.FC<EventsDirectoryProps> = ({
                           className="btn-external-ticket btn-ticket-external"
                           title="Open official event pass ticket portal in new tab"
                         >
-                          <span>Get Passes & Tickets</span>
+                          <span>Get Passes</span>
                           <span className="external-arrow">↗</span>
                         </a>
                       )}

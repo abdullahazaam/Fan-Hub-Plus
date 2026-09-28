@@ -1926,7 +1926,13 @@ export const AdminConsole: React.FC<AdminConsoleProps> = ({
                 <div className="admin-analytics-stat-card">
                   <div className="analytics-stat-title">Total Operatives</div>
                   <div className="analytics-stat-num">{analytics.totalUsers}</div>
-                  <div className="analytics-stat-sub">{analytics.activeUsers} active this month</div>
+                  <div className="analytics-stat-sub">Registered users</div>
+                </div>
+
+                <div className="admin-analytics-stat-card">
+                  <div className="analytics-stat-title">ACTIVE USERS</div>
+                  <div className="analytics-stat-num">{analytics.activeUsers}</div>
+                  <div className="analytics-stat-sub">Active in the last 30 days</div>
                 </div>
 
                 <div className="admin-analytics-stat-card">

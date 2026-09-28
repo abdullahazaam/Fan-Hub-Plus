@@ -247,6 +247,9 @@ partial class FanHubDbContextModelSnapshot : ModelSnapshot
                 b.HasIndex("Username")
                     .IsUnique();
 
+                b.Property<DateTime?>("LastLoginAt").HasColumnType("datetime2");
+                b.Property<DateTime?>("LastActiveAt").HasColumnType("datetime2");
+                b.HasIndex("LastActiveAt");
                 b.ToTable("Users");
             });
 

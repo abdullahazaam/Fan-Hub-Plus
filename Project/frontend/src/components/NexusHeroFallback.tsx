@@ -5,7 +5,9 @@ export function HeroSceneFallback({theme,onSelect,selected}:HeroSceneProps) {
   const ref=useRef<SVGSVGElement>(null)
   useLayoutEffect(()=>{
     const svg=ref.current!
-    const observer=new ResizeObserver(([entry])=>{const {width,height}=entry.contentRect;if(!width||!height)return;const v=heroView(width,height);svg.setAttribute('viewBox',`${v.x} ${v.y} ${v.width} ${v.height}`)})
+    const resize=()=>{const {width,height}=svg.getBoundingClientRect();if(!width||!height)return;const v=heroView(width,height);svg.setAttribute('viewBox',`${v.x} ${v.y} ${v.width} ${v.height}`)}
+    resize()
+    const observer=new ResizeObserver(resize)
     observer.observe(svg);return()=>observer.disconnect()
   },[])
   return <svg ref={ref} className="fh-scene-fallback" viewBox="0 0 1875 839" aria-label="Eight fandom realms">

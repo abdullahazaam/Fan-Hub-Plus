@@ -19,6 +19,18 @@ AppDomain.CurrentDomain.AssemblyResolve += (sender, args) =>
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Explicit migration command: apply schema only, without seeding or starting HTTP.
+if (args.Contains("--migrate-only"))
+{
+    var options = new DbContextOptionsBuilder<FanHubDbContext>()
+        .UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
+        .ConfigureWarnings(w => w.Ignore(Microsoft.EntityFrameworkCore.Diagnostics.RelationalEventId.PendingModelChangesWarning));
+    await using var db = new FanHubDbContext(options.Options);
+    await db.Database.MigrateAsync();
+    Console.WriteLine("Database migrations applied.");
+    return;
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Validate that JWT signing key is present in configuration before startup.
 // Key is read from the FAN_HUB_JWT_KEY environment variable (mapped below).
@@ -60,6 +72,8 @@ builder.Services.AddDbContext<FanHubDbContext>(options =>
            .ConfigureWarnings(w => w.Ignore(Microsoft.EntityFrameworkCore.Diagnostics.RelationalEventId.PendingModelChangesWarning)));
 
 builder.Services.AddSingleton<TokenService>();
+builder.Services.AddSingleton<PasswordResetEmailSender>();
+builder.Services.AddSingleton<UserActivityTracker>();
 
 var app = builder.Build();
 
@@ -111,6 +125,11 @@ app.Use(async (ctx, next) =>
         if (principal is not null)
         {
             ctx.User = principal;
+            if (int.TryParse(principal.FindFirstValue(ClaimTypes.NameIdentifier), out var activityUserId))
+            {
+                var tracker = ctx.RequestServices.GetRequiredService<UserActivityTracker>();
+                await tracker.RecordAsync(activityUserId, ctx.RequestServices.GetRequiredService<FanHubDbContext>(), ctx.RequestAborted);
+            }
         }
     }
     await next();
@@ -468,6 +487,10 @@ app.MapPost("/api/auth/login", async (HttpContext ctx, FanHubDbContext db, Token
     if (!passwordValid)
         return Results.Unauthorized();
 
+    var now = DateTime.UtcNow;
+    user!.LastLoginAt = now;
+    user.LastActiveAt = now;
+    await db.SaveChangesAsync();
     var token = tokens.IssueToken(user!);
     return Results.Ok(new AuthResponseDto(
         token, user!.Role, user.Id, user.Email,
@@ -477,6 +500,9 @@ app.MapPost("/api/auth/login", async (HttpContext ctx, FanHubDbContext db, Token
 // ─────────────────────────────────────────────────────────────────────────────
 // Auth: Me – returns current user info from JWT
 // ─────────────────────────────────────────────────────────────────────────────
+app.MapPost("/api/auth/activity", (HttpContext ctx) =>
+    ctx.User.Identity?.IsAuthenticated == true ? Results.NoContent() : Results.Unauthorized());
+
 app.MapGet("/api/auth/me", async (HttpContext ctx, FanHubDbContext db) =>
 {
     var (isAuth, userId, _) = GetAuthInfo(ctx.User);
@@ -485,10 +511,14 @@ app.MapGet("/api/auth/me", async (HttpContext ctx, FanHubDbContext db) =>
     var user = await db.Users.FindAsync(userId);
     if (user is null) return Results.NotFound();
 
+    var favCats = (user.FavoriteCategory ?? "")
+        .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+        .ToList();
+
     return Results.Ok(new UserProfileDto(
         user.Id, user.Email, user.Username, user.Role,
         user.DisplayName, user.Bio, user.AvatarUrl,
-        user.FavoriteCategory, user.CreatedAt));
+        user.FavoriteCategory, favCats, user.CreatedAt));
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -498,10 +528,9 @@ app.MapGet("/api/auth/me", async (HttpContext ctx, FanHubDbContext db) =>
 //   - Always returns the same public response whether the email exists or not
 //     (prevents user enumeration).
 //   - Only the SHA-256 hash of the reset token is stored in SQL Server.
-//   - The raw token is ONLY included in the response when ASPNETCORE_ENVIRONMENT
-//     is "Development". It is never included in Production.
+//   - Raw tokens are delivered by email only, never returned or logged.
 // ─────────────────────────────────────────────────────────────────────────────
-app.MapPost("/api/auth/forgot-password", async (HttpContext ctx, FanHubDbContext db, ForgotPasswordDto dto, IWebHostEnvironment env, ILogger<Program> logger) =>
+app.MapPost("/api/auth/forgot-password", async (HttpContext ctx, FanHubDbContext db, ForgotPasswordDto dto, PasswordResetEmailSender emailSender, ILogger<Program> logger) =>
 {
     var ip = ctx.Connection.RemoteIpAddress?.ToString() ?? "unknown";
     var windowSec = int.Parse(builder.Configuration["RateLimit:ForgotPasswordWindowSeconds"] ?? "300");
@@ -514,11 +543,12 @@ app.MapPost("/api/auth/forgot-password", async (HttpContext ctx, FanHubDbContext
     // Standard (always-identical) public response — prevents email enumeration
     object publicResponse = new
     {
-        message = "If an account with that email exists, a password reset token has been generated. " +
-                  "Check the console (Development only) or contact your administrator."
+        message = "If an account with that email exists, you will receive password reset instructions by email."
     };
 
-    if (string.IsNullOrWhiteSpace(dto.Email))
+    if (string.IsNullOrWhiteSpace(dto.Email) || dto.Email.Length > 254 ||
+        !System.Net.Mail.MailAddress.TryCreate(dto.Email.Trim(), out var address) ||
+        !string.Equals(address.Address, dto.Email.Trim(), StringComparison.OrdinalIgnoreCase))
         return Results.Ok(publicResponse);
 
     var normalizedEmail = dto.Email.Trim().ToUpper();
@@ -548,29 +578,17 @@ app.MapPost("/api/auth/forgot-password", async (HttpContext ctx, FanHubDbContext
     });
     await db.SaveChangesAsync();
 
-    // In Development: log the raw token to console and include it in the response
-    // to facilitate local testing without an email server.
-    // This code path is NEVER reached in Production.
-    if (env.IsDevelopment())
+    try
     {
-        logger.LogWarning(
-            "[DEV-ONLY] Password reset token for {Email}: {Token} (expires at {Expires} UTC). " +
-            "This token is NOT emailed in development; copy it from here or from the API response.",
-            user.Email, rawToken, expiresAt.ToString("o"));
-
-        return Results.Ok(new
-        {
-            message = "If an account with that email exists, a password reset token has been generated. " +
-                      "Check the console (Development only) or contact your administrator.",
-            // ── LOCAL DEV CONVENIENCE ─────────────────────────────────────────
-            // devNotice and devResetToken are ONLY present in Development builds.
-            // They are absent from the response in any non-Development environment.
-            // ─────────────────────────────────────────────────────────────────
-            devNotice = "[DEVELOPMENT ONLY] Raw reset token shown here for local testing. " +
-                        "In production this field will not be present and tokens are delivered by email.",
-            devResetToken = rawToken,
-            devExpiresAt = expiresAt
-        });
+        await emailSender.SendAsync(user.Email, rawToken, ctx.RequestAborted);
+    }
+    catch (Exception ex) when (ex is System.Net.Mail.SmtpException or InvalidOperationException or FormatException or OperationCanceledException)
+    {
+        // Never expose account existence, credentials or the token in responses/logs.
+        logger.LogError("Password reset email delivery failed ({FailureType}). Check SMTP configuration and connectivity.", ex.GetType().Name);
+        var undelivered = db.PasswordResetTokens.Local.First(t => t.TokenHash == tokenHash);
+        undelivered.IsUsed = true;
+        await db.SaveChangesAsync();
     }
 
     return Results.Ok(publicResponse);
@@ -625,10 +643,14 @@ app.MapGet("/api/profile", async (HttpContext ctx, FanHubDbContext db) =>
     var user = await db.Users.FindAsync(userId);
     if (user is null) return Results.NotFound();
 
+    var favCats = (user.FavoriteCategory ?? "")
+        .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+        .ToList();
+
     return Results.Ok(new UserProfileDto(
         user.Id, user.Email, user.Username, user.Role,
         user.DisplayName, user.Bio, user.AvatarUrl,
-        user.FavoriteCategory, user.CreatedAt));
+        user.FavoriteCategory, favCats, user.CreatedAt));
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -645,15 +667,33 @@ app.MapPut("/api/profile", async (HttpContext ctx, FanHubDbContext db, UpdatePro
     user.DisplayName = string.IsNullOrWhiteSpace(dto.DisplayName) ? user.DisplayName : dto.DisplayName.Trim();
     user.Bio = dto.Bio?.Trim() ?? string.Empty;
     user.AvatarUrl = dto.AvatarUrl?.Trim() ?? string.Empty;
-    user.FavoriteCategory = dto.FavoriteCategory?.Trim() ?? string.Empty;
+
+    if (dto.FavoriteCategories != null)
+    {
+        var cleaned = dto.FavoriteCategories
+            .Where(c => !string.IsNullOrWhiteSpace(c))
+            .Select(c => c.Trim())
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToList();
+        user.FavoriteCategory = string.Join(", ", cleaned);
+    }
+    else if (dto.FavoriteCategory != null)
+    {
+        user.FavoriteCategory = dto.FavoriteCategory.Trim();
+    }
+
     user.UpdatedAt = DateTime.UtcNow;
 
     await db.SaveChangesAsync();
 
+    var favCats = (user.FavoriteCategory ?? "")
+        .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+        .ToList();
+
     return Results.Ok(new UserProfileDto(
         user.Id, user.Email, user.Username, user.Role,
         user.DisplayName, user.Bio, user.AvatarUrl,
-        user.FavoriteCategory, user.CreatedAt));
+        user.FavoriteCategory, favCats, user.CreatedAt));
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -1173,6 +1213,87 @@ app.MapGet("/api/user/submissions", async (HttpContext ctx, FanHubDbContext db) 
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
+// USER: Recent Activity Feed (Bookmarks, Ratings, Submissions)
+// ─────────────────────────────────────────────────────────────────────────────
+app.MapGet("/api/user/activity", async (HttpContext ctx, FanHubDbContext db) =>
+{
+    var (isAuth, userId, _) = GetAuthInfo(ctx.User);
+    if (!isAuth) return Results.Unauthorized();
+
+    var user = await db.Users.FindAsync(userId);
+    var userEmail = user?.Email.ToLower();
+
+    // 1. Latest Bookmarks/Saves
+    var bookmarks = await db.UserBookmarks
+        .Where(b => b.UserId == userId)
+        .OrderByDescending(b => b.CreatedAt)
+        .Take(25)
+        .Select(b => new UserActivityDto(
+            $"bm-{b.Id}",
+            "Bookmark",
+            "Saved to Archive",
+            b.ItemType,
+            b.ItemId,
+            b.ItemTitle,
+            b.ItemSubtitle,
+            b.ItemImageUrl,
+            "Saved Relic",
+            b.CreatedAt
+        ))
+        .ToListAsync();
+
+    // 2. Latest Media Ratings
+    var ratings = await db.MediaRatings
+        .Include(r => r.MediaItem)
+        .Where(r => r.UserId == userId)
+        .OrderByDescending(r => r.UpdatedAt)
+        .Take(25)
+        .Select(r => new UserActivityDto(
+            $"rt-{r.Id}",
+            "Rating",
+            "Rated Media",
+            "Media",
+            r.MediaItemId,
+            r.MediaItem != null ? r.MediaItem.Title : "Media Item",
+            r.MediaItem != null ? r.MediaItem.FandomUniverse : "Nexus Multiverse",
+            r.MediaItem != null ? r.MediaItem.ThumbnailUrl : null,
+            $"{r.Score} Stars Rating",
+            r.UpdatedAt
+        ))
+        .ToListAsync();
+
+    // 3. Latest Community Submissions
+    var submissions = await db.FanSubmissions
+        .Include(s => s.Category)
+        .Where(s => s.UserId == userId || (userEmail != null && s.AuthorEmail != null && s.AuthorEmail.ToLower() == userEmail))
+        .OrderByDescending(s => s.SubmittedAt)
+        .Take(25)
+        .Select(s => new UserActivityDto(
+            $"sub-{s.Id}",
+            "Submission",
+            "Dispatched Lore",
+            s.SubmissionType,
+            s.Id,
+            s.Title,
+            s.Category != null ? s.Category.Name : s.FandomUniverse,
+            s.MediaUrl,
+            $"Status: {s.Status}",
+            s.SubmittedAt
+        ))
+        .ToListAsync();
+
+    var combined = bookmarks
+        .Concat(ratings)
+        .Concat(submissions)
+        .OrderByDescending(a => a.Timestamp)
+        .Take(30)
+        .ToList();
+
+    return Results.Ok(combined);
+});
+
+
+// ─────────────────────────────────────────────────────────────────────────────
 // ADMIN: Fan Submissions
 // ─────────────────────────────────────────────────────────────────────────────
 app.MapGet("/api/admin/submissions", async (HttpContext ctx, FanHubDbContext db, string? status, string? search, int page = 1, int pageSize = 10) =>
@@ -1490,8 +1611,7 @@ app.MapGet("/api/admin/analytics", async (HttpContext ctx, FanHubDbContext db) =
 
     var totalUsers = await db.Users.CountAsync();
     var thirtyDaysAgo = DateTime.UtcNow.AddDays(-30);
-    var activeUsers = await db.Users.CountAsync(u => u.CreatedAt >= thirtyDaysAgo || u.UpdatedAt >= thirtyDaysAgo);
-    if (activeUsers == 0 && totalUsers > 0) activeUsers = totalUsers;
+    var activeUsers = await db.Users.CountAsync(u => u.LastActiveAt >= thirtyDaysAgo);
 
     var totalContent = await db.ContentItems.CountAsync();
     var totalCharacters = await db.Characters.CountAsync();

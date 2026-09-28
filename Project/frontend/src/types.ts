@@ -147,6 +147,7 @@ export interface UserProfile {
   bio: string
   avatarUrl: string
   favoriteCategory: string
+  favoriteCategories?: string[]
   createdAt: string
 }
 
@@ -177,6 +178,7 @@ export interface ProfileUpdateForm {
   bio?: string
   avatarUrl?: string
   favoriteCategory?: string
+  favoriteCategories?: string[]
 }
 
 export interface ForgotPasswordForm {
@@ -365,5 +367,19 @@ export type NavView =
   | 'dashboard'
   | 'submissions'
   | 'admin'
+
+export interface UserActivityItem {
+  id: string
+  activityType: 'Bookmark' | 'Rating' | 'Submission' | string
+  actionText: string
+  itemType: string
+  targetId: number
+  targetTitle: string
+  targetSubtitle?: string | null
+  imageUrl?: string | null
+  details?: string | null
+  timestamp: string
+}
+
 
 

@@ -1,6 +1,6 @@
 import { characterPageRoster } from './components/characterPageRoster'
 import { ChroniclesEditorialGrid } from './components/ChroniclesEditorialGrid'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import * as api from './api'
 import { AdminCharacterModal } from './components/AdminCharacterModal'
 import { AdminConsole } from './components/AdminConsole'
@@ -149,7 +149,7 @@ function AppContent() {
   // Theme state: 'dark' or 'light' with persistent storage
   const [theme, setTheme] = useState<'dark' | 'light'>(getInitialTheme)
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     document.documentElement.setAttribute('data-theme', theme)
     try {
       localStorage.setItem('fhp_theme', theme)
@@ -270,7 +270,7 @@ function AppContent() {
     return (localStorage.getItem('fhp_font_size') as 'small' | 'normal' | 'large') || 'normal'
   })
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     document.documentElement.setAttribute('data-font-size', fontSize)
     localStorage.setItem('fhp_font_size', fontSize)
   }, [fontSize])
@@ -1440,6 +1440,7 @@ function AppContent() {
             bookmarkedIds={eventBookmarkedIds}
             onOpenAuth={() => setIsAuthModalOpen(true)}
             isAuthenticated={!!user}
+            theme={theme}
           />
         </main>
       )}

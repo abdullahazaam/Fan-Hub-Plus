@@ -29,6 +29,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [profile, setProfile] = useState<UserProfile | null>(null)
   const [isLoading, setIsLoading] = useState(true)
 
+  // Record genuine foreground interaction, never an idle background heartbeat.
+  useEffect(() => {
+    if (!user) return
+    let lastSent = 0
+    const activity = () => {
+      if (document.hidden || Date.now() - lastSent < 300000) return
+      const token = getStoredToken()
+      if (!token) return
+      lastSent = Date.now()
+      void fetch('/api/auth/activity', { method: 'POST', headers: { Authorization: `Bearer ${token}` } }).catch(() => {})
+    }
+    const events = ['pointerdown', 'keydown', 'scroll'] as const
+    events.forEach(event => window.addEventListener(event, activity, { passive: true }))
+    return () => events.forEach(event => window.removeEventListener(event, activity))
+  }, [user?.userId])
+
   // On mount: if a token exists in localStorage, re-validate it
   useEffect(() => {
     const token = getStoredToken()

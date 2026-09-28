@@ -57,18 +57,6 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
     }
   }
 
-  const isDev = import.meta.env.DEV
-
-  function fillDemoAdmin() {
-    setLoginEmail('admin@fanhubplus.local')
-    clearErrors()
-  }
-
-  function fillDemoMember() {
-    setLoginEmail('user@fanhubplus.local')
-    clearErrors()
-  }
-
   // ── Register ──────────────────────────────────────────────────────────────
   async function handleRegister(e: React.FormEvent) {
     e.preventDefault()
@@ -152,25 +140,31 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
         {/* ── Login Tab ─────────────────────────────────────────────────── */}
         {tab === 'login' && (
           <form onSubmit={handleLogin} className="auth-form">
-            {isDev && (
-              <div className="auth-demo-row">
-                <span className="auth-demo-label">Dev quick-fill:</span>
-                <button type="button" className="btn-demo admin" onClick={fillDemoAdmin}>Admin Email</button>
-                <button type="button" className="btn-demo member" onClick={fillDemoMember}>Member Email</button>
+            <div className="auth-field-group">
+              <label className="auth-field-label">Email</label>
+              <input
+                className="auth-input" type="email" required
+                value={loginEmail} onChange={(e) => setLoginEmail(e.target.value)}
+                placeholder="you@example.com"
+              />
+            </div>
+            <div className="auth-field-group">
+              <div className="auth-label-row">
+                <label className="auth-field-label">Password</label>
+                <button
+                  type="button"
+                  className="auth-link-btn"
+                  onClick={() => { setTab('forgot'); clearErrors() }}
+                >
+                  Forgot password?
+                </button>
               </div>
-            )}
-            <label className="auth-field-label">Email</label>
-            <input
-              className="auth-input" type="email" required
-              value={loginEmail} onChange={(e) => setLoginEmail(e.target.value)}
-              placeholder="you@example.com"
-            />
-            <label className="auth-field-label">Password</label>
-            <input
-              className="auth-input" type="password" required
-              value={loginPassword} onChange={(e) => setLoginPassword(e.target.value)}
-              placeholder="••••••••"
-            />
+              <input
+                className="auth-input" type="password" required
+                value={loginPassword} onChange={(e) => setLoginPassword(e.target.value)}
+                placeholder="••••••••"
+              />
+            </div>
             <button className="btn-auth-submit" type="submit" disabled={loading}>
               {loading ? 'Signing In…' : 'Sign In'}
             </button>
@@ -180,30 +174,38 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
         {/* ── Register Tab ──────────────────────────────────────────────── */}
         {tab === 'register' && (
           <form onSubmit={handleRegister} className="auth-form">
-            <label className="auth-field-label">Username</label>
-            <input
-              className="auth-input" type="text" required
-              value={regUsername} onChange={(e) => setRegUsername(e.target.value)}
-              placeholder="fandom_fan"
-            />
-            <label className="auth-field-label">Display Name</label>
-            <input
-              className="auth-input" type="text"
-              value={regDisplayName} onChange={(e) => setRegDisplayName(e.target.value)}
-              placeholder="Fandom Fan"
-            />
-            <label className="auth-field-label">Email</label>
-            <input
-              className="auth-input" type="email" required
-              value={regEmail} onChange={(e) => setRegEmail(e.target.value)}
-              placeholder="you@example.com"
-            />
-            <label className="auth-field-label">Password <span className="hint">(min 8 characters)</span></label>
-            <input
-              className="auth-input" type="password" required minLength={8}
-              value={regPassword} onChange={(e) => setRegPassword(e.target.value)}
-              placeholder="••••••••"
-            />
+            <div className="auth-field-group">
+              <label className="auth-field-label">Username</label>
+              <input
+                className="auth-input" type="text" required
+                value={regUsername} onChange={(e) => setRegUsername(e.target.value)}
+                placeholder="fandom_fan"
+              />
+            </div>
+            <div className="auth-field-group">
+              <label className="auth-field-label">Display Name</label>
+              <input
+                className="auth-input" type="text"
+                value={regDisplayName} onChange={(e) => setRegDisplayName(e.target.value)}
+                placeholder="Fandom Fan"
+              />
+            </div>
+            <div className="auth-field-group">
+              <label className="auth-field-label">Email</label>
+              <input
+                className="auth-input" type="email" required
+                value={regEmail} onChange={(e) => setRegEmail(e.target.value)}
+                placeholder="you@example.com"
+              />
+            </div>
+            <div className="auth-field-group">
+              <label className="auth-field-label">Password <span className="hint">(min 8 characters)</span></label>
+              <input
+                className="auth-input" type="password" required minLength={8}
+                value={regPassword} onChange={(e) => setRegPassword(e.target.value)}
+                placeholder="••••••••"
+              />
+            </div>
             <button className="btn-auth-submit" type="submit" disabled={loading}>
               {loading ? 'Creating Account…' : 'Create Account'}
             </button>
@@ -216,35 +218,50 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
             {!forgotResult ? (
               <form onSubmit={handleForgot}>
                 <p className="auth-info-text">Enter your account email to receive a password reset token.</p>
-                <label className="auth-field-label">Email</label>
-                <input
-                  className="auth-input" type="email" required
-                  value={forgotEmail} onChange={(e) => setForgotEmail(e.target.value)}
-                  placeholder="you@example.com"
-                />
+                <div className="auth-field-group">
+                  <label className="auth-field-label">Email Address</label>
+                  <input
+                    className="auth-input" type="email" required
+                    value={forgotEmail} onChange={(e) => setForgotEmail(e.target.value)}
+                    placeholder="you@example.com"
+                  />
+                </div>
                 <button className="btn-auth-submit" type="submit" disabled={loading}>
-                  {loading ? 'Sending…' : 'Request Reset Token'}
+                  {loading ? 'Sending Request…' : 'Request Reset Token'}
                 </button>
               </form>
             ) : (
-              <div className="forgot-result">
-                <p className="auth-success-text">{forgotResult.message}</p>
+              <div className="auth-status-card success">
+                <div className="status-indicator-badge">✓ Token Dispatched</div>
+                <p className="auth-status-message">{forgotResult.message}</p>
                 {forgotResult.devResetToken && (
-                  <div className="dev-token-box">
-                    <div className="dev-token-badge">Development Only</div>
-                    <p className="dev-token-notice">{forgotResult.devNotice}</p>
-                    <code className="dev-token-value">{forgotResult.devResetToken}</code>
+                  <div className="auth-token-box">
+                    <span className="auth-token-tag">Development Token</span>
+                    <p className="auth-token-notice">{forgotResult.devNotice}</p>
+                    <div className="auth-token-display">
+                      <code className="auth-token-code">{forgotResult.devResetToken}</code>
+                    </div>
                     <button
-                      className="btn-copy-token"
+                      type="button"
+                      className="btn-token-action"
                       onClick={() => {
                         navigator.clipboard.writeText(forgotResult.devResetToken ?? '')
                         setResetToken(forgotResult.devResetToken ?? '')
                         setTab('reset')
                       }}
                     >
-                      Copy Token &amp; Go to Reset →
+                      Copy Token &amp; Proceed to Reset →
                     </button>
                   </div>
+                )}
+                {!forgotResult.devResetToken && (
+                  <button
+                    type="button"
+                    className="btn-token-action"
+                    onClick={() => setTab('reset')}
+                  >
+                    Proceed to Reset Password →
+                  </button>
                 )}
               </div>
             )}
@@ -255,28 +272,33 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
         {tab === 'reset' && (
           <div className="auth-form">
             {resetSuccess ? (
-              <div className="auth-success-text">
-                <p>Password reset successfully. You may now sign in.</p>
+              <div className="auth-status-card success">
+                <div className="status-indicator-badge">✓ Password Updated</div>
+                <p className="auth-status-message">Your password has been reset successfully. You can now sign in with your new credentials.</p>
                 <button className="btn-auth-submit" onClick={() => { setTab('login'); setResetSuccess(false) }}>
-                  Go to Sign In
+                  Sign In Now
                 </button>
               </div>
             ) : (
               <form onSubmit={handleReset}>
-                <label className="auth-field-label">Reset Token</label>
-                <input
-                  className="auth-input" type="text" required
-                  value={resetToken} onChange={(e) => setResetToken(e.target.value)}
-                  placeholder="Paste reset token here"
-                />
-                <label className="auth-field-label">New Password <span className="hint">(min 8 characters)</span></label>
-                <input
-                  className="auth-input" type="password" required minLength={8}
-                  value={resetPassword} onChange={(e) => setResetPassword(e.target.value)}
-                  placeholder="••••••••"
-                />
+                <div className="auth-field-group">
+                  <label className="auth-field-label">Reset Token</label>
+                  <input
+                    className="auth-input" type="text" required
+                    value={resetToken} onChange={(e) => setResetToken(e.target.value)}
+                    placeholder="Paste reset token here"
+                  />
+                </div>
+                <div className="auth-field-group">
+                  <label className="auth-field-label">New Password <span className="hint">(min 8 characters)</span></label>
+                  <input
+                    className="auth-input" type="password" required minLength={8}
+                    value={resetPassword} onChange={(e) => setResetPassword(e.target.value)}
+                    placeholder="••••••••"
+                  />
+                </div>
                 <button className="btn-auth-submit" type="submit" disabled={loading}>
-                  {loading ? 'Resetting…' : 'Reset Password'}
+                  {loading ? 'Updating Password…' : 'Reset Password'}
                 </button>
               </form>
             )}

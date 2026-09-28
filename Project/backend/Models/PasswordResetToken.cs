@@ -8,7 +8,7 @@ public class PasswordResetToken
     public User User { get; set; } = null!;
 
     // Only a SHA-256 hash of the actual token is stored in the database.
-    // The raw token is generated in-memory, shown once (in Development), and never persisted.
+    // The raw token is generated in-memory, delivered by email, and never persisted.
     public string TokenHash { get; set; } = string.Empty;
 
     public DateTime ExpiresAt { get; set; }

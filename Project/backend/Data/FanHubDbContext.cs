@@ -75,8 +75,9 @@ public class FanHubDbContext : DbContext
             entity.Property(u => u.DisplayName).HasMaxLength(120);
             entity.Property(u => u.Bio).HasMaxLength(500);
             entity.Property(u => u.AvatarUrl).HasMaxLength(1000);
-            entity.Property(u => u.FavoriteCategory).HasMaxLength(100);
+            entity.Property(u => u.FavoriteCategory).HasMaxLength(500);
 
+            entity.HasIndex(u => u.LastActiveAt);
             entity.HasIndex(u => u.NormalizedEmail).IsUnique();
             entity.HasIndex(u => u.Username).IsUnique();
         });

@@ -19,10 +19,20 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
 }) => {
   const { user, profile, updateProfile, refreshProfile } = useAuth()
 
+  const parseFavorites = (prof: typeof profile): string[] => {
+    if (prof?.favoriteCategories && prof.favoriteCategories.length > 0) {
+      return prof.favoriteCategories
+    }
+    if (prof?.favoriteCategory) {
+      return prof.favoriteCategory.split(',').map((s) => s.trim()).filter(Boolean)
+    }
+    return []
+  }
+
   const [displayName, setDisplayName] = useState(profile?.displayName ?? user?.displayName ?? user?.username ?? '')
   const [bio, setBio] = useState(profile?.bio ?? '')
   const [avatarUrl, setAvatarUrl] = useState(profile?.avatarUrl ?? user?.avatarUrl ?? '')
-  const [favoriteCategory, setFavoriteCategory] = useState(profile?.favoriteCategory ?? '')
+  const [favoriteCategories, setFavoriteCategories] = useState<string[]>(() => parseFavorites(profile))
 
   const [saving, setSaving] = useState(false)
   const [savedMessage, setSavedMessage] = useState<string | null>(null)
@@ -33,9 +43,20 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
       setDisplayName(profile.displayName || user?.displayName || user?.username || '')
       setBio(profile.bio || '')
       setAvatarUrl(profile.avatarUrl || user?.avatarUrl || '')
-      setFavoriteCategory(profile.favoriteCategory || '')
+      setFavoriteCategories(parseFavorites(profile))
     }
   }, [profile, user])
+
+  const toggleFavoriteCategory = (catName: string) => {
+    setFavoriteCategories((prev) => {
+      const exists = prev.some((c) => c.toLowerCase() === catName.toLowerCase())
+      if (exists) {
+        return prev.filter((c) => c.toLowerCase() !== catName.toLowerCase())
+      } else {
+        return [...prev, catName]
+      }
+    })
+  }
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -50,7 +71,8 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
         displayName: displayName.trim() || undefined,
         bio: bio.trim() || undefined,
         avatarUrl: avatarUrl.trim() || undefined,
-        favoriteCategory: favoriteCategory || undefined,
+        favoriteCategory: favoriteCategories.join(', ') || undefined,
+        favoriteCategories: favoriteCategories,
       }
 
       await updateProfile(form)
@@ -141,8 +163,16 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
                     <span className="stat-label">Saved Relics</span>
                   </div>
                   <div className="profile-stat-box">
-                    <span className="stat-number">{favoriteCategory || 'Nexus'}</span>
-                    <span className="stat-label">Primary Realm</span>
+                    <span className="stat-number">
+                      {favoriteCategories.length > 0
+                        ? favoriteCategories.length === 1
+                          ? favoriteCategories[0]
+                          : `${favoriteCategories.length} Realms`
+                        : 'Nexus'}
+                    </span>
+                    <span className="stat-label">
+                      {favoriteCategories.length > 1 ? 'Favorite Realms' : 'Primary Realm'}
+                    </span>
                   </div>
                   <div className="profile-stat-box">
                     <span className="stat-number">
@@ -222,16 +252,18 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
                 </div>
 
                 <div className="form-group-full">
-                  <label className="srs-label">Primary Fandom Realm</label>
+                  <label className="srs-label">
+                    Favorite Fandom Realms {favoriteCategories.length > 0 ? `(${favoriteCategories.length} selected)` : ''}
+                  </label>
                   <div className="fandom-pill-selector">
                     {categoryNames.map((catName) => {
-                      const isSelected = favoriteCategory.toLowerCase() === catName.toLowerCase()
+                      const isSelected = favoriteCategories.some((c) => c.toLowerCase() === catName.toLowerCase())
                       return (
                         <button
                           key={catName}
                           type="button"
                           className={`fandom-selector-chip ${isSelected ? 'active' : ''}`}
-                          onClick={() => setFavoriteCategory(catName)}
+                          onClick={() => toggleFavoriteCategory(catName)}
                         >
                           {isSelected && <StarIcon size={12} fill="currentColor" />}
                           <span>{catName}</span>
@@ -239,6 +271,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
                       )
                     })}
                   </div>
+                  <span className="srs-hint">Select one or multiple favorite realms to personalize your multiverse feed.</span>
                 </div>
 
                 <div className="form-group-full">

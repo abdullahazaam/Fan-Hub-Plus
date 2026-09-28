@@ -23,6 +23,10 @@ public class User
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 
+    // UTC; null means no activity has been recorded yet.
+    public DateTime? LastLoginAt { get; set; }
+    public DateTime? LastActiveAt { get; set; }
+
     // Navigation
     public ICollection<PasswordResetToken> PasswordResetTokens { get; set; } = new List<PasswordResetToken>();
 }

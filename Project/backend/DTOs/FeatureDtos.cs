@@ -257,3 +257,18 @@ public record EventItemDto(
     string TicketUrl,
     string Status
 );
+
+// ─── User Activity DTO ───────────────────────────────────────────────────────
+public record UserActivityDto(
+    string Id,
+    string ActivityType,
+    string ActionText,
+    string ItemType,
+    int TargetId,
+    string TargetTitle,
+    string? TargetSubtitle,
+    string? ImageUrl,
+    string? Details,
+    DateTime Timestamp
+);
+

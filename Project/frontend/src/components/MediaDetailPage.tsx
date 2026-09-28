@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useAuth } from '../context/AuthContext'
 import { BookmarkIcon, StarIcon } from './Icons'
 import { getMediaCatalog, rateMedia } from '../api'
@@ -42,7 +42,49 @@ export const MediaDetailPage:React.FC<Props>=({id,initialItem,onSelect,onLibrary
   return <main className="media-detail">
     <button className="media-detail-back" onClick={onLibrary}>← Media library</button>
     <div className="media-detail-player" data-player-kind={audio?'audio':'video'} data-provider={embed?'youtube':'native'}>
-      {(!embed&&!direct)||playerFailed?<div className="media-unavailable"><h2>Media unavailable</h2><p>{playerFailed?'This source could not be played. Try the original source below.':'The source URL is missing or is not a supported video or audio URL.'}</p></div>:embed?<iframe src={embed} title={`${audio?'Soundtrack':'Video'} player: ${item.title}`} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen referrerPolicy="strict-origin-when-cross-origin"/>:audio?<div className="media-detail-audio"><img src={item.thumbnailUrl} alt=""/><audio onError={()=>setPlayerFailed(true)} controls preload="metadata" src={direct||undefined}/></div>:<video onError={()=>setPlayerFailed(true)} controls playsInline preload="metadata" poster={item.thumbnailUrl} src={direct||undefined}/>}
+      {(!embed && !direct) || playerFailed ? (
+        <div className="media-fallback-stage" style={{ backgroundImage: `url(${item.thumbnailUrl})` }}>
+          <div className="media-fallback-scrim" />
+          <div className="media-fallback-body">
+            <span className="media-fallback-chip">{item.mediaType} Stream</span>
+            <h2 className="media-fallback-title">{item.title}</h2>
+            <p className="media-fallback-sub">Direct external source available</p>
+            {item.mediaUrl?.trim() && (
+              <a
+                className="media-fallback-action"
+                href={item.mediaUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Open Source &#8599;
+              </a>
+            )}
+          </div>
+        </div>
+      ) : embed ? (
+        <iframe
+          src={embed}
+          title={`${audio ? 'Soundtrack' : 'Video'} player: ${item.title}`}
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          allowFullScreen
+          referrerPolicy="strict-origin-when-cross-origin"
+          onError={() => setPlayerFailed(true)}
+        />
+      ) : audio ? (
+        <div className="media-detail-audio">
+          <img src={item.thumbnailUrl} alt="" />
+          <audio onError={() => setPlayerFailed(true)} controls preload="metadata" src={direct || undefined} />
+        </div>
+      ) : (
+        <video
+          onError={() => setPlayerFailed(true)}
+          controls
+          playsInline
+          preload="metadata"
+          poster={item.thumbnailUrl}
+          src={direct || undefined}
+        />
+      )}
     </div>
     <section className="media-detail-copy media-info-panel" aria-label="Media information">
       <img className="media-detail-artwork" src={item.thumbnailUrl} alt={item.title}/>

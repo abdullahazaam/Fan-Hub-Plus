@@ -852,4 +852,406 @@ body.theme-light {
   color: var(--release-glass-ink-light) !important;
 }
 
+/* ==============================================================================
+   8. ADMIN TOOLS — GLOBAL GLASS CONSISTENCY ENGINE (DARK & LIGHT MODE)
+   Applies the exact same global glass surface tokens as the rest of the website:
+   - Same opacity, blur (14px), depth, borders and surface consistency
+   - Dark mode: Obsidian smoked glass with crimson rim & inset shine
+   - Light mode: Warm ivory/white frosted glass with crimson edge & soft depth
+   - Covers: All cards, panels, tabs, tables and boxes in Admin Tools
+   ============================================================================== */
+
+/* ─── A. DARK MODE ADMIN TOOLS ─── */
+:root:not([data-theme='light']) .portal-universe:not(.theme-light) :is(
+  .admin-action-card,
+  .admin-analytics-stat-card,
+  .admin-mgmt-section,
+  .admin-modal-container,
+  .admin-confirm-dialog
+),
+.portal-universe.theme-dark :is(
+  .admin-action-card,
+  .admin-analytics-stat-card,
+  .admin-mgmt-section,
+  .admin-modal-container,
+  .admin-confirm-dialog
+),
+:root:not([data-theme='light']) :is(
+  .admin-action-card,
+  .admin-analytics-stat-card,
+  .admin-mgmt-section,
+  .admin-modal-container,
+  .admin-confirm-dialog
+) {
+  background: var(--release-glass-bg) !important;
+  background-color: var(--release-glass-bg) !important;
+  border: 1px solid var(--release-glass-border) !important;
+  box-shadow: var(--release-glass-shadow) !important;
+  backdrop-filter: var(--release-glass-blur) !important;
+  -webkit-backdrop-filter: var(--release-glass-blur) !important;
+}
+
+:root:not([data-theme='light']) .portal-universe:not(.theme-light) :is(
+  .admin-action-card:hover,
+  .admin-analytics-stat-card:hover
+),
+.portal-universe.theme-dark :is(
+  .admin-action-card:hover,
+  .admin-analytics-stat-card:hover
+),
+:root:not([data-theme='light']) :is(
+  .admin-action-card:hover,
+  .admin-analytics-stat-card:hover
+) {
+  border-color: var(--release-glass-border-strong) !important;
+  box-shadow: var(--release-glass-shadow-elevated) !important;
+}
+
+/* Dark Mode Admin Tabs Navigation Strip */
+:root:not([data-theme='light']) .portal-universe:not(.theme-light) .admin-tabs-nav,
+.portal-universe.theme-dark .admin-tabs-nav,
+:root:not([data-theme='light']) .admin-tabs-nav {
+  background: var(--release-glass-bg) !important;
+  border: 1px solid var(--release-glass-border) !important;
+  box-shadow: var(--release-glass-shadow) !important;
+  backdrop-filter: var(--release-glass-blur) !important;
+  -webkit-backdrop-filter: var(--release-glass-blur) !important;
+  border-radius: var(--radius-xl) !important;
+  padding: 0.65rem 1rem !important;
+}
+
+/* Dark Mode Admin Tab Buttons */
+:root:not([data-theme='light']) .portal-universe:not(.theme-light) .admin-tab-btn:not(.active),
+.portal-universe.theme-dark .admin-tab-btn:not(.active),
+:root:not([data-theme='light']) .admin-tab-btn:not(.active) {
+  background: var(--release-glass-field) !important;
+  border: 1px solid var(--release-glass-border) !important;
+  color: var(--release-glass-muted) !important;
+  backdrop-filter: var(--release-glass-blur) !important;
+  -webkit-backdrop-filter: var(--release-glass-blur) !important;
+}
+
+:root:not([data-theme='light']) .portal-universe:not(.theme-light) .admin-tab-btn:hover,
+.portal-universe.theme-dark .admin-tab-btn:hover,
+:root:not([data-theme='light']) .admin-tab-btn:hover {
+  border-color: var(--release-glass-border-strong) !important;
+  color: var(--release-glass-ink) !important;
+}
+
+:root:not([data-theme='light']) .portal-universe:not(.theme-light) .admin-tab-btn.active,
+.portal-universe.theme-dark .admin-tab-btn.active,
+:root:not([data-theme='light']) .admin-tab-btn.active {
+  background: rgba(220, 20, 60, 0.22) !important;
+  border: 1px solid var(--release-glass-border-strong) !important;
+  color: var(--release-glass-ink) !important;
+  box-shadow: 0 0 16px rgba(220, 38, 38, 0.35) !important;
+}
+
+/* Dark Mode Admin Tab Badges */
+:root:not([data-theme='light']) .portal-universe:not(.theme-light) .admin-tab-badge,
+.portal-universe.theme-dark .admin-tab-badge,
+:root:not([data-theme='light']) .admin-tab-badge {
+  background: var(--release-glass-field) !important;
+  border: 1px solid var(--release-glass-border) !important;
+  color: var(--accent-crimson) !important;
+}
+
+/* Dark Mode Admin Table Wrapper & Table */
+:root:not([data-theme='light']) .portal-universe:not(.theme-light) .admin-mgmt-table-wrapper,
+.portal-universe.theme-dark .admin-mgmt-table-wrapper,
+:root:not([data-theme='light']) .admin-mgmt-table-wrapper {
+  background: var(--release-glass-field) !important;
+  border: 1px solid var(--release-glass-border) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
+  backdrop-filter: var(--release-glass-blur) !important;
+  -webkit-backdrop-filter: var(--release-glass-blur) !important;
+}
+
+:root:not([data-theme='light']) .portal-universe:not(.theme-light) .admin-mgmt-table thead,
+.portal-universe.theme-dark .admin-mgmt-table thead,
+:root:not([data-theme='light']) .admin-mgmt-table thead {
+  background: rgba(9, 7, 13, 0.72) !important;
+  border-bottom: 1px solid var(--release-glass-border) !important;
+}
+
+:root:not([data-theme='light']) .portal-universe:not(.theme-light) .admin-mgmt-table th,
+.portal-universe.theme-dark .admin-mgmt-table th,
+:root:not([data-theme='light']) .admin-mgmt-table th {
+  color: var(--release-glass-dim) !important;
+  border-bottom: 1px solid var(--release-glass-border) !important;
+}
+
+:root:not([data-theme='light']) .portal-universe:not(.theme-light) .admin-mgmt-table td,
+.portal-universe.theme-dark .admin-mgmt-table td,
+:root:not([data-theme='light']) .admin-mgmt-table td {
+  border-bottom: 1px solid rgba(191, 61, 90, 0.15) !important;
+  color: var(--release-glass-ink) !important;
+}
+
+:root:not([data-theme='light']) .portal-universe:not(.theme-light) .admin-table-row:hover,
+.portal-universe.theme-dark .admin-table-row:hover,
+:root:not([data-theme='light']) .admin-table-row:hover {
+  background: rgba(220, 38, 38, 0.08) !important;
+}
+
+/* Dark Mode Admin Inputs, Dropdowns, Control Boxes */
+:root:not([data-theme='light']) .portal-universe:not(.theme-light) :is(
+  .admin-search-input,
+  .admin-select,
+  .admin-count-pill,
+  .admin-table-pill,
+  .btn-mgmt-action,
+  .btn-admin-pager,
+  .admin-table-avatar-placeholder,
+  .admin-table-thumb-placeholder
+),
+.portal-universe.theme-dark :is(
+  .admin-search-input,
+  .admin-select,
+  .admin-count-pill,
+  .admin-table-pill,
+  .btn-mgmt-action,
+  .btn-admin-pager,
+  .admin-table-avatar-placeholder,
+  .admin-table-thumb-placeholder
+),
+:root:not([data-theme='light']) :is(
+  .admin-search-input,
+  .admin-select,
+  .admin-count-pill,
+  .admin-table-pill,
+  .btn-mgmt-action,
+  .btn-admin-pager,
+  .admin-table-avatar-placeholder,
+  .admin-table-thumb-placeholder
+) {
+  background: var(--release-glass-field) !important;
+  border: 1px solid var(--release-glass-border) !important;
+  color: var(--release-glass-ink) !important;
+  backdrop-filter: var(--release-glass-blur) !important;
+  -webkit-backdrop-filter: var(--release-glass-blur) !important;
+}
+
+:root:not([data-theme='light']) .portal-universe:not(.theme-light) :is(.admin-search-input:focus, .admin-select:focus),
+.portal-universe.theme-dark :is(.admin-search-input:focus, .admin-select:focus),
+:root:not([data-theme='light']) :is(.admin-search-input:focus, .admin-select:focus) {
+  border-color: var(--release-glass-border-strong) !important;
+  box-shadow: 0 0 12px rgba(220, 38, 38, 0.3) !important;
+}
+
+/* Dark Mode Empty & Loading Boxes */
+:root:not([data-theme='light']) .portal-universe:not(.theme-light) :is(.admin-table-empty, .admin-table-loading),
+.portal-universe.theme-dark :is(.admin-table-empty, .admin-table-loading),
+:root:not([data-theme='light']) :is(.admin-table-empty, .admin-table-loading) {
+  background: var(--release-glass-field) !important;
+  border: 1px solid var(--release-glass-border) !important;
+  color: var(--release-glass-muted) !important;
+}
+
+/* Dark Mode Admin Table Pagination */
+:root:not([data-theme='light']) .portal-universe:not(.theme-light) .admin-table-pagination,
+.portal-universe.theme-dark .admin-table-pagination,
+:root:not([data-theme='light']) .admin-table-pagination {
+  border-top: 1px solid var(--release-glass-border) !important;
+  color: var(--release-glass-muted) !important;
+}
+
+
+/* ─── B. LIGHT MODE ADMIN TOOLS ─── */
+:root[data-theme='light'] :is(
+  .admin-action-card,
+  .admin-analytics-stat-card,
+  .admin-mgmt-section,
+  .admin-modal-container,
+  .admin-confirm-dialog
+),
+.portal-universe.theme-light :is(
+  .admin-action-card,
+  .admin-analytics-stat-card,
+  .admin-mgmt-section,
+  .admin-modal-container,
+  .admin-confirm-dialog
+),
+body.theme-light :is(
+  .admin-action-card,
+  .admin-analytics-stat-card,
+  .admin-mgmt-section,
+  .admin-modal-container,
+  .admin-confirm-dialog
+) {
+  background: var(--release-glass-bg-light) !important;
+  background-color: var(--release-glass-bg-light) !important;
+  border: 1px solid var(--release-glass-border-light) !important;
+  box-shadow: var(--release-glass-shadow-light) !important;
+  backdrop-filter: var(--release-glass-blur-light) !important;
+  -webkit-backdrop-filter: var(--release-glass-blur-light) !important;
+  color: var(--release-glass-ink-light);
+}
+
+:root[data-theme='light'] :is(
+  .admin-action-card:hover,
+  .admin-analytics-stat-card:hover
+),
+.portal-universe.theme-light :is(
+  .admin-action-card:hover,
+  .admin-analytics-stat-card:hover
+),
+body.theme-light :is(
+  .admin-action-card:hover,
+  .admin-analytics-stat-card:hover
+) {
+  border-color: var(--release-glass-border-strong-light) !important;
+  box-shadow: var(--release-glass-shadow-elevated-light) !important;
+}
+
+/* Light Mode Admin Tabs Navigation Strip */
+:root[data-theme='light'] .admin-tabs-nav,
+.portal-universe.theme-light .admin-tabs-nav,
+body.theme-light .admin-tabs-nav {
+  background: var(--release-glass-bg-light) !important;
+  border: 1px solid var(--release-glass-border-light) !important;
+  box-shadow: var(--release-glass-shadow-light) !important;
+  backdrop-filter: var(--release-glass-blur-light) !important;
+  -webkit-backdrop-filter: var(--release-glass-blur-light) !important;
+  border-radius: var(--radius-xl) !important;
+  padding: 0.65rem 1rem !important;
+}
+
+/* Light Mode Admin Tab Buttons */
+:root[data-theme='light'] .admin-tab-btn:not(.active),
+.portal-universe.theme-light .admin-tab-btn:not(.active),
+body.theme-light .admin-tab-btn:not(.active) {
+  background: var(--release-glass-field-light) !important;
+  border: 1px solid var(--release-glass-border-light) !important;
+  color: var(--release-glass-muted-light) !important;
+  backdrop-filter: var(--release-glass-blur-light) !important;
+  -webkit-backdrop-filter: var(--release-glass-blur-light) !important;
+}
+
+:root[data-theme='light'] .admin-tab-btn:hover,
+.portal-universe.theme-light .admin-tab-btn:hover,
+body.theme-light .admin-tab-btn:hover {
+  border-color: var(--release-glass-border-strong-light) !important;
+  color: var(--release-glass-ink-light) !important;
+}
+
+:root[data-theme='light'] .admin-tab-btn.active,
+.portal-universe.theme-light .admin-tab-btn.active,
+body.theme-light .admin-tab-btn.active {
+  background: rgba(220, 20, 60, 0.12) !important;
+  border: 1px solid var(--release-glass-border-strong-light) !important;
+  color: #c01035 !important;
+  box-shadow: 0 0 14px rgba(220, 38, 38, 0.2) !important;
+}
+
+/* Light Mode Admin Tab Badges */
+:root[data-theme='light'] .admin-tab-badge,
+.portal-universe.theme-light .admin-tab-badge,
+body.theme-light .admin-tab-badge {
+  background: var(--release-glass-field-light) !important;
+  border: 1px solid var(--release-glass-border-light) !important;
+  color: #c01035 !important;
+}
+
+/* Light Mode Admin Table Wrapper & Table */
+:root[data-theme='light'] .admin-mgmt-table-wrapper,
+.portal-universe.theme-light .admin-mgmt-table-wrapper,
+body.theme-light .admin-mgmt-table-wrapper {
+  background: var(--release-glass-field-light) !important;
+  border: 1px solid var(--release-glass-border-light) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9) !important;
+  backdrop-filter: var(--release-glass-blur-light) !important;
+  -webkit-backdrop-filter: var(--release-glass-blur-light) !important;
+}
+
+:root[data-theme='light'] .admin-mgmt-table thead,
+.portal-universe.theme-light .admin-mgmt-table thead,
+body.theme-light .admin-mgmt-table thead {
+  background: rgba(247, 242, 235, 0.85) !important;
+  border-bottom: 1px solid var(--release-glass-border-light) !important;
+}
+
+:root[data-theme='light'] .admin-mgmt-table th,
+.portal-universe.theme-light .admin-mgmt-table th,
+body.theme-light .admin-mgmt-table th {
+  color: var(--release-glass-dim-light) !important;
+  border-bottom: 1px solid var(--release-glass-border-light) !important;
+}
+
+:root[data-theme='light'] .admin-mgmt-table td,
+.portal-universe.theme-light .admin-mgmt-table td,
+body.theme-light .admin-mgmt-table td {
+  border-bottom: 1px solid rgba(220, 38, 38, 0.12) !important;
+  color: var(--release-glass-ink-light) !important;
+}
+
+:root[data-theme='light'] .admin-table-row:hover,
+.portal-universe.theme-light .admin-table-row:hover,
+body.theme-light .admin-table-row:hover {
+  background: rgba(220, 38, 38, 0.05) !important;
+}
+
+/* Light Mode Admin Inputs, Dropdowns, Control Boxes */
+:root[data-theme='light'] :is(
+  .admin-search-input,
+  .admin-select,
+  .admin-count-pill,
+  .admin-table-pill,
+  .btn-mgmt-action,
+  .btn-admin-pager,
+  .admin-table-avatar-placeholder,
+  .admin-table-thumb-placeholder
+),
+.portal-universe.theme-light :is(
+  .admin-search-input,
+  .admin-select,
+  .admin-count-pill,
+  .admin-table-pill,
+  .btn-mgmt-action,
+  .btn-admin-pager,
+  .admin-table-avatar-placeholder,
+  .admin-table-thumb-placeholder
+),
+body.theme-light :is(
+  .admin-search-input,
+  .admin-select,
+  .admin-count-pill,
+  .admin-table-pill,
+  .btn-mgmt-action,
+  .btn-admin-pager,
+  .admin-table-avatar-placeholder,
+  .admin-table-thumb-placeholder
+) {
+  background: var(--release-glass-field-light) !important;
+  border: 1px solid var(--release-glass-border-light) !important;
+  color: var(--release-glass-ink-light) !important;
+  backdrop-filter: var(--release-glass-blur-light) !important;
+  -webkit-backdrop-filter: var(--release-glass-blur-light) !important;
+}
+
+:root[data-theme='light'] :is(.admin-search-input:focus, .admin-select:focus),
+.portal-universe.theme-light :is(.admin-search-input:focus, .admin-select:focus),
+body.theme-light :is(.admin-search-input:focus, .admin-select:focus) {
+  border-color: var(--release-glass-border-strong-light) !important;
+  box-shadow: 0 0 12px rgba(220, 38, 38, 0.2) !important;
+}
+
+/* Light Mode Empty & Loading Boxes */
+:root[data-theme='light'] :is(.admin-table-empty, .admin-table-loading),
+.portal-universe.theme-light :is(.admin-table-empty, .admin-table-loading),
+body.theme-light :is(.admin-table-empty, .admin-table-loading) {
+  background: var(--release-glass-field-light) !important;
+  border: 1px solid var(--release-glass-border-light) !important;
+  color: var(--release-glass-muted-light) !important;
+}
+
+/* Light Mode Admin Table Pagination */
+:root[data-theme='light'] .admin-table-pagination,
+.portal-universe.theme-light .admin-table-pagination,
+body.theme-light .admin-table-pagination {
+  border-top: 1px solid var(--release-glass-border-light) !important;
+  color: var(--release-glass-muted-light) !important;
+}
+
+
 

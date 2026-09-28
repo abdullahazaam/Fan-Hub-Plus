@@ -23,6 +23,7 @@ import type {
   RegisterForm,
   ResetPasswordForm,
   UpcomingRelease,
+  UserActivityItem,
   UserProfile,
 } from './types'
 
@@ -691,6 +692,16 @@ export async function getUserSubmissions(): Promise<FanSubmission[]> {
     return handleResponse<FanSubmission[]>(res)
   }, { ttlMs: 30000 })
 }
+
+export async function getUserActivity(): Promise<UserActivityItem[]> {
+  const token = getStoredToken()
+  if (!token) return []
+  const res = await fetch(`${BASE_URL}/api/user/activity`, {
+    headers: authHeaders(),
+  })
+  return handleResponse<UserActivityItem[]>(res)
+}
+
 
 // ─── Merchandise API ────────────────────────────────────────────────────────
 export async function getMerchandise(params: {

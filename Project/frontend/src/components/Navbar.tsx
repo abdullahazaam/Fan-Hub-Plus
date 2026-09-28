@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useAuth } from '../context/AuthContext'
 import type { NavView } from '../types'
@@ -72,8 +72,8 @@ export const Navbar: React.FC<NavbarProps> = ({
   const firstDrawerItemRef = useRef<HTMLButtonElement>(null)
   const headerRef = useRef<HTMLElement>(null)
 
-  // Dynamically synchronize exact rendered navbar height with CSS variable
-  useEffect(() => {
+  // Dynamically synchronize exact rendered navbar height before paint.
+  useLayoutEffect(() => {
     const updateHeight = () => {
       if (headerRef.current) {
         const h = headerRef.current.getBoundingClientRect().height
@@ -82,7 +82,9 @@ export const Navbar: React.FC<NavbarProps> = ({
     }
     updateHeight()
     window.addEventListener('resize', updateHeight)
-    return () => window.removeEventListener('resize', updateHeight)
+    const observer = new ResizeObserver(updateHeight)
+    if (headerRef.current) observer.observe(headerRef.current)
+    return () => { window.removeEventListener('resize', updateHeight); observer.disconnect() }
   }, [fontSize, isScrolled])
 
   // Close dropdowns on outside click

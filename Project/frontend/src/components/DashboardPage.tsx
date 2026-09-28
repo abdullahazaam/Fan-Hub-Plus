@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import * as api from '../api'
 import { useAuth } from '../context/AuthContext'
-import type { Bookmark, Category, FanSubmission, NavView } from '../types'
+import type { Bookmark, Category, FanSubmission, NavView, UserActivityItem } from '../types'
 import { Breadcrumbs } from './Breadcrumbs'
 import './DashboardDarkSurface.css'
 import {
@@ -45,21 +45,35 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
 }) => {
   const { user, profile, updateProfile, refreshProfile } = useAuth()
 
-  const [activeTab, setActiveTab] = useState<'bookmarks' | 'submissions' | 'preferences'>('bookmarks')
+  const [activeTab, setActiveTab] = useState<'bookmarks' | 'submissions' | 'activity' | 'preferences'>('bookmarks')
   const [bookmarkTypeFilter, setBookmarkTypeFilter] = useState<string>('All')
 
   // Submissions state
   const [submissions, setSubmissions] = useState<FanSubmission[]>([])
   const [loadingSubmissions, setLoadingSubmissions] = useState(false)
 
-  // Favorite category state
-  const [selectedFavorite, setSelectedFavorite] = useState<string>(profile?.favoriteCategory || '')
+  // Recent Activity state
+  const [activities, setActivities] = useState<UserActivityItem[]>([])
+  const [loadingActivity, setLoadingActivity] = useState(false)
+
+  const parseFavorites = (prof: typeof profile): string[] => {
+    if (prof?.favoriteCategories && prof.favoriteCategories.length > 0) {
+      return prof.favoriteCategories
+    }
+    if (prof?.favoriteCategory) {
+      return prof.favoriteCategory.split(',').map((s) => s.trim()).filter(Boolean)
+    }
+    return []
+  }
+
+  // Favorite categories state (ARRAY)
+  const [favoriteCategories, setFavoriteCategories] = useState<string[]>(() => parseFavorites(profile))
   const [updatingFavorite, setUpdatingFavorite] = useState(false)
   const [favoriteSuccess, setFavoriteSuccess] = useState(false)
 
   useEffect(() => {
-    if (profile?.favoriteCategory) {
-      setSelectedFavorite(profile.favoriteCategory)
+    if (profile) {
+      setFavoriteCategories(parseFavorites(profile))
     }
   }, [profile])
 
@@ -76,27 +90,50 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
     }
   }
 
+  const loadActivities = async () => {
+    if (!user) return
+    try {
+      setLoadingActivity(true)
+      const data = await api.getUserActivity()
+      setActivities(data)
+    } catch {
+      // ignore
+    } finally {
+      setLoadingActivity(false)
+    }
+  }
+
   useEffect(() => {
     if (user) {
       loadSubmissions()
+      loadActivities()
     }
-  }, [user, activeTab])
+  }, [user, activeTab, bookmarks.length])
 
-  const handleUpdateFavorite = async (catName: string) => {
+  const handleToggleFavorite = async (catName: string) => {
+    const exists = favoriteCategories.some((c) => c.toLowerCase() === catName.toLowerCase())
+    const nextCategories = exists
+      ? favoriteCategories.filter((c) => c.toLowerCase() !== catName.toLowerCase())
+      : [...favoriteCategories, catName]
+
+    // Optimistically toggle in/out of array
+    setFavoriteCategories(nextCategories)
+
     try {
       setUpdatingFavorite(true)
-      setSelectedFavorite(catName)
       await updateProfile({
         displayName: profile?.displayName || user?.displayName || user?.username,
         bio: profile?.bio || '',
         avatarUrl: profile?.avatarUrl || '',
-        favoriteCategory: catName,
+        favoriteCategory: nextCategories.join(', '),
+        favoriteCategories: nextCategories,
       })
       await refreshProfile()
       setFavoriteSuccess(true)
       setTimeout(() => setFavoriteSuccess(false), 2500)
     } catch {
-      // ignore
+      // rollback if failed
+      setFavoriteCategories(parseFavorites(profile))
     } finally {
       setUpdatingFavorite(false)
     }
@@ -176,8 +213,16 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
                   <StarIcon size={20} fill="currentColor" />
                 </div>
                 <div className="metric-details">
-                  <span className="metric-val">{selectedFavorite || 'Nexus Prime'}</span>
-                  <span className="metric-lbl">Primary Sector</span>
+                  <span className="metric-val">
+                    {favoriteCategories.length > 0
+                      ? favoriteCategories.length === 1
+                        ? favoriteCategories[0]
+                        : `${favoriteCategories.length} Realms`
+                      : 'Nexus Prime'}
+                  </span>
+                  <span className="metric-lbl">
+                    {favoriteCategories.length > 1 ? 'Favorite Realms' : 'Primary Sector'}
+                  </span>
                 </div>
               </div>
 
@@ -207,6 +252,13 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
                 onClick={() => setActiveTab('submissions')}
               >
                 My Lore Submissions ({submissions.length})
+              </button>
+              <button
+                type="button"
+                className={`srs-tab-btn ${activeTab === 'activity' ? 'active' : ''}`}
+                onClick={() => setActiveTab('activity')}
+              >
+                Recent Activity ({activities.length})
               </button>
               <button
                 type="button"
@@ -395,41 +447,145 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
                 </div>
               )}
 
+              {/* TAB: RECENT ACTIVITY */}
+              {activeTab === 'activity' && (
+                <div>
+                  <div className="submissions-action-bar">
+                    <div className="submissions-action-text">
+                      <h3>Recent Operative Transmissions & Activity</h3>
+                      <p>Chronological feed of your bookmarks, multimedia ratings, and dispatched lore submissions.</p>
+                    </div>
+                  </div>
+
+                  {loadingActivity ? (
+                    <div className="srs-loading-box">
+                      <div className="astral-spinner" />
+                      <p>Gathering recent operative telemetry...</p>
+                    </div>
+                  ) : activities.length === 0 ? (
+                    <div className="srs-empty-box glass-panel">
+                      <div className="srs-empty-icon"><ClockIcon size={40} /></div>
+                      <h3>No Recent Activity on Record</h3>
+                      <p>Your recent saved chronicles, media ratings, and lore dispatches will automatically appear here.</p>
+                      <button
+                        type="button"
+                        className="srs-btn-action"
+                        onClick={() => onNavigate('explore')}
+                      >
+                        Explore Multiverse Chronicles
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="srs-history-list">
+                      {activities.map((act) => (
+                        <div key={act.id} className="srs-history-card glass-panel" style={{ display: 'flex', gap: '1rem', alignItems: 'flex-start' }}>
+                          {act.imageUrl && (
+                            <img
+                              src={act.imageUrl}
+                              alt=""
+                              style={{ width: '60px', height: '60px', objectFit: 'cover', borderRadius: '8px', flexShrink: 0 }}
+                              loading="lazy"
+                            />
+                          )}
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            <div className="history-card-top">
+                              <div className="history-card-title-group">
+                                <span className={`srs-status-tag ${act.activityType === 'Bookmark' ? 'status-approved' : act.activityType === 'Rating' ? 'status-pending' : 'status-approved'}`}>
+                                  {act.activityType === 'Bookmark' && <BookmarkIcon size={12} />}
+                                  {act.activityType === 'Rating' && <StarIcon size={12} fill="currentColor" />}
+                                  {act.activityType === 'Submission' && <PenToolIcon size={12} />}
+                                  <span>{act.actionText}</span>
+                                </span>
+                                <span className="history-card-type">{act.itemType} • {act.targetSubtitle || 'Nexus Multiverse'}</span>
+                              </div>
+                              <span className="history-card-date">
+                                {new Date(act.timestamp).toLocaleDateString(undefined, {
+                                  month: 'short',
+                                  day: 'numeric',
+                                  year: 'numeric',
+                                  hour: '2-digit',
+                                  minute: '2-digit',
+                                })}
+                              </span>
+                            </div>
+
+                            <h4
+                              className="history-card-heading"
+                              style={{ cursor: act.targetId > 0 && act.itemType !== 'Submission' ? 'pointer' : 'default' }}
+                              onClick={() => {
+                                if (act.targetId > 0 && act.itemType !== 'Submission') {
+                                  onOpenItem(act.itemType, act.targetId)
+                                }
+                              }}
+                            >
+                              {act.targetTitle}
+                            </h4>
+
+                            {act.details && (
+                              <p className="history-card-universe" style={{ margin: '4px 0 0 0' }}>
+                                Details: <strong>{act.details}</strong>
+                              </p>
+                            )}
+
+                            {act.targetId > 0 && act.itemType !== 'Submission' && (
+                              <div style={{ marginTop: '0.75rem' }}>
+                                <button
+                                  type="button"
+                                  className="srs-btn-secondary btn-sm"
+                                  onClick={() => onOpenItem(act.itemType, act.targetId)}
+                                >
+                                  View Item Record
+                                </button>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+
               {/* TAB 3: PREFERENCES */}
               {activeTab === 'preferences' && (
                 <div className="dash-preferences-layout">
-                  {/* Primary Realm */}
+                  {/* Favorite Realms */}
                   <div className="dash-section-card glass-panel">
                     <div className="section-head">
-                      <h4>Primary Fandom Realm</h4>
-                      <p>Select your home universe to personalize spotlight feeds and recommendations.</p>
+                      <h4>Favorite Fandom Realms</h4>
+                      <p>Select your favorite universes to personalize spotlight feeds and recommendations.</p>
                     </div>
 
                     {favoriteSuccess && (
                       <div className="srs-alert-banner success">
                         <CheckCircleIcon size={16} />
-                        <span>Primary sector updated successfully!</span>
+                        <span>Favorite realms updated successfully!</span>
                       </div>
                     )}
 
                     <div className="fandom-fav-grid">
-                      {categories.map((cat) => (
-                        <button
-                          key={cat.id}
-                          type="button"
-                          disabled={updatingFavorite}
-                          className={`fandom-fav-btn ${selectedFavorite.toLowerCase() === cat.name.toLowerCase() ? 'selected' : ''}`}
-                          onClick={() => handleUpdateFavorite(cat.name)}
-                        >
-                          <span className="fandom-name">{cat.name}</span>
-                          {selectedFavorite.toLowerCase() === cat.name.toLowerCase() && (
-                            <span className="fav-check">
-                              <StarIcon size={12} fill="currentColor" />
-                              <span>Primary</span>
-                            </span>
-                          )}
-                        </button>
-                      ))}
+                      {categories.map((cat) => {
+                        const isSelected = favoriteCategories.some(
+                          (c) => c.toLowerCase() === cat.name.toLowerCase()
+                        )
+                        return (
+                          <button
+                            key={cat.id}
+                            type="button"
+                            disabled={updatingFavorite}
+                            className={`fandom-fav-btn ${isSelected ? 'selected' : ''}`}
+                            onClick={() => handleToggleFavorite(cat.name)}
+                          >
+                            <span className="fandom-name">{cat.name}</span>
+                            {isSelected && (
+                              <span className="fav-check">
+                                <CheckCircleIcon size={12} />
+                                <span>Selected</span>
+                              </span>
+                            )}
+                          </button>
+                        )
+                      })}
                     </div>
                   </div>
 
