@@ -78,3 +78,9 @@ $RECYCLE.BIN/
 .gemini/
 scratch/
 *.zip
+*.publishSettings
+*.pubxml
+*.pubxml.user
+*.sql
+publish/
+**/publish/

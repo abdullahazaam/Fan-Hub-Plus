@@ -19,6 +19,17 @@ AppDomain.CurrentDomain.AssemblyResolve += (sender, args) =>
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Explicit export command: generate standalone MonsterASP MSSQL script
+if (args.Contains("--export-monster"))
+{
+    var connStr = builder.Configuration.GetConnectionString("DefaultConnection") 
+        ?? "Server=(localdb)\\mssqllocaldb;Database=FanHubPlus;Trusted_Connection=True;TrustServerCertificate=True;";
+    var outArgIndex = Array.IndexOf(args, "--output");
+    var outFile = outArgIndex >= 0 && outArgIndex < args.Length - 1 ? args[outArgIndex + 1] : "FanHubPlus_Monster.sql";
+    FanHubPlus.Exporter.DbExporter.Run(connStr, outFile);
+    return;
+}
+
 // Explicit migration command: apply schema only, without seeding or starting HTTP.
 if (args.Contains("--migrate-only"))
 {
@@ -61,9 +72,28 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
     {
-        policy.WithOrigins("http://localhost:5173", "http://localhost:3000")
-              .AllowAnyHeader()
-              .AllowAnyMethod();
+        var configuredOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>()
+            ?? Array.Empty<string>();
+
+        policy.SetIsOriginAllowed(origin =>
+        {
+            if (string.IsNullOrWhiteSpace(origin)) return false;
+
+            // Allow local development ports
+            if (origin.StartsWith("http://localhost:", StringComparison.OrdinalIgnoreCase) ||
+                origin.StartsWith("http://127.0.0.1:", StringComparison.OrdinalIgnoreCase))
+                return true;
+
+            // Allow any Vercel deployment preview or production domain
+            if (origin.EndsWith(".vercel.app", StringComparison.OrdinalIgnoreCase))
+                return true;
+
+            // Allow custom configured origins from environment / config
+            return configuredOrigins.Any(co => string.Equals(co, origin, StringComparison.OrdinalIgnoreCase));
+        })
+        .AllowAnyHeader()
+        .AllowAnyMethod()
+        .AllowCredentials();
     });
 });
 
@@ -161,14 +191,24 @@ using (var scope = app.Services.CreateScope())
     var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
     try
     {
-        var db = scope.ServiceProvider.GetRequiredService<FanHubDbContext>();
         var isDev = app.Environment.IsDevelopment();
-        DbInitializer.Initialize(db, isDev);
-        logger.LogInformation("Fan Hub Plus database initialized and seeded successfully.");
+        var skipInit = builder.Configuration.GetValue<bool>("Database:SkipInitialization", false)
+            || string.Equals(Environment.GetEnvironmentVariable("SKIP_DB_INIT"), "true", StringComparison.OrdinalIgnoreCase);
+
+        if (!skipInit && isDev)
+        {
+            var db = scope.ServiceProvider.GetRequiredService<FanHubDbContext>();
+            DbInitializer.Initialize(db, isDev);
+            logger.LogInformation("Fan Hub Plus database initialized and seeded successfully.");
+        }
+        else
+        {
+            logger.LogInformation("Database initialization skipped (production or restored DB configuration active).");
+        }
     }
     catch (Exception ex)
     {
-        logger.LogError(ex, "An error occurred during database initialization/seeding.");
+        logger.LogError(ex, "An error occurred during database initialization check.");
     }
 }
 
