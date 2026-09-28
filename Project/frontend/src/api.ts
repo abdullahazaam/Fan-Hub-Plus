@@ -500,6 +500,17 @@ export async function apiUpdateProfile(form: ProfileUpdateForm): Promise<UserPro
   return handleResponse(res)
 }
 
+export async function apiUploadAvatar(file: File): Promise<{ avatarUrl: string }> {
+  const formData = new FormData()
+  formData.append('avatar', file)
+  const res = await fetch(`${BASE_URL}/api/profile/avatar`, {
+    method: 'POST',
+    headers: authHeaders(),
+    body: formData,
+  })
+  return handleResponse<{ avatarUrl: string }>(res)
+}
+
 // ─── Admin Fan Submissions API ──────────────────────────────────────────────
 export async function getAdminSubmissions(params: {
   status?: string

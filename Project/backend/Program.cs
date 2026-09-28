@@ -150,6 +150,7 @@ bool IsRateLimited(
 // is not present in the local offline lib/ folder)
 // ─────────────────────────────────────────────────────────────────────────────
 app.UseCors("AllowFrontend");
+app.UseStaticFiles();
 
 // Custom JWT bearer extraction middleware — attaches ClaimsPrincipal to HttpContext
 app.Use(async (ctx, next) =>
@@ -778,6 +779,55 @@ app.MapPut("/api/profile", async (HttpContext ctx, FanHubDbContext db, UpdatePro
         user.DisplayName, user.Bio, user.AvatarUrl,
         user.FavoriteCategory, favCats, user.CreatedAt));
 });
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Profile: Avatar Upload (authenticated)
+// ─────────────────────────────────────────────────────────────────────────────
+app.MapPost("/api/profile/avatar", async (HttpContext ctx, FanHubDbContext db) =>
+{
+    var (isAuth, userId, _) = GetAuthInfo(ctx.User);
+    if (!isAuth) return Results.Unauthorized();
+
+    if (!ctx.Request.HasFormContentType)
+        return Results.BadRequest(new { message = "Invalid content type. Expected form-data." });
+
+    var form = await ctx.Request.ReadFormAsync();
+    var file = form.Files.GetFile("avatar") ?? form.Files.FirstOrDefault();
+    if (file == null || file.Length == 0)
+        return Results.BadRequest(new { message = "No image file provided." });
+
+    if (file.Length > 2 * 1024 * 1024)
+        return Results.BadRequest(new { message = "File size exceeds 2MB limit." });
+
+    var ext = Path.GetExtension(file.FileName).ToLowerInvariant();
+    if (ext != ".jpg" && ext != ".jpeg" && ext != ".png" && ext != ".webp")
+        return Results.BadRequest(new { message = "Only JPG, PNG, and WebP images are supported." });
+
+    var webRoot = app.Environment.WebRootPath ?? Path.Combine(app.Environment.ContentRootPath, "wwwroot");
+    var uploadsFolder = Path.Combine(webRoot, "uploads", "avatars");
+    Directory.CreateDirectory(uploadsFolder);
+
+    var uniqueFileName = $"avatar_{userId}_{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}{ext}";
+    var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+    using (var stream = new FileStream(filePath, FileMode.Create))
+    {
+        await file.CopyToAsync(stream);
+    }
+
+    var baseUrl = $"{ctx.Request.Scheme}://{ctx.Request.Host}";
+    var avatarUrl = $"{baseUrl}/uploads/avatars/{uniqueFileName}";
+
+    var user = await db.Users.FindAsync(userId);
+    if (user != null)
+    {
+        user.AvatarUrl = avatarUrl;
+        user.UpdatedAt = DateTime.UtcNow;
+        await db.SaveChangesAsync();
+    }
+
+    return Results.Ok(new { avatarUrl });
+}).DisableAntiforgery();
 
 // ─────────────────────────────────────────────────────────────────────────────
 // CHARACTERS: Public Browse & Detail
