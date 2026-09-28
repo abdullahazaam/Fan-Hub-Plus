@@ -1,3 +1,4 @@
+import { RealmDiscovery } from './components/RealmDiscovery'
 import { characterPageRoster } from './components/characterPageRoster'
 import { ChroniclesEditorialGrid } from './components/ChroniclesEditorialGrid'
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
@@ -74,6 +75,7 @@ export const PROTOTYPE_CHARACTER: Character = {
 }
 
 const VALID_VIEWS: readonly NavView[] = [
+  'discover',
   'home',
   'explore',
   'characters',
@@ -909,6 +911,7 @@ function AppContent() {
       {/* =====================================================================
           1. HOMEPAGE VIEW: Concept Art Layout
           ===================================================================== */}
+      {currentView === 'discover' && <RealmDiscovery onHome={()=>setCurrentView('home')} onExplore={cat=>{setSelectedCategoryId(cat.id);setPage(1);setCurrentView('explore')}} onChronicle={openChronicle} onCharacter={openCharacter} onMedia={openMedia} onMerchandise={openMerchandise} onEvents={()=>setCurrentView('events')} onSignIn={()=>setIsAuthModalOpen(true)} />}
       {currentView === 'home' && (
         <HomepageExperience>
           {/* Full-viewport Hero with Left Headline & Nexus Gate Visual Slot */}
@@ -926,6 +929,8 @@ function AppContent() {
           />
 
           <div className="home-section-boundary" aria-hidden="true" />
+
+          <section className="discovery-home-invitation" aria-labelledby="discovery-invitation-title"><div><span>FIND YOUR CONNECTION</span><h2 id="discovery-invitation-title">Eight realms. Which one feels like you?</h2><p>Five choices. A world of stories waiting on the other side.</p></div><button onClick={()=>setCurrentView('discover')}>Discover Your Realm &rarr;</button></section>
 
           {/* Multiverse Navigation Gateways */}
           <ConceptHighlights

@@ -354,6 +354,7 @@ export interface FeedbackFormData {
 }
 
 export type NavView =
+  | 'discover'
   | 'home'
   | 'explore'
   | 'characters'
