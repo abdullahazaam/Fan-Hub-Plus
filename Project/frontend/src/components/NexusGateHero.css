@@ -119,9 +119,10 @@
     height: auto !important;
     z-index: 2 !important;
   }
-  /* Hide the 3D canvas background so mobile-hero-bg.png is the sole continuous background */
+  /* Re-enable the 3D scene canvas as a transparent overlay so character and cards render over mobile-hero-bg.png */
   .fh-nexus-hero .fh-scene-canvas {
-    display: none !important;
+    display: block !important;
+    background: transparent !important;
   }
   /* Hide .fh-fallback-art completely so mobile-hero-bg.png is the ONLY background */
   .fh-nexus-hero .fh-fallback-art,
