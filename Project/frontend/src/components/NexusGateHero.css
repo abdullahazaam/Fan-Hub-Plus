@@ -102,12 +102,18 @@
     background-color: #f7ede5 !important;
     background-image: url('/mobile-hero-bg.png') !important;
   }
-  /* Remove separate background layer from stage to eliminate split/seam */
+  /* Hide the 3D canvas background and fallback background image so mobile-hero-bg.png is the sole continuous background */
   .fh-nexus-hero .fh-scene-canvas {
-    background: transparent !important;
+    display: none !important;
+  }
+  .fh-nexus-hero .fh-scene-ready .fh-fallback-art {
+    visibility: visible !important;
   }
   .fh-nexus-hero .fh-fallback-art > image:first-child {
     display: none !important;
+  }
+  .fh-nexus-hero .fh-scene-overlay {
+    background: transparent !important;
   }
   .fh-nexus-hero .fh-nexus-copy {
     background: transparent !important;
