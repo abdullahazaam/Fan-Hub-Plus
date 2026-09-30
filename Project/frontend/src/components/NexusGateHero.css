@@ -88,6 +88,34 @@
   .fh-nexus-hero .fh-nexus-copy button { font-size:14px;padding:15px 26px; }
   .fh-nexus-hero .fh-nexus-stage { width:100%;height:auto;aspect-ratio:1100 / 839; }
 }
+@media(max-width:480px) {
+  /* Full seamless Hero background on mobile ≤480px with /mobile-hero-bg.png */
+  .fh-nexus-hero {
+    background-color: #0c080b !important;
+    background-image: url('/mobile-hero-bg.png') !important;
+    background-repeat: no-repeat !important;
+    background-size: cover !important;
+    background-position: center top !important;
+    overflow-x: hidden !important;
+  }
+  .fh-nexus-hero.theme-light {
+    background-color: #f7ede5 !important;
+    background-image: url('/mobile-hero-bg.png') !important;
+  }
+  /* Remove separate background layer from stage to eliminate split/seam */
+  .fh-nexus-hero .fh-scene-canvas {
+    background: transparent !important;
+  }
+  .fh-nexus-hero .fh-fallback-art > image:first-child {
+    display: none !important;
+  }
+  .fh-nexus-hero .fh-nexus-copy {
+    background: transparent !important;
+  }
+  .fh-nexus-hero .fh-nexus-copy::before {
+    display: none !important;
+  }
+}
 @media(max-width:390px) {
   .fh-nexus-hero .fh-nexus-copy { padding:22px 16px 16px; }
   .fh-nexus-hero h1 { font-size:clamp(28px,8.2cqw,34px); }
