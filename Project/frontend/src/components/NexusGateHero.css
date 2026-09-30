@@ -119,18 +119,22 @@
     height: auto !important;
     z-index: 2 !important;
   }
-  /* Hide the 3D canvas background and fallback background image so mobile-hero-bg.png is the sole continuous background */
+  /* Hide the 3D canvas background so mobile-hero-bg.png is the sole continuous background */
   .fh-nexus-hero .fh-scene-canvas {
     display: none !important;
   }
+  .fh-nexus-hero .fh-fallback-art,
   .fh-nexus-hero .fh-scene-ready .fh-fallback-art {
     visibility: visible !important;
+    display: block !important;
   }
   .fh-nexus-hero .fh-fallback-art > image:first-child {
     display: none !important;
+    visibility: hidden !important;
   }
   .fh-nexus-hero .fh-scene-overlay {
     background: transparent !important;
+    visibility: visible !important;
   }
   .fh-nexus-hero .fh-nexus-copy {
     position: relative !important;
