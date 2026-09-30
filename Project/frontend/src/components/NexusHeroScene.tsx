@@ -37,14 +37,13 @@ export default function NexusHeroScene({theme,onSelect,selected}:HeroSceneProps)
     function texture(url:string){return loader.loadAsync(url).then(t=>{if(disposed){t.dispose();throw new Error('disposed')}t.colorSpace=THREE.SRGBColorSpace;textures.push(t);return t})}
     function invalidate(){if(!frame&&!disposed&&!lost&&visible&&!document.hidden&&renderer){last=performance.now()-16;frame=requestAnimationFrame(render)}}
     invalidateRef.current=invalidate
-    function resize(){const {width,height}=wrap.getBoundingClientRect();if(!width||!height)return;background.visible=!matchMedia('(max-width: 768px)').matches;view=heroView(width,height);svg.setAttribute('viewBox',`${view.x} ${view.y} ${view.width} ${view.height}`);camera.left=view.x;camera.right=view.x+view.width;camera.top=839-view.y;camera.bottom=839-view.y-view.height;camera.updateProjectionMatrix();renderer?.setPixelRatio(Math.min(devicePixelRatio, 2));renderer?.setSize(width,height,false);invalidate()}
+    function resize(){const {width,height}=wrap.getBoundingClientRect();if(!width||!height)return;view=heroView(width,height);svg.setAttribute('viewBox',`${view.x} ${view.y} ${view.width} ${view.height}`);camera.left=view.x;camera.right=view.x+view.width;camera.top=839-view.y;camera.bottom=839-view.y-view.height;camera.updateProjectionMatrix();renderer?.setPixelRatio(Math.min(devicePixelRatio, 2));renderer?.setSize(width,height,false);invalidate()}
     const resizeObserver=new ResizeObserver(resize);resizeObserver.observe(wrap);resize()
     try {renderer=new THREE.WebGLRenderer({canvas,alpha:true,antialias:true,powerPreference:'high-performance',preserveDrawingBuffer:false});renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.setClearColor(0x000000,0)} catch {return()=>resizeObserver.disconnect()}
     scene.add(new THREE.AmbientLight(0xffffff,2))
     const rimLight=new THREE.DirectionalLight(0xff443d,3);rimLight.position.set(900,700,700);scene.add(rimLight)
     const themeBlend={value:themeRef.current==='light'?1:0}
     const darkEnvironment={value:null as THREE.Texture|null},lightEnvironment={value:null as THREE.Texture|null}
-    const isMobile = matchMedia('(max-width: 768px)')
     const background=mesh(new THREE.PlaneGeometry(1875,839),new THREE.ShaderMaterial({
       uniforms:{darkEnvironment,lightEnvironment,themeBlend},depthWrite:false,toneMapped:false,
       vertexShader:`varying vec2 imageUv;void main(){imageUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);}`,
@@ -53,7 +52,6 @@ export default function NexusHeroScene({theme,onSelect,selected}:HeroSceneProps)
           #include <colorspace_fragment>
         }`
     }));background.position.set(937.5,419.5,-30)
-    if(isMobile.matches) background.visible = false
     const pending:Promise<unknown>[]=[]
     const portalUniforms={darkEnvironment,lightEnvironment,themeBlend,clock:{value:0},charge:{value:0},center:{value:new THREE.Vector2(HERO_WORLD.portalX,839-HERO_WORLD.portalY)}}
     // Load current active theme first for near-instant hero presentation, then lazy load alternate theme
