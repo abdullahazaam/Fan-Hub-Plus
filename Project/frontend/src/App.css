@@ -10068,7 +10068,7 @@ article.content-card.chronicle-flip::after { display: none; }
   .fh-nexus-hero .fh-nexus-copy p,
   .fh-nexus-hero .fh-nexus-tagline
 ) {
-  color: #2b2226 !important;
+  color: #ffffff !important;
   font-weight: 550 !important;
   text-shadow: 0 1px 1px rgba(255, 255, 255, 0.5) !important;
 }

@@ -15,6 +15,7 @@ interface NexusGateHeroProps {
 export const NexusGateHero: React.FC<NexusGateHeroProps> = ({onExploreClick, onSelectCategory, theme, selectedCategorySlug}) => {
   const select = (slug: string) => onSelectCategory ? onSelectCategory(slug) : onExploreClick()
   return <section className={`fh-nexus-hero theme-${theme}`} aria-label="Fan Hub Plus Multiverse Gate">
+    <div className="fh-mobile-hero-bg" aria-hidden="true" />
     <div className="fh-nexus-stage">
       <Suspense fallback={<HeroSceneFallback theme={theme} onSelect={select} selected={selectedCategorySlug} />}>
         <HeroScene theme={theme} onSelect={select} selected={selectedCategorySlug} />

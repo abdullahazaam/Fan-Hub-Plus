@@ -1,5 +1,6 @@
 /* Hero-local CSS pixels and container units deliberately ignore root font scaling. */
 .fh-nexus-hero { position:relative;isolation:isolate;width:100%;height:calc(100dvh - var(--navbar-height, 75px));max-height:calc(100dvh - var(--navbar-height, 75px));display:flex;align-items:center;justify-content:center;container-type:inline-size;overflow:hidden;background:#12090c;color:#fff;font-size:16px;line-height:1.4;margin:0;padding:0; }
+.fh-mobile-hero-bg { display: none; }
 .fh-nexus-hero .fh-nexus-stage { position:relative;width:100%;height:100%; }
 .fh-nexus-hero .fh-scene-canvas,.fh-nexus-hero .fh-scene-overlay,.fh-nexus-hero .fh-scene-fallback { position:absolute;inset:0;display:block;width:100%;height:100%; }
 .fh-nexus-hero .fh-scene-canvas { pointer-events:none; }
@@ -89,7 +90,7 @@
   .fh-nexus-hero .fh-nexus-stage { width:100%;height:auto;aspect-ratio:1100 / 839; }
 }
 @media(max-width:768px) {
-  /* Full seamless Hero background on screens ≤768px with /mobile-hero-bg.png preserving 9:16 composition */
+  /* .fh-nexus-hero outer background is transparent/neutral, letting global page background sit behind */
   .fh-nexus-hero {
     display: block !important;
     position: relative !important;
@@ -97,16 +98,25 @@
     height: auto !important;
     min-height: calc(100vw * 1672 / 941) !important;
     aspect-ratio: 941 / 1672 !important;
-    background-color: #0c080b !important;
-    background-image: url('/mobile-hero-bg.png?v=2') !important;
-    background-repeat: no-repeat !important;
-    background-size: 100% 100% !important;
-    background-position: top center !important;
+    background: transparent !important;
     overflow: hidden !important;
   }
   .fh-nexus-hero.theme-light {
-    background-color: #f7ede5 !important;
-    background-image: url('/mobile-hero-bg.png?v=2') !important;
+    background: transparent !important;
+  }
+  /* Middle visual layer: mobile-hero-bg.png sits between global background and content */
+  .fh-nexus-hero .fh-mobile-hero-bg {
+    display: block !important;
+    position: absolute !important;
+    inset: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    background-image: url('/mobile-hero-bg.png') !important;
+    background-repeat: no-repeat !important;
+    background-size: 100% 100% !important;
+    background-position: top center !important;
+    pointer-events: none !important;
+    z-index: 1 !important;
   }
   /* Operative character & 8 realm cards positioned directly over the red portal center */
   .fh-nexus-hero .fh-nexus-stage {
@@ -123,9 +133,12 @@
   .fh-nexus-hero .fh-scene-canvas {
     display: none !important;
   }
-  /* Hide .fh-fallback-art completely so mobile-hero-bg.png is the ONLY background */
+  /* Hide ONLY the background image in .fh-fallback-art so mobile-hero-bg.png is the sole background, while keeping the 8 realm cards and character visible */
   .fh-nexus-hero .fh-fallback-art,
-  .fh-nexus-hero .fh-scene-ready .fh-fallback-art,
+  .fh-nexus-hero .fh-scene-ready .fh-fallback-art {
+    visibility: visible !important;
+    display: block !important;
+  }
   .fh-nexus-hero .fh-fallback-art > image:first-child {
     display: none !important;
     visibility: hidden !important;
@@ -143,20 +156,44 @@
     padding: 24px 20px 14px !important;
     background: transparent !important;
   }
-  /* Subtle vignette over upper text area ensuring sharp readability without any hard seam */
+  /* Subtle, transparent fade confined strictly behind text/CTA area */
   .fh-nexus-hero .fh-nexus-copy::before {
     content: '' !important;
     display: block !important;
     position: absolute !important;
-    inset: 0 -20px -20px -20px !important;
-    background: radial-gradient(ellipse at 50% 40%, rgba(10, 7, 12, 0.72) 0%, rgba(10, 7, 12, 0.40) 65%, transparent 100%) !important;
+    inset: 4px 8px 6px 8px !important;
+    border-radius: 16px !important;
+    background: radial-gradient(ellipse at 50% 50%, rgba(10, 7, 12, 0.40) 0%, rgba(10, 7, 12, 0.18) 60%, transparent 100%) !important;
     pointer-events: none !important;
     z-index: -1 !important;
     border: none !important;
     box-shadow: none !important;
+    filter: blur(8px) !important;
   }
-  .fh-nexus-hero.theme-light .fh-nexus-copy::before {
-    background: radial-gradient(ellipse at 50% 40%, rgba(255, 252, 248, 0.88) 0%, rgba(255, 252, 248, 0.45) 65%, transparent 100%) !important;
+  /* ALL Mobile Hero text set to solid white (#fff) with crisp shadows */
+  .fh-nexus-hero h1,
+  .fh-nexus-hero.theme-light h1,
+  .fh-nexus-hero h1 span,
+  .fh-nexus-hero.theme-light h1 span {
+    color: #ffffff !important;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.95), 0 2px 8px rgba(0, 0, 0, 0.85) !important;
+  }
+  .fh-nexus-hero .fh-nexus-eyebrow,
+  .fh-nexus-hero.theme-light .fh-nexus-eyebrow {
+    color: #ffffff !important;
+    background: rgba(19, 13, 16, 0.85) !important;
+    border: 1px solid rgba(255, 255, 255, 0.25) !important;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8) !important;
+  }
+  .fh-nexus-hero .fh-nexus-tagline,
+  .fh-nexus-hero.theme-light .fh-nexus-tagline {
+    color: #ffffff !important;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.95), 0 2px 8px rgba(0, 0, 0, 0.85) !important;
+  }
+  .fh-nexus-hero .fh-nexus-copy p,
+  .fh-nexus-hero.theme-light .fh-nexus-copy p {
+    color: #ffffff !important;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.95), 0 2px 8px rgba(0, 0, 0, 0.85) !important;
   }
 }
 @media(max-width:390px) {
