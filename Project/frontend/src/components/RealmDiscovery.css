@@ -1,25 +1,61 @@
 /* ==============================================================================
-   DISCOVER YOUR REALM: CINEMATIC MULTIVERSE RESONANCE UI
-   Design Language: Obsidian Abyss (Dark) & Neoclassical Warm Ivory (Light)
-   Focal Accent: Vivid Cinematic Crimson (#dc2626) & Specular Glass Surfaces
-   Strict Consistency with Fan Hub Plus Card Experience & Surface System
+   DISCOVER YOUR REALM: EXACT GLOBAL GLASS ENGINE
+   Using the exact same glass treatment defined in GlobalGlassConsistency.css:
+   DARK MODE:
+     background: rgba(19, 13, 21, 0.78);
+     field: rgba(9, 7, 13, 0.52);
+     border: 1px solid rgba(191, 61, 90, 0.25);
+     border-strong: rgba(220, 38, 38, 0.65);
+     shadow: 0 12px 28px -22px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+     shadow-elevated: 0 18px 40px -18px rgba(0, 0, 0, 0.85), 0 0 20px rgba(220, 38, 38, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+     backdrop-filter: blur(14px);
+   LIGHT MODE:
+     background: rgba(255, 252, 247, 0.78);
+     field: rgba(247, 242, 235, 0.52);
+     border: 1px solid rgba(220, 38, 38, 0.22);
+     border-strong: rgba(220, 38, 38, 0.60);
+     shadow: 0 12px 28px -22px rgba(90, 20, 30, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.95);
+     shadow-elevated: 0 18px 40px -18px rgba(90, 20, 30, 0.25), 0 0 18px rgba(220, 38, 38, 0.12), inset 0 1px 0 rgba(255, 255, 255, 1);
+     backdrop-filter: blur(14px);
    ============================================================================== */
 
-.realm-discovery {
-  --disc-ink: var(--text-main, #ffffff);
-  --disc-muted: var(--text-muted, #d8d8dc);
-  --disc-dim: var(--text-dim, #9ca3af);
-  --disc-surface: var(--portal-obsidian-surface, rgba(11, 14, 20, 0.94));
-  --disc-card-bg: var(--portal-obsidian-card, rgba(13, 16, 23, 0.92));
-  --disc-field-bg: var(--portal-obsidian-field, rgba(18, 22, 32, 0.96));
-  --disc-crimson: var(--accent-crimson, #dc2626);
-  --disc-crimson-hover: var(--accent-crimson-hover, #ef4444);
-  --disc-border: var(--portal-crimson-border, rgba(220, 38, 38, 0.35));
-  --disc-border-strong: var(--portal-crimson-border-strong, rgba(220, 38, 38, 0.65));
-  --disc-glow: var(--portal-crimson-glow, rgba(220, 38, 38, 0.35));
-  --disc-specular: inset 0 1px 0 rgba(255, 255, 255, 0.12), inset 0 0 20px rgba(220, 38, 38, 0.05);
-  --disc-shadow: 0 16px 40px -10px rgba(0, 0, 0, 0.82), 0 4px 16px rgba(0, 0, 0, 0.6);
+:root:not([data-theme='light']) .realm-discovery,
+.portal-universe.theme-dark .realm-discovery,
+:root[data-theme='dark'] .realm-discovery,
+html:not([data-theme='light']) .realm-discovery {
+  --disc-glass-bg: rgba(19, 13, 21, 0.78);
+  --disc-glass-field: rgba(9, 7, 13, 0.52);
+  --disc-glass-border: rgba(191, 61, 90, 0.25);
+  --disc-glass-border-strong: rgba(220, 38, 38, 0.65);
+  --disc-glass-shadow: 0 12px 28px -22px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  --disc-glass-shadow-elevated: 0 18px 40px -18px rgba(0, 0, 0, 0.85), 0 0 20px rgba(220, 38, 38, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  --disc-glass-blur: blur(14px);
+  --disc-ink: #fff3ec;
+  --disc-muted: #d3c3cb;
+  --disc-dim: #9b8c95;
+  --disc-crimson: #dc2626;
+  --disc-crimson-hover: #ef4444;
+}
 
+:root[data-theme='light'] .realm-discovery,
+.portal-universe.theme-light .realm-discovery,
+html[data-theme='light'] .realm-discovery,
+body.theme-light .realm-discovery {
+  --disc-glass-bg: rgba(255, 252, 247, 0.78);
+  --disc-glass-field: rgba(247, 242, 235, 0.52);
+  --disc-glass-border: rgba(220, 38, 38, 0.22);
+  --disc-glass-border-strong: rgba(220, 38, 38, 0.60);
+  --disc-glass-shadow: 0 12px 28px -22px rgba(90, 20, 30, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.95);
+  --disc-glass-shadow-elevated: 0 18px 40px -18px rgba(90, 20, 30, 0.25), 0 0 18px rgba(220, 38, 38, 0.12), inset 0 1px 0 rgba(255, 255, 255, 1);
+  --disc-glass-blur: blur(14px);
+  --disc-ink: #181216;
+  --disc-muted: #52434a;
+  --disc-dim: #7c6c74;
+  --disc-crimson: #dc2626;
+  --disc-crimson-hover: #b91c1c;
+}
+
+.realm-discovery {
   position: relative;
   z-index: 2;
   width: min(1320px, 92%);
@@ -27,22 +63,6 @@
   color: var(--disc-ink);
   font-family: var(--font-sans, 'Plus Jakarta Sans', sans-serif);
   min-height: 75vh;
-}
-
-/* Light Mode Overrides */
-[data-theme='light'] .realm-discovery,
-.portal-universe.theme-light .realm-discovery {
-  --disc-ink: var(--text-main, #171717);
-  --disc-muted: var(--text-muted, #454545);
-  --disc-dim: var(--text-dim, #6b7280);
-  --disc-surface: var(--portal-obsidian-surface, rgba(248, 245, 239, 0.96));
-  --disc-card-bg: var(--portal-obsidian-card, rgba(255, 255, 255, 0.95));
-  --disc-field-bg: var(--portal-obsidian-field, rgba(240, 236, 229, 0.96));
-  --disc-border: var(--portal-crimson-border, rgba(220, 38, 38, 0.28));
-  --disc-border-strong: var(--portal-crimson-border-strong, rgba(220, 38, 38, 0.55));
-  --disc-glow: var(--portal-crimson-glow, rgba(220, 38, 38, 0.18));
-  --disc-specular: inset 0 1px 0 rgba(255, 255, 255, 0.95), inset 0 0 18px rgba(220, 38, 38, 0.04);
-  --disc-shadow: 0 12px 28px -6px rgba(0, 0, 0, 0.12), 0 3px 8px rgba(0, 0, 0, 0.06);
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -73,11 +93,13 @@
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--disc-crimson);
-  background: rgba(220, 38, 38, 0.08);
-  border: 1px solid var(--disc-border);
+  background: var(--disc-glass-field) !important;
+  border: 1px solid var(--disc-glass-border) !important;
+  box-shadow: var(--disc-glass-shadow) !important;
+  backdrop-filter: var(--disc-glass-blur) !important;
+  -webkit-backdrop-filter: var(--disc-glass-blur) !important;
   padding: 0.35rem 0.75rem;
   border-radius: 9999px;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
 }
 
 .discovery-pulse-dot {
@@ -103,15 +125,17 @@
 }
 
 .discovery-home-back-btn {
-  background: var(--disc-field-bg);
-  color: var(--disc-muted);
-  border: 1px solid var(--disc-border);
+  background: var(--disc-glass-field) !important;
+  color: var(--disc-muted) !important;
+  border: 1px solid var(--disc-glass-border) !important;
+  box-shadow: var(--disc-glass-shadow) !important;
+  backdrop-filter: var(--disc-glass-blur) !important;
+  -webkit-backdrop-filter: var(--disc-glass-blur) !important;
   padding: 0.55rem 1.1rem;
   border-radius: 8px;
   font-size: 0.8rem;
   font-weight: 600;
   cursor: pointer;
-  box-shadow: var(--disc-specular);
   transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
   display: inline-flex;
   align-items: center;
@@ -119,22 +143,27 @@
 }
 
 .discovery-home-back-btn:hover {
-  border-color: var(--disc-border-strong);
-  color: var(--disc-ink);
-  background: rgba(220, 38, 38, 0.12);
+  border-color: var(--disc-glass-border-strong) !important;
+  color: var(--disc-ink) !important;
+  box-shadow: var(--disc-glass-shadow-elevated) !important;
   transform: translateX(-2px);
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   2. SHARED GLASS SURFACE & HEADINGS
+   2. SHARED GLASS SURFACE & HEADINGS (Exact Global Glass Panel)
    ═══════════════════════════════════════════════════════════════════════════ */
-.discovery-glass-panel {
-  background: var(--disc-surface);
-  border: 1px solid var(--disc-border);
-  border-radius: 20px;
-  box-shadow: var(--disc-shadow), var(--disc-specular);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
+.discovery-glass-panel,
+.discovery-question,
+.discovery-reveal,
+.discovery-result,
+.discovery-recommendations {
+  background: var(--disc-glass-bg) !important;
+  background-color: var(--disc-glass-bg) !important;
+  border: 1px solid var(--disc-glass-border) !important;
+  border-radius: 20px !important;
+  box-shadow: var(--disc-glass-shadow) !important;
+  backdrop-filter: var(--disc-glass-blur) !important;
+  -webkit-backdrop-filter: var(--disc-glass-blur) !important;
   overflow: hidden;
   position: relative;
 }
@@ -201,7 +230,8 @@
 .discovery-progress-bar {
   width: 100%;
   height: 3px;
-  background: rgba(220, 38, 38, 0.16);
+  background: var(--disc-glass-field);
+  border: 1px solid var(--disc-glass-border);
   border-radius: 2px;
   overflow: hidden;
   position: relative;
@@ -218,7 +248,7 @@
 
 .discovery-progress .is-lit .discovery-progress-fill {
   transform: scaleX(1);
-  box-shadow: 0 0 10px var(--disc-glow);
+  box-shadow: 0 0 10px rgba(220, 38, 38, 0.45);
 }
 
 .discovery-progress .is-lit {
@@ -256,8 +286,8 @@
   min-height: 330px;
   overflow: hidden;
   border-radius: 14px;
-  border: 1px solid var(--disc-border);
-  background: #0d0910;
+  border: 1px solid var(--disc-glass-border) !important;
+  background: var(--disc-glass-bg) !important;
   color: #fff7f0;
   text-align: left;
   padding: 0;
@@ -266,16 +296,12 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  box-shadow: var(--disc-shadow), var(--disc-specular);
+  box-shadow: var(--disc-glass-shadow) !important;
+  backdrop-filter: var(--disc-glass-blur) !important;
+  -webkit-backdrop-filter: var(--disc-glass-blur) !important;
   transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1),
               border-color 0.25s cubic-bezier(0.16, 1, 0.3, 1),
               box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-[data-theme='light'] .discovery-option,
-.portal-universe.theme-light .discovery-option {
-  background: #1c141d;
-  box-shadow: 0 10px 24px -4px rgba(0, 0, 0, 0.15), var(--disc-specular);
 }
 
 .discovery-option-art {
@@ -294,10 +320,10 @@
   inset: 0;
   background: linear-gradient(
     180deg,
-    rgba(10, 6, 12, 0.45) 0%,
-    rgba(10, 6, 12, 0.15) 35%,
-    rgba(10, 6, 12, 0.85) 70%,
-    rgba(8, 4, 10, 0.98) 100%
+    rgba(10, 6, 12, 0.4) 0%,
+    rgba(10, 6, 12, 0.12) 35%,
+    rgba(10, 6, 12, 0.8) 70%,
+    rgba(8, 4, 10, 0.95) 100%
   );
   z-index: -1;
   transition: opacity 0.3s ease;
@@ -306,7 +332,7 @@
 .discovery-option-specular {
   position: absolute;
   inset: 0;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), inset 0 0 24px rgba(220, 38, 38, 0.08);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15);
   pointer-events: none;
   z-index: 1;
 }
@@ -334,11 +360,12 @@
   font-weight: 700;
   letter-spacing: 0.1em;
   color: #fff;
-  background: rgba(14, 9, 16, 0.75);
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: var(--disc-glass-field) !important;
+  border: 1px solid var(--disc-glass-border) !important;
   padding: 0.25rem 0.55rem;
   border-radius: 6px;
-  backdrop-filter: blur(8px);
+  backdrop-filter: var(--disc-glass-blur) !important;
+  -webkit-backdrop-filter: var(--disc-glass-blur) !important;
 }
 
 .discovery-selection {
@@ -346,12 +373,13 @@
   height: 32px;
   display: grid;
   place-items: center;
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  border: 1px solid var(--disc-glass-border) !important;
   border-radius: 50%;
-  background: rgba(14, 9, 16, 0.65);
+  background: var(--disc-glass-field) !important;
   color: #fff;
   font-size: 0.9rem;
-  backdrop-filter: blur(8px);
+  backdrop-filter: var(--disc-glass-blur) !important;
+  -webkit-backdrop-filter: var(--disc-glass-blur) !important;
   transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
@@ -384,8 +412,8 @@
 @media (hover: hover) {
   .discovery-option:hover {
     transform: translateY(-6px) scale(1.01);
-    border-color: var(--disc-border-strong);
-    box-shadow: 0 20px 45px -8px rgba(0, 0, 0, 0.9), 0 0 24px var(--disc-glow), var(--disc-specular);
+    border-color: var(--disc-glass-border-strong) !important;
+    box-shadow: var(--disc-glass-shadow-elevated) !important;
   }
 
   .discovery-option:hover .discovery-option-art {
@@ -394,34 +422,22 @@
   }
 
   .discovery-option:hover .discovery-selection {
-    border-color: var(--disc-crimson);
+    border-color: var(--disc-crimson) !important;
     color: #fff;
-    background: rgba(220, 38, 38, 0.4);
-    box-shadow: 0 0 12px var(--disc-glow);
+    background: rgba(220, 38, 38, 0.4) !important;
   }
 }
 
 .discovery-option.is-selected {
-  border-color: var(--disc-crimson);
-  box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.75), 0 18px 45px -8px rgba(220, 38, 38, 0.4), var(--disc-specular);
+  border-color: var(--disc-crimson) !important;
+  box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.75), var(--disc-glass-shadow-elevated) !important;
   transform: translateY(-4px);
 }
 
 .discovery-option.is-selected .discovery-selection {
-  background: var(--disc-crimson);
-  border-color: #fff;
+  background: var(--disc-crimson) !important;
+  border-color: #fff !important;
   color: #ffffff;
-  box-shadow: 0 0 16px var(--disc-glow);
-}
-
-.discovery-option.is-selected .discovery-option-shade {
-  background: linear-gradient(
-    180deg,
-    rgba(220, 38, 38, 0.25) 0%,
-    rgba(10, 6, 12, 0.2) 35%,
-    rgba(10, 6, 12, 0.88) 70%,
-    rgba(8, 4, 10, 0.98) 100%
-  );
 }
 
 /* Actions Footer */
@@ -432,7 +448,7 @@
   gap: 1.25rem;
   margin-top: 1.5rem;
   padding-top: 1.5rem;
-  border-top: 1px solid var(--disc-border);
+  border-top: 1px solid var(--disc-glass-border);
 }
 
 .discovery-hint {
@@ -462,15 +478,17 @@
 
 .discovery-primary-btn:not(:disabled):hover {
   background: var(--disc-crimson-hover);
-  box-shadow: 0 8px 25px -4px rgba(220, 38, 38, 0.8), 0 0 16px var(--disc-glow);
+  box-shadow: 0 8px 25px -4px rgba(220, 38, 38, 0.8), 0 0 16px rgba(220, 38, 38, 0.35);
   transform: translateY(-2px);
 }
 
 .discovery-secondary-btn {
-  background: var(--disc-field-bg);
-  color: var(--disc-ink);
-  border: 1px solid var(--disc-border);
-  box-shadow: var(--disc-specular);
+  background: var(--disc-glass-field) !important;
+  color: var(--disc-ink) !important;
+  border: 1px solid var(--disc-glass-border) !important;
+  box-shadow: var(--disc-glass-shadow) !important;
+  backdrop-filter: var(--disc-glass-blur) !important;
+  -webkit-backdrop-filter: var(--disc-glass-blur) !important;
   font-family: var(--font-sans, sans-serif);
   font-weight: 700;
   font-size: 0.84rem;
@@ -484,15 +502,15 @@
 }
 
 .discovery-secondary-btn:not(:disabled):hover {
-  border-color: var(--disc-border-strong);
-  background: rgba(220, 38, 38, 0.12);
+  border-color: var(--disc-glass-border-strong) !important;
+  box-shadow: var(--disc-glass-shadow-elevated) !important;
   transform: translateY(-2px);
 }
 
 .discovery-secondary-btn.is-active-fav {
-  border-color: var(--disc-crimson);
-  background: rgba(220, 38, 38, 0.15);
-  color: var(--disc-crimson);
+  border-color: var(--disc-crimson) !important;
+  background: rgba(220, 38, 38, 0.15) !important;
+  color: var(--disc-crimson) !important;
 }
 
 .discovery-text-button {
@@ -551,9 +569,9 @@
   border-radius: 50%;
   background: radial-gradient(
     circle,
-    rgba(255, 255, 255, 0.22) 0%,
-    rgba(220, 38, 38, 0.25) 20%,
-    rgba(140, 20, 40, 0.18) 45%,
+    rgba(255, 255, 255, 0.18) 0%,
+    rgba(220, 38, 38, 0.22) 20%,
+    rgba(140, 20, 40, 0.14) 45%,
     transparent 70%
   );
   animation: discovery-breathe 2.4s ease-in-out infinite;
@@ -573,26 +591,26 @@
 .portal-ring {
   position: absolute;
   border-radius: 46% 54% 48% 52%;
-  border: 1px solid rgba(220, 38, 38, 0.65);
-  box-shadow: inset 0 0 25px rgba(220, 38, 38, 0.25), 0 0 20px rgba(220, 38, 38, 0.3);
+  border: 1px solid var(--disc-glass-border);
+  box-shadow: inset 0 0 25px rgba(220, 38, 38, 0.2), 0 0 15px rgba(220, 38, 38, 0.2);
 }
 
 .portal-ring.ring-1 {
   inset: 12%;
   animation: discovery-turn 10s linear infinite;
-  border-color: rgba(220, 38, 38, 0.75);
+  border-color: rgba(220, 38, 38, 0.65);
 }
 
 .portal-ring.ring-2 {
   inset: 4%;
   animation: discovery-turn 14s linear infinite reverse;
-  border-color: rgba(255, 255, 255, 0.3);
+  border-color: rgba(255, 255, 255, 0.25);
 }
 
 .portal-ring.ring-3 {
   inset: 22%;
   animation: discovery-turn 7s linear infinite;
-  border-color: rgba(220, 38, 38, 0.5);
+  border-color: rgba(220, 38, 38, 0.45);
 }
 
 .portal-badge {
@@ -657,7 +675,7 @@
   isolation: isolate;
   display: grid;
   place-items: center;
-  background: #0d0910;
+  background: var(--disc-glass-field);
   overflow: hidden;
 }
 
@@ -677,9 +695,9 @@
   inset: 0;
   background: linear-gradient(
     0deg,
-    rgba(10, 6, 12, 0.98) 0%,
-    rgba(10, 6, 12, 0.55) 45%,
-    rgba(10, 6, 12, 0.25) 100%
+    rgba(10, 6, 12, 0.95) 0%,
+    rgba(10, 6, 12, 0.45) 45%,
+    rgba(10, 6, 12, 0.2) 100%
   );
   z-index: -1;
 }
@@ -710,12 +728,14 @@
   font-weight: 800;
   letter-spacing: 0.16em;
   color: var(--disc-crimson);
-  background: rgba(14, 9, 16, 0.8);
-  border: 1px solid var(--disc-border);
+  background: var(--disc-glass-field) !important;
+  border: 1px solid var(--disc-glass-border) !important;
+  box-shadow: var(--disc-glass-shadow) !important;
+  backdrop-filter: var(--disc-glass-blur) !important;
+  -webkit-backdrop-filter: var(--disc-glass-blur) !important;
   padding: 0.2rem 0.55rem;
   border-radius: 4px;
   align-self: flex-start;
-  backdrop-filter: blur(8px);
 }
 
 .discovery-match strong {
@@ -754,9 +774,12 @@
   font-size: 0.65rem;
   font-weight: 800;
   letter-spacing: 0.14em;
-  color: #ffffff;
-  background: rgba(220, 38, 38, 0.2);
-  border: 1px solid var(--disc-border);
+  color: var(--disc-ink);
+  background: var(--disc-glass-field) !important;
+  border: 1px solid var(--disc-glass-border) !important;
+  box-shadow: var(--disc-glass-shadow) !important;
+  backdrop-filter: var(--disc-glass-blur) !important;
+  -webkit-backdrop-filter: var(--disc-glass-blur) !important;
   padding: 0.2rem 0.55rem;
   border-radius: 4px;
 }
@@ -788,7 +811,7 @@
   font-size: 0.76rem;
   line-height: 1.6;
   color: var(--disc-dim);
-  border-left: 2px solid var(--disc-border);
+  border-left: 2px solid var(--disc-glass-border);
   padding-left: 0.75rem;
   margin-bottom: 1.5rem;
 }
@@ -818,7 +841,7 @@
 .discovery-restart-row {
   margin-top: 1.75rem;
   padding-top: 1.25rem;
-  border-top: 1px solid var(--disc-border);
+  border-top: 1px solid var(--disc-glass-border);
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -848,7 +871,7 @@
 
 .discovery-recommendation-group {
   margin-top: 2.5rem;
-  border-top: 1px solid var(--disc-border);
+  border-top: 1px solid var(--disc-glass-border);
   padding-top: 1.75rem;
 }
 
@@ -873,8 +896,11 @@
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--disc-muted);
-  background: rgba(220, 38, 38, 0.08);
-  border: 1px solid var(--disc-border);
+  background: var(--disc-glass-field) !important;
+  border: 1px solid var(--disc-glass-border) !important;
+  box-shadow: var(--disc-glass-shadow) !important;
+  backdrop-filter: var(--disc-glass-blur) !important;
+  -webkit-backdrop-filter: var(--disc-glass-blur) !important;
   padding: 0.2rem 0.55rem;
   border-radius: 4px;
 }
@@ -893,20 +919,17 @@
   align-items: flex-end;
   text-align: left;
   padding: 1.35rem;
-  background: #0d0910;
-  border: 1px solid var(--disc-border);
+  background: var(--disc-glass-bg) !important;
+  border: 1px solid var(--disc-glass-border) !important;
   border-radius: 12px;
   overflow: hidden;
   cursor: pointer;
-  box-shadow: var(--disc-shadow), var(--disc-specular);
+  box-shadow: var(--disc-glass-shadow) !important;
+  backdrop-filter: var(--disc-glass-blur) !important;
+  -webkit-backdrop-filter: var(--disc-glass-blur) !important;
   transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1),
               border-color 0.25s cubic-bezier(0.16, 1, 0.3, 1),
               box-shadow 0.32s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-[data-theme='light'] .discovery-recommendation,
-.portal-universe.theme-light .discovery-recommendation {
-  background: #1c141d;
 }
 
 .discovery-rec-bg {
@@ -924,9 +947,9 @@
   inset: 0;
   background: linear-gradient(
     180deg,
-    rgba(9, 6, 12, 0.2) 0%,
-    rgba(9, 6, 12, 0.65) 50%,
-    rgba(9, 6, 12, 0.98) 100%
+    rgba(9, 6, 12, 0.15) 0%,
+    rgba(9, 6, 12, 0.55) 50%,
+    rgba(9, 6, 12, 0.92) 100%
   );
   z-index: -1;
   transition: opacity 0.3s ease;
@@ -954,12 +977,14 @@
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--disc-crimson);
-  background: rgba(14, 9, 16, 0.7);
-  border: 1px solid rgba(220, 38, 38, 0.3);
+  background: var(--disc-glass-field) !important;
+  border: 1px solid var(--disc-glass-border) !important;
+  box-shadow: var(--disc-glass-shadow) !important;
+  backdrop-filter: var(--disc-glass-blur) !important;
+  -webkit-backdrop-filter: var(--disc-glass-blur) !important;
   padding: 0.2rem 0.5rem;
   border-radius: 4px;
   align-self: flex-start;
-  backdrop-filter: blur(6px);
 }
 
 .discovery-rec-title {
@@ -987,8 +1012,8 @@
 @media (hover: hover) {
   .discovery-recommendation:hover {
     transform: translateY(-5px);
-    border-color: var(--disc-border-strong);
-    box-shadow: 0 16px 36px -6px rgba(0, 0, 0, 0.9), 0 0 20px var(--disc-glow), var(--disc-specular);
+    border-color: var(--disc-glass-border-strong) !important;
+    box-shadow: var(--disc-glass-shadow-elevated) !important;
   }
 
   .discovery-recommendation:hover .discovery-rec-bg {
@@ -1006,9 +1031,12 @@
   color: var(--disc-muted);
   line-height: 1.7;
   padding: 1.5rem;
-  background: var(--disc-field-bg);
-  border: 1px solid var(--disc-border);
+  background: var(--disc-glass-field) !important;
+  border: 1px solid var(--disc-glass-border) !important;
   border-radius: 10px;
+  box-shadow: var(--disc-glass-shadow) !important;
+  backdrop-filter: var(--disc-glass-blur) !important;
+  -webkit-backdrop-filter: var(--disc-glass-blur) !important;
 }
 
 .discovery-load {
@@ -1031,7 +1059,7 @@
   width: 18px;
   height: 18px;
   border-radius: 50%;
-  border: 2px solid var(--disc-border);
+  border: 2px solid var(--disc-glass-border);
   border-top-color: var(--disc-crimson);
   animation: discovery-turn 0.8s linear infinite;
 }
@@ -1044,32 +1072,26 @@
 
 .skeleton-card {
   height: 240px;
-  background: linear-gradient(
-    110deg,
-    rgba(220, 38, 38, 0.05) 0%,
-    rgba(220, 38, 38, 0.12) 50%,
-    rgba(220, 38, 38, 0.05) 100%
-  );
-  background-size: 200% 100%;
-  animation: discovery-skeleton-shimmer 1.8s infinite linear;
+  background: var(--disc-glass-field) !important;
+  border: 1px solid var(--disc-glass-border) !important;
   border-radius: 12px;
-  border: 1px solid var(--disc-border);
-}
-
-@keyframes discovery-skeleton-shimmer {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
+  box-shadow: var(--disc-glass-shadow) !important;
+  backdrop-filter: var(--disc-glass-blur) !important;
+  -webkit-backdrop-filter: var(--disc-glass-blur) !important;
 }
 
 .discovery-message.error-box {
   padding: 1.5rem;
-  background: rgba(220, 38, 38, 0.08);
-  border: 1px solid var(--disc-crimson);
+  background: var(--disc-glass-bg) !important;
+  border: 1px solid var(--disc-crimson) !important;
   border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
+  box-shadow: var(--disc-glass-shadow) !important;
+  backdrop-filter: var(--disc-glass-blur) !important;
+  -webkit-backdrop-filter: var(--disc-glass-blur) !important;
 }
 
 .discovery-message p {
@@ -1079,8 +1101,32 @@
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   7. HOMEPAGE INVITATION BANNER
+   7. HOMEPAGE INVITATION BANNER (Exact Global Glass Engine)
    ═══════════════════════════════════════════════════════════════════════════ */
+:root:not([data-theme='light']) .discovery-home-invitation,
+.portal-universe.theme-dark .discovery-home-invitation,
+:root[data-theme='dark'] .discovery-home-invitation,
+html:not([data-theme='light']) .discovery-home-invitation {
+  background: rgba(19, 13, 21, 0.78) !important;
+  border: 1px solid rgba(191, 61, 90, 0.25) !important;
+  box-shadow: 0 12px 28px -22px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.12) !important;
+  backdrop-filter: blur(14px) !important;
+  -webkit-backdrop-filter: blur(14px) !important;
+  color: #fff3ec !important;
+}
+
+:root[data-theme='light'] .discovery-home-invitation,
+.portal-universe.theme-light .discovery-home-invitation,
+html[data-theme='light'] .discovery-home-invitation,
+body.theme-light .discovery-home-invitation {
+  background: rgba(255, 252, 247, 0.78) !important;
+  border: 1px solid rgba(220, 38, 38, 0.22) !important;
+  box-shadow: 0 12px 28px -22px rgba(90, 20, 30, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.95) !important;
+  backdrop-filter: blur(14px) !important;
+  -webkit-backdrop-filter: blur(14px) !important;
+  color: #181216 !important;
+}
+
 .discovery-home-invitation {
   position: relative;
   z-index: 2;
@@ -1090,21 +1136,9 @@
   align-items: center;
   justify-content: space-between;
   gap: 1.5rem;
-  border: 1px solid var(--portal-crimson-border, rgba(220, 38, 38, 0.35));
   border-radius: 16px;
   padding: 1.75rem 2.25rem;
-  background: linear-gradient(135deg, rgba(25, 12, 18, 0.94) 0%, rgba(13, 10, 16, 0.96) 100%);
-  color: #fff3e8;
-  box-shadow: 0 16px 36px -10px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.12), inset 0 0 24px rgba(220, 38, 38, 0.06);
-  backdrop-filter: blur(18px);
-}
-
-[data-theme='light'] .discovery-home-invitation,
-.portal-universe.theme-light .discovery-home-invitation {
-  background: linear-gradient(135deg, rgba(255, 250, 244, 0.96) 0%, rgba(246, 240, 230, 0.96) 100%);
-  color: #171717;
-  border-color: rgba(220, 38, 38, 0.28);
-  box-shadow: 0 12px 28px -6px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.95);
+  overflow: hidden;
 }
 
 .discovery-home-invitation span {
@@ -1126,12 +1160,8 @@
 .discovery-home-invitation p {
   font-size: 0.88rem;
   margin: 0;
-  color: var(--portal-muted, #d8d8dc);
-}
-
-[data-theme='light'] .discovery-home-invitation p,
-.portal-universe.theme-light .discovery-home-invitation p {
-  color: #454545;
+  color: inherit;
+  opacity: 0.85;
 }
 
 .discovery-home-invitation button {
@@ -1153,7 +1183,7 @@
 
 .discovery-home-invitation button:hover {
   background: var(--accent-crimson-hover, #ef4444);
-  box-shadow: 0 8px 24px -4px rgba(220, 38, 38, 0.8), 0 0 18px var(--portal-crimson-glow, rgba(220, 38, 38, 0.35));
+  box-shadow: 0 8px 24px -4px rgba(220, 38, 38, 0.8), 0 0 18px rgba(220, 38, 38, 0.35);
   transform: translateY(-2px);
 }
 

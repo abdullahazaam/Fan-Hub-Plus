@@ -310,7 +310,7 @@ export function RealmDiscovery(props: Props) {
       </div>
 
       {phase === 'questions' && (
-        <section className="discovery-question discovery-glass-panel" aria-labelledby="discovery-title">
+        <section className="discovery-question discovery-glass-panel glass-panel" aria-labelledby="discovery-title">
           {/* Step Progress Track */}
           <div className="discovery-progress" aria-label={`Question ${step + 1} of 5`}>
             {QUESTIONS.map((q, i) => (
@@ -344,7 +344,7 @@ export function RealmDiscovery(props: Props) {
               <button
                 key={option.title}
                 type="button"
-                className={`discovery-option ${selected === i ? 'is-selected' : ''}`}
+                className={`discovery-option glass-panel ${selected === i ? 'is-selected' : ''}`}
                 aria-pressed={selected === i}
                 onClick={() => setSelected(i)}
               >
@@ -358,8 +358,8 @@ export function RealmDiscovery(props: Props) {
                 <span className="discovery-option-specular" />
 
                 <div className="discovery-option-top">
-                  <span className="discovery-option-number">0{i + 1}</span>
-                  <span className="discovery-selection" aria-hidden="true">
+                  <span className="discovery-option-number glass-panel">0{i + 1}</span>
+                  <span className="discovery-selection glass-panel" aria-hidden="true">
                     {selected === i ? '✓' : '+'}
                   </span>
                 </div>
@@ -423,7 +423,7 @@ export function RealmDiscovery(props: Props) {
       {phase === 'result' && result && (
         <>
           <section
-            className="discovery-result discovery-glass-panel"
+            className="discovery-result discovery-glass-panel glass-panel"
             aria-labelledby="discovery-result-title"
           >
             <div className="discovery-result-art">
@@ -439,7 +439,7 @@ export function RealmDiscovery(props: Props) {
                 <i className="portal-ring ring-3" />
               </div>
               <div className="discovery-match">
-                <span className="discovery-match-badge">RESONANCE RATING</span>
+                <span className="discovery-match-badge glass-panel">RESONANCE RATING</span>
                 <strong>{result.percent}%</strong>
                 <span>Direct Affinity Match</span>
               </div>
@@ -448,7 +448,7 @@ export function RealmDiscovery(props: Props) {
             <div className="discovery-result-copy">
               <div className="discovery-kicker-row">
                 <span className="discovery-kicker">YOUR SOVEREIGN REALM</span>
-                <span className="discovery-tag-pill">CONFIRMED ALLIANCE</span>
+                <span className="discovery-tag-pill glass-panel">CONFIRMED ALLIANCE</span>
               </div>
               <h1 id="discovery-result-title" ref={heading} tabIndex={-1}>
                 {result.realm.name}
@@ -471,7 +471,7 @@ export function RealmDiscovery(props: Props) {
                 </button>
                 <button
                   type="button"
-                  className={`discovery-secondary-btn ${isFavorite ? 'is-active-fav' : ''}`}
+                  className={`discovery-secondary-btn glass-panel ${isFavorite ? 'is-active-fav' : ''}`}
                   disabled={!category || saving || isFavorite}
                   onClick={saveFavorite}
                 >
@@ -511,7 +511,7 @@ export function RealmDiscovery(props: Props) {
           </section>
 
           <section
-            className="discovery-recommendations discovery-glass-panel"
+            className="discovery-recommendations discovery-glass-panel glass-panel"
             aria-labelledby="discovery-recommendations-title"
           >
             <header className="discovery-recommendations-header">
@@ -529,19 +529,19 @@ export function RealmDiscovery(props: Props) {
                   <span>Streaming curated records from {result.realm.name}...</span>
                 </div>
                 <div className="discovery-skeletons" aria-hidden="true">
-                  <div className="skeleton-card" />
-                  <div className="skeleton-card" />
-                  <div className="skeleton-card" />
+                  <div className="skeleton-card glass-panel" />
+                  <div className="skeleton-card glass-panel" />
+                  <div className="skeleton-card glass-panel" />
                 </div>
               </div>
             )}
 
             {error && (
-              <div className="discovery-message error-box" role="alert">
+              <div className="discovery-message error-box glass-panel" role="alert">
                 <p>{error}</p>
                 <button
                   type="button"
-                  className="discovery-secondary-btn"
+                  className="discovery-secondary-btn glass-panel"
                   onClick={() => setRetry((r) => r + 1)}
                 >
                   Retry Connection
@@ -555,13 +555,13 @@ export function RealmDiscovery(props: Props) {
                 <section className="discovery-recommendation-group" key={group.name}>
                   <div className="discovery-group-header">
                     <h3>{group.name}</h3>
-                    <span className="discovery-group-count">
+                    <span className="discovery-group-count glass-panel">
                       {group.items.length ? `${group.items.length} Curated` : 'Archiving'}
                     </span>
                   </div>
 
                   {group.failed ? (
-                    <div className="discovery-message">
+                    <div className="discovery-message glass-panel">
                       <p>{group.name} stream could not be loaded.</p>
                       <button
                         type="button"
@@ -577,7 +577,7 @@ export function RealmDiscovery(props: Props) {
                         <button
                           key={item.id}
                           type="button"
-                          className="discovery-recommendation"
+                          className="discovery-recommendation glass-panel"
                           onClick={item.open}
                         >
                           {item.image && (
@@ -596,7 +596,7 @@ export function RealmDiscovery(props: Props) {
                           <div className="discovery-rec-specular" />
 
                           <div className="discovery-rec-content">
-                            <span className="discovery-rec-tag">{item.detail}</span>
+                            <span className="discovery-rec-tag glass-panel">{item.detail}</span>
                             <strong className="discovery-rec-title">{item.title}</strong>
                             <span className="discovery-rec-action">
                               <span>{group.name === 'Events' ? 'Explore Events' : 'Inspect Dossier'}</span>
@@ -608,7 +608,7 @@ export function RealmDiscovery(props: Props) {
                       ))}
                     </div>
                   ) : (
-                    <p className="discovery-empty">
+                    <p className="discovery-empty glass-panel">
                       No {group.name.toLowerCase()} cataloged for this realm yet. Check back soon.
                     </p>
                   )}
