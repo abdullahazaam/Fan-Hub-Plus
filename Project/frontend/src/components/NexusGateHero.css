@@ -123,11 +123,9 @@
   .fh-nexus-hero .fh-scene-canvas {
     display: none !important;
   }
+  /* Hide .fh-fallback-art completely so mobile-hero-bg.png is the ONLY background */
   .fh-nexus-hero .fh-fallback-art,
-  .fh-nexus-hero .fh-scene-ready .fh-fallback-art {
-    visibility: visible !important;
-    display: block !important;
-  }
+  .fh-nexus-hero .fh-scene-ready .fh-fallback-art,
   .fh-nexus-hero .fh-fallback-art > image:first-child {
     display: none !important;
     visibility: hidden !important;
