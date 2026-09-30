@@ -37,7 +37,7 @@ export default function NexusHeroScene({theme,onSelect,selected}:HeroSceneProps)
     function texture(url:string){return loader.loadAsync(url).then(t=>{if(disposed){t.dispose();throw new Error('disposed')}t.colorSpace=THREE.SRGBColorSpace;textures.push(t);return t})}
     function invalidate(){if(!frame&&!disposed&&!lost&&visible&&!document.hidden&&renderer){last=performance.now()-16;frame=requestAnimationFrame(render)}}
     invalidateRef.current=invalidate
-    function resize(){const {width,height}=wrap.getBoundingClientRect();if(!width||!height)return;view=heroView(width,height);svg.setAttribute('viewBox',`${view.x} ${view.y} ${view.width} ${view.height}`);camera.left=view.x;camera.right=view.x+view.width;camera.top=839-view.y;camera.bottom=839-view.y-view.height;camera.updateProjectionMatrix();renderer?.setPixelRatio(Math.min(devicePixelRatio, width<860?1.5:2));renderer?.setSize(width,height,false);invalidate()}
+    function resize(){const {width,height}=wrap.getBoundingClientRect();if(!width||!height)return;view=heroView(width,height);svg.setAttribute('viewBox',`${view.x} ${view.y} ${view.width} ${view.height}`);camera.left=view.x;camera.right=view.x+view.width;camera.top=839-view.y;camera.bottom=839-view.y-view.height;camera.updateProjectionMatrix();renderer?.setPixelRatio(Math.min(devicePixelRatio, 2));renderer?.setSize(width,height,false);invalidate()}
     const resizeObserver=new ResizeObserver(resize);resizeObserver.observe(wrap);resize()
     try {renderer=new THREE.WebGLRenderer({canvas,alpha:true,antialias:true,powerPreference:'high-performance',preserveDrawingBuffer:false});renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.setClearColor(0x000000,0)} catch {return()=>resizeObserver.disconnect()}
     scene.add(new THREE.AmbientLight(0xffffff,2))
@@ -130,7 +130,7 @@ export default function NexusHeroScene({theme,onSelect,selected}:HeroSceneProps)
           ctx.drawImage(image,(image.width-sw)/2,Math.max(0,(artHeight-sh)*.35),sw,sh,0,0,762,292)
         }
         const gradient=ctx.createLinearGradient(0,190,0,396);gradient.addColorStop(0,'#07070a00');gradient.addColorStop(.6,'#07070abf');gradient.addColorStop(1,'#07070af5');ctx.fillStyle=gradient;ctx.fillRect(0,0,762,396)
-        ctx.fillStyle='#08080b';ctx.fillRect(0,292,762,104);ctx.fillStyle='#fff';ctx.font='bold 56px Arial';ctx.textBaseline='middle';ctx.fillText(realm.name,68,339);ctx.fillStyle='#ff5c63';ctx.fillRect(27,318,9,42);ctx.restore();ctx.strokeStyle='#f27279';ctx.lineWidth=3;ctx.beginPath();ctx.roundRect(3,3,756,390,20);ctx.stroke()
+        ctx.fillStyle='#060608';ctx.fillRect(0,284,762,112);ctx.fillStyle='#ffffff';ctx.font='900 62px Arial, sans-serif';ctx.textBaseline='middle';ctx.letterSpacing='1.5px';ctx.fillText(realm.name,72,342);ctx.fillStyle='#ff3b44';ctx.fillRect(26,316,11,50);ctx.restore();ctx.strokeStyle='#f27279';ctx.lineWidth=3;ctx.beginPath();ctx.roundRect(3,3,756,390,20);ctx.stroke()
         const t=new THREE.CanvasTexture(art);t.colorSpace=THREE.SRGBColorSpace;t.anisotropy=Math.min(8,renderer!.capabilities.getMaxAnisotropy());textures.push(t);const m=face.material as THREE.MeshBasicMaterial;m.map=t;m.needsUpdate=true;invalidate()
       }
       draw()

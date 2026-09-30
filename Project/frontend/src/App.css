@@ -10255,3 +10255,50 @@ body::-webkit-scrollbar-thumb {
 .site-atmosphere-layer .atmosphere-global-light-bg{opacity:0;transition:opacity .5s ease}
 .site-atmosphere-layer.theme-light .atmosphere-global-light-bg{opacity:1}
 @media(prefers-reduced-motion:reduce){.site-atmosphere-layer .atmosphere-global-light-bg{transition:none}}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   MOBILE READABILITY POLISH (320px – 440px)
+   Maintains current composition, spacing, and zero overflow.
+   Desktop and tablet remain 100% unchanged.
+   ═══════════════════════════════════════════════════════════════════════════ */
+@media (max-width: 480px) {
+  /* Discovery invitation card on home */
+  .discovery-home-invitation span {
+    font-size: 0.76rem !important;
+    letter-spacing: 0.12em !important;
+  }
+  .discovery-home-invitation h2 {
+    font-size: clamp(1.22rem, 5.2vw, 1.45rem) !important;
+    line-height: 1.28 !important;
+  }
+  .discovery-home-invitation p {
+    font-size: 0.95rem !important;
+    line-height: 1.5 !important;
+  }
+  .discovery-home-invitation button {
+    font-size: 0.92rem !important;
+    padding: 0.8rem 1.4rem !important;
+  }
+
+  /* Section subtitles and eyebrow tags */
+  .home-section-desc,
+  .explore-subtitle {
+    font-size: 0.94rem !important;
+    line-height: 1.55 !important;
+  }
+  .home-section-badge {
+    font-size: 0.72rem !important;
+  }
+
+  /* Cards inner body and badges readability */
+  .card-footer-meta {
+    font-size: 0.82rem !important;
+  }
+  .tag-pill {
+    font-size: 0.75rem !important;
+  }
+  .btn-view-detail {
+    font-size: 0.72rem !important;
+    padding: 0.35rem 0.9rem !important;
+  }
+}
