@@ -88,8 +88,8 @@
   .fh-nexus-hero .fh-nexus-copy button { font-size:14px;padding:15px 26px; }
   .fh-nexus-hero .fh-nexus-stage { width:100%;height:auto;aspect-ratio:1100 / 839; }
 }
-@media(max-width:480px) {
-  /* Full seamless Hero background on mobile ≤480px with /mobile-hero-bg.png */
+@media(max-width:768px) {
+  /* Full seamless Hero background on screens ≤768px with /mobile-hero-bg.png */
   .fh-nexus-hero {
     background-color: #0c080b !important;
     background-image: url('/mobile-hero-bg.png') !important;
