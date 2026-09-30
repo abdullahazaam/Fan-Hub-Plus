@@ -36,22 +36,22 @@ export default function NexusHeroScene({theme,onSelect,selected}:HeroSceneProps)
     function mesh(geometry:THREE.BufferGeometry,material:THREE.Material,parent:THREE.Object3D=scene){geometries.push(geometry);materials.push(material);const m=new THREE.Mesh(geometry,material);parent.add(m);return m}
     function texture(url:string){return loader.loadAsync(url).then(t=>{if(disposed){t.dispose();throw new Error('disposed')}t.colorSpace=THREE.SRGBColorSpace;textures.push(t);return t})}
     function invalidate(){if(!frame&&!disposed&&!lost&&visible&&!document.hidden&&renderer){last=performance.now()-16;frame=requestAnimationFrame(render)}}
-    invalidateRef.current=invalidate
-    function resize(){const {width,height}=wrap.getBoundingClientRect();if(!width||!height)return;view=heroView(width,height);svg.setAttribute('viewBox',`${view.x} ${view.y} ${view.width} ${view.height}`);camera.left=view.x;camera.right=view.x+view.width;camera.top=839-view.y;camera.bottom=839-view.y-view.height;camera.updateProjectionMatrix();renderer?.setPixelRatio(Math.min(devicePixelRatio, 2));renderer?.setSize(width,height,false);invalidate()}
+    let background: THREE.Mesh | undefined
+    function resize(){const {width,height}=wrap.getBoundingClientRect();if(!width||!height)return;view=heroView(width,height);svg.setAttribute('viewBox',`${view.x} ${view.y} ${view.width} ${view.height}`);camera.left=view.x;camera.right=view.x+view.width;camera.top=839-view.y;camera.bottom=839-view.y-view.height;camera.updateProjectionMatrix();renderer?.setPixelRatio(Math.min(devicePixelRatio, 2));renderer?.setSize(width,height,false);if(background)background.visible=window.innerWidth>768;invalidate()}
     const resizeObserver=new ResizeObserver(resize);resizeObserver.observe(wrap);resize()
     try {renderer=new THREE.WebGLRenderer({canvas,alpha:true,antialias:true,powerPreference:'high-performance',preserveDrawingBuffer:false});renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.setClearColor(0x000000,0)} catch {return()=>resizeObserver.disconnect()}
     scene.add(new THREE.AmbientLight(0xffffff,2))
     const rimLight=new THREE.DirectionalLight(0xff443d,3);rimLight.position.set(900,700,700);scene.add(rimLight)
     const themeBlend={value:themeRef.current==='light'?1:0}
     const darkEnvironment={value:null as THREE.Texture|null},lightEnvironment={value:null as THREE.Texture|null}
-    const background=mesh(new THREE.PlaneGeometry(1875,839),new THREE.ShaderMaterial({
+    background=mesh(new THREE.PlaneGeometry(1875,839),new THREE.ShaderMaterial({
       uniforms:{darkEnvironment,lightEnvironment,themeBlend},depthWrite:false,toneMapped:false,
       vertexShader:`varying vec2 imageUv;void main(){imageUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);}`,
       fragmentShader:`uniform sampler2D darkEnvironment;uniform sampler2D lightEnvironment;uniform float themeBlend;varying vec2 imageUv;
         void main(){gl_FragColor=mix(texture2D(darkEnvironment,imageUv),texture2D(lightEnvironment,imageUv),themeBlend);
           #include <colorspace_fragment>
         }`
-    }));background.position.set(937.5,419.5,-30)
+    }));background.position.set(937.5,419.5,-30);background.visible=window.innerWidth>768
     const pending:Promise<unknown>[]=[]
     const portalUniforms={darkEnvironment,lightEnvironment,themeBlend,clock:{value:0},charge:{value:0},center:{value:new THREE.Vector2(HERO_WORLD.portalX,839-HERO_WORLD.portalY)}}
     // Load current active theme first for near-instant hero presentation, then lazy load alternate theme
@@ -382,8 +382,8 @@ export default function NexusHeroScene({theme,onSelect,selected}:HeroSceneProps)
     const point=new THREE.Vector3()
     function render(time:number){
       frame=0;if(disposed||lost||!visible||document.hidden)return
-      const animate=!reduced.matches&&fine.matches,dt=Math.min(.05,(time-last)/1000);last=time;const damping=animate?1-Math.exp(-dt*10):1
-      const tx=animate?px:0,ty=animate?py:0;cx+=(tx-cx)*damping;cy+=(ty-cy)*damping
+      const animate=!reduced.matches,dt=Math.min(.05,(time-last)/1000);last=time;const damping=animate?1-Math.exp(-dt*10):1
+      const tx=animate&&fine.matches?px:0,ty=animate&&fine.matches?py:0;cx+=(tx-cx)*damping;cy+=(ty-cy)*damping
       let settling=Math.abs(tx-cx)+Math.abs(ty-cy)
       groups.forEach((group,i)=>{const r=HERO_REALMS[i],target=activeRef.current===i?1:0;depths[i]+=(target-depths[i])*damping;settling+=Math.abs(target-depths[i]);const d=depths[i]
         const floatTime=reduced.matches?0:energyTime,phase=i*1.73
@@ -392,7 +392,7 @@ export default function NexusHeroScene({theme,onSelect,selected}:HeroSceneProps)
         const tiltY=reduced.matches?0:Math.cos(floatTime*.41+phase)*.018
         group.position.set(r.x+cx*1.2,839-r.y+drift*(1-d*.7)+d*3,15+d*15)
         group.scale.setScalar(1+(reduced.matches?0:.06*d))
-        group.rotation.set(((animate?cy*.008:0)+tiltX)*(1-d),((animate?cx*.012:0)+tiltY)*(1-d),-r.angle*Math.PI/180*(1-d*.7))
+        group.rotation.set(((fine.matches?cy*.008:0)+tiltX)*(1-d),((fine.matches?cx*.012:0)+tiltY)*(1-d),-r.angle*Math.PI/180*(1-d*.7))
         cardGlows[i].uniforms.hover.value=d;cardGlass[i].value=d
         group.updateMatrixWorld(true)
         const corners=[[-CARD.width/2,CARD.height/2],[CARD.width/2,CARD.height/2],[CARD.width/2,-CARD.height/2],[-CARD.width/2,-CARD.height/2]].map(([x,y])=>{point.set(x,y,11);group.localToWorld(point);point.project(camera);return `${view.x+(point.x+1)*view.width/2},${view.y+(1-point.y)*view.height/2}`})
@@ -430,7 +430,7 @@ export default function NexusHeroScene({theme,onSelect,selected}:HeroSceneProps)
     <canvas ref={canvasRef} className="fh-scene-canvas" aria-hidden="true"/>
     <svg ref={svgRef} className="fh-scene-overlay" viewBox="0 0 1875 839" aria-label="Eight fandom realms">
       <HeroFallbackArtwork theme={theme}/>
-      {HERO_REALMS.map((realm,i)=><g key={realm.slug} role="button" tabIndex={0} aria-label={`Enter ${realm.name} Realm`} aria-pressed={selected===realm.slug} onPointerEnter={()=>activate(i)} onPointerLeave={()=>activate(-1)} onFocus={()=>activate(i)} onBlur={()=>activate(-1)} onClick={()=>onSelect(realm.slug)} onKeyDown={e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();onSelect(realm.slug)}}}><polygon className="fh-realm-hit" points={realmPoints(i)}/></g>)}
+      {HERO_REALMS.map((realm,i)=><g key={realm.slug} role="button" tabIndex={0} aria-label={`Enter ${realm.name} Realm`} aria-pressed={selected===realm.slug} onPointerDown={()=>activate(i)} onPointerEnter={()=>activate(i)} onPointerLeave={()=>activate(-1)} onFocus={()=>activate(i)} onBlur={()=>activate(-1)} onClick={()=>onSelect(realm.slug)} onKeyDown={e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();onSelect(realm.slug)}}}><polygon className="fh-realm-hit" points={realmPoints(i)}/></g>)}
     </svg>
   </div>
 }
