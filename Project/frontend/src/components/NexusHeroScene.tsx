@@ -245,8 +245,8 @@ export default function NexusHeroScene({theme,onSelect,selected}:HeroSceneProps)
         vertexShader:`varying vec2 boltUv;void main(){boltUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);}`,
         fragmentShader:`uniform float intensity;varying vec2 boltUv;void main(){
           float d=abs(boltUv.x*2.0-1.0);
-          float hot=exp(-d*d*155.0),sheath=exp(-d*d*21.0),halo=pow(1.0-d,2.3);
-          vec3 light=vec3(1.0,0.72,0.58)*hot*1.9+vec3(1.0,0.028,0.045)*sheath*1.02+vec3(0.7,0.001,0.009)*halo*0.76;
+          float hot=exp(-d*d*75.0),sheath=exp(-d*d*11.0),halo=pow(max(0.0,1.0-d),1.6);
+          vec3 light=vec3(1.0,0.85,0.78)*hot*2.4+vec3(1.0,0.08,0.14)*sheath*1.5+vec3(0.85,0.015,0.03)*halo*1.1;
           gl_FragColor=vec4(light,intensity);
           #include <colorspace_fragment>
         }`})
@@ -289,14 +289,14 @@ export default function NexusHeroScene({theme,onSelect,selected}:HeroSceneProps)
         const jag=((random(i*3+seed)-.5)*17+(random(Math.floor(i/4)+seed+81)-.5)*24)*envelope
         bolt.path[i].set(origin.x+dx*t+nx*jag,origin.y+dy*t+ny*jag,origin.z+(endpoint.z-origin.z)*t+Math.sin(Math.PI*t)*8)
       }
-      writeRibbon(bolt,14.5,false)
+      writeRibbon(bolt,28.0,false)
       branches.forEach((branch,b)=>{
-        const start=bolt.path[7+b*7],sign=b%2===0?1:-1,reach=23+random(seed+b)*22
+        const start=bolt.path[7+b*7],sign=b%2===0?1:-1,reach=28+random(seed+b)*24
         for(let i=0;i<=branch.segments;i++){
-          const t=i/branch.segments,jag=(random(seed+i*7+b*31)-.5)*9*Math.sin(Math.PI*t)
+          const t=i/branch.segments,jag=(random(seed+i*7+b*31)-.5)*12*Math.sin(Math.PI*t)
           branch.path[i].set(start.x+dx/length*reach*t+nx*(sign*reach*.75*t+jag),start.y+dy/length*reach*t+ny*(sign*reach*.75*t+jag),start.z+t*3)
         }
-        writeRibbon(branch,6.8,true);branch.material.uniforms.intensity.value=connectionPower*.78
+        writeRibbon(branch,13.5,true);branch.material.uniforms.intensity.value=connectionPower*.92
       })
       const flicker=motion?.68+.32*random(tick*11+connection):1
       bolt.material.uniforms.intensity.value=connectionPower*flicker*(1+strike*.4)
