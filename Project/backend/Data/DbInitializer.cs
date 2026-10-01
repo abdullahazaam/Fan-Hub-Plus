@@ -496,7 +496,7 @@ public static class DbInitializer
         {
             if (!context.Users.Any(u => u.NormalizedEmail == email.ToUpper()))
             {
-                var (h, s) = PasswordHasher.Hash("User@12345");
+                var (h, s) = PasswordHasher.Hash(devUserPassword);
                 context.Users.Add(new User
                 {
                     Email = email,
