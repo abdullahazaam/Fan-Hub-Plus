@@ -5448,16 +5448,59 @@ h1, h2, h3, h4, section, [id] {
     font-size: 1.85rem;
   }
 
+  .portal-footer {
+    background: #09060b !important;
+    border-top: 1px solid rgba(220, 38, 38, 0.4) !important;
+    box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.8) !important;
+  }
+
+  .theme-light .portal-footer {
+    background: #fdfaf6 !important;
+    border-top: 1px solid rgba(220, 38, 38, 0.3) !important;
+  }
+
+  .footer-container {
+    padding: 2rem 1.25rem 1.75rem !important;
+    gap: 1.5rem !important;
+  }
+
   .footer-columns-grid {
-    grid-template-columns: 1fr;
-    gap: 1.5rem;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 1.5rem 1.25rem !important;
+  }
+
+  /* Col 1 Brand spans both columns at top */
+  .footer-col.col-brand {
+    grid-column: span 2 !important;
+    padding-bottom: 1.25rem;
+    border-bottom: 1px solid rgba(220, 38, 38, 0.15);
+  }
+
+  .footer-col.col-portals {
+    grid-column: span 1 !important;
+    border-left: none !important;
+    border-top: none !important;
+    padding: 0 !important;
+  }
+
+  .footer-col.col-realms {
+    grid-column: span 1 !important;
+    border-left: 1px solid rgba(220, 38, 38, 0.12) !important;
+    border-top: none !important;
+    padding-left: 1rem !important;
+  }
+
+  .footer-col.col-architecture {
+    grid-column: span 2 !important;
+    border-left: none !important;
+    border-top: 1px solid rgba(220, 38, 38, 0.15) !important;
+    padding-top: 1.25rem !important;
+    padding-left: 0 !important;
   }
 
   .footer-col:not(:first-child) {
     border-left: none;
     padding-left: 0;
-    border-top: 1px solid rgba(220, 38, 38, 0.1);
-    padding-top: 1.25rem;
   }
 
   .footer-col:nth-child(even) {
@@ -5465,14 +5508,57 @@ h1, h2, h3, h4, section, [id] {
     padding-left: 0;
   }
 
+  .footer-nav-grid-2col,
+  .universe-links-grid {
+    grid-template-columns: 1fr !important;
+    gap: 0.5rem !important;
+  }
+
+  .footer-link-btn {
+    font-size: 0.88rem !important;
+    padding: 0.2rem 0 !important;
+    color: #cbd5e1 !important;
+  }
+
+  .theme-light .footer-link-btn {
+    color: #334155 !important;
+  }
+
+  .footer-col-title {
+    font-size: 0.85rem !important;
+    margin-bottom: 0.85rem !important;
+    color: #ffffff !important;
+  }
+
+  .theme-light .footer-col-title {
+    color: #0f172a !important;
+  }
+
+  .footer-mission-text {
+    max-width: 100% !important;
+    font-size: 0.85rem !important;
+    line-height: 1.55 !important;
+  }
+
   .footer-bottom-strip {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.75rem;
+    flex-direction: column !important;
+    align-items: center !important;
+    text-align: center !important;
+    gap: 0.6rem !important;
+    padding-top: 1.25rem !important;
+    border-top: 1px solid rgba(220, 38, 38, 0.18) !important;
+  }
+
+  .footer-bottom-meta {
+    display: flex !important;
+    justify-content: center !important;
+    flex-wrap: wrap !important;
+    gap: 0.4rem !important;
   }
 
   .media-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
   }
 
   .story-content-pane,
@@ -5495,7 +5581,8 @@ h1, h2, h3, h4, section, [id] {
   }
 
   .content-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
   }
 
   .universe-links-grid,
@@ -6854,6 +6941,52 @@ html[data-font-size="large"] {
   padding-top: 1.5rem;
   border-top: 1px solid var(--border-subtle);
   width: 100%;
+}
+
+@media (max-width: 768px) {
+  .srs-card,
+  .portal-universe :is(.release-card, .event-card):is(.release-card, .event-card):is(.release-card, .event-card) {
+    min-height: 290px !important;
+    height: auto !important;
+    max-height: none !important;
+    border-radius: 13px !important;
+  }
+  .srs-card-media-wrap {
+    height: 120px !important;
+  }
+  .srs-card-body {
+    padding: 0.7rem !important;
+    gap: 0.3rem !important;
+  }
+  .srs-card-title {
+    font-size: 0.88rem !important;
+    line-height: 1.25 !important;
+  }
+  .srs-card-description {
+    font-size: 0.72rem !important;
+    line-height: 1.35 !important;
+    -webkit-line-clamp: 2 !important;
+  }
+  .srs-card-meta-line {
+    font-size: 0.65rem !important;
+  }
+  .srs-price-tag {
+    font-size: 0.95rem !important;
+  }
+  .srs-card-footer {
+    padding-top: 0.5rem !important;
+    gap: 0.35rem !important;
+  }
+  .btn-inspect-action,
+  .btn-ticket-external {
+    padding: 0.35rem 0.6rem !important;
+    font-size: 0.7rem !important;
+  }
+  .btn-bookmark-action,
+  .btn-icon-danger {
+    width: 28px !important;
+    height: 28px !important;
+  }
 }
 
 /* ==============================================================================
@@ -8938,7 +9071,8 @@ html[data-font-size="large"] {
   }
 
   .srs-cards-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
   }
 
   .srs-filter-row {
@@ -9524,8 +9658,8 @@ article.content-card.chronicle-flip::after { display: none; }
 }
 @media (max-width: 600px) {
   .portal-universe :is(.upcoming-releases-view,.events-directory-view) .srs-cards-grid {
-    grid-template-columns: 1fr !important;
-    gap: 12px !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 10px !important;
   }
 }
 

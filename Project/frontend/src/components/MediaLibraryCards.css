@@ -1,4 +1,4 @@
-﻿.media-page-main .media-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
+.media-page-main .media-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
 .media-library-tile{position:relative;isolation:isolate;aspect-ratio:16/11;min-width:0;overflow:hidden;border:1px solid #d3435b77;border-radius:16px;background:#130c12;box-shadow:0 14px 24px -17px #000b}
 .media-library-tile>img{position:absolute;width:100%;height:100%;object-fit:cover;transition:transform .65s}
 .media-library-shade{position:absolute;inset:0;background:linear-gradient(#08040c66,transparent 25%,#08040c55 50%,#08040cf2)}
@@ -12,5 +12,30 @@
 .media-library-link:focus-visible{outline:2px solid #ff8094;outline-offset:-4px;border-radius:16px}
 @media(hover:hover){.media-library-tile:hover>img{transform:scale(1.045)}}
 @media(max-width:1000px){.media-page-main .media-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media(max-width:600px){.media-page-main .media-grid{grid-template-columns:minmax(0,1fr)}.media-library-tile{aspect-ratio:16/11}}
+@media(max-width:768px){
+  .media-page-main .media-grid{grid-template-columns:repeat(2,minmax(0,1fr)) !important;gap:12px !important}
+  .media-library-tile{aspect-ratio:16/12;border-radius:12px}
+  .media-library-top{top:8px;left:8px;right:8px;font-size:7.5px}
+  .media-library-top>*{padding:3px 5px}
+  .media-library-link>span{width:38px;height:38px}
+  .media-library-link>span svg{width:18px;height:18px}
+  .media-library-copy{bottom:10px;left:10px;right:34px}
+  .media-library-copy h3{font-size:13px !important;line-height:1.2;margin:0 0 4px}
+  .media-library-copy>span{font-size:10px}
+  .media-library-bookmark{bottom:10px;right:8px;padding:5px}
+  .media-library-bookmark svg{width:13px;height:13px}
+}
+@media(max-width:480px){
+  .media-page-main .media-grid{grid-template-columns:repeat(2,minmax(0,1fr)) !important;gap:10px !important}
+  .media-library-tile{aspect-ratio:16/13;border-radius:11px}
+  .media-library-top{top:6px;left:6px;right:6px;font-size:7px}
+  .media-library-top>*{padding:2px 4px}
+  .media-library-link>span{width:34px;height:34px}
+  .media-library-link>span svg{width:16px;height:16px}
+  .media-library-copy{bottom:8px;left:8px;right:30px}
+  .media-library-copy h3{font-size:12px !important;line-height:1.2;margin:0 0 3px}
+  .media-library-copy>span{font-size:9.5px}
+  .media-library-bookmark{bottom:8px;right:6px;padding:4px}
+  .media-library-bookmark svg{width:12px;height:12px}
+}
 @media(prefers-reduced-motion:reduce){.media-library-tile>img{transition:none}}

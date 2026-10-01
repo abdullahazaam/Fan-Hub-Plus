@@ -1,4 +1,4 @@
-﻿.chronicles-editorial-grid{display:grid;gap:14px;width:100%;min-width:0}
+.chronicles-editorial-grid{display:grid;gap:14px;width:100%;min-width:0}
 .chronicles-editorial-row{display:grid;grid-template-columns:1.8fr 1fr 1fr;gap:14px;min-width:0}
 .chronicles-editorial-row.is-reversed{grid-template-columns:1fr 1fr 1.8fr}
 .chronicles-editorial-card{position:relative;isolation:isolate;min-width:0;min-height:390px;overflow:hidden;border-radius:17px;border:1px solid #d439526b;background:#120a10;box-shadow:0 2px 0 #35111b,0 12px 24px -16px #0009;transition:transform .4s cubic-bezier(.2,.75,.2,1),box-shadow .4s,border-color .4s}
@@ -13,7 +13,34 @@
 .chronicles-editorial-card:focus-within{border-color:#f2677b;box-shadow:0 4px 0 #35111b,0 22px 35px -18px #000c,0 0 18px #db24432b}.chronicles-editorial-card button:focus-visible{outline:2px solid #ff8f9c;outline-offset:4px}
 @media(hover:hover){.chronicles-editorial-card:hover{transform:perspective(1200px) translateY(-5px) rotateX(1deg);border-color:#ef7183;box-shadow:0 5px 0 #35111b,0 24px 35px -16px #000b,0 0 22px #d3274330}.chronicles-editorial-card:hover .chronicles-editorial-art{transform:scale(1.045)}}
 @media(max-width:1024px) and (min-width:769px){.chronicles-editorial-row{gap:12px}.chronicles-editorial-copy{padding:15px}.chronicles-editorial-copy h2{font-size:18px}.chronicles-editorial-card.is-featured h2{font-size:23px}}
-@media(max-width:768px){.chronicles-editorial-row,.chronicles-editorial-row.is-reversed{grid-template-columns:minmax(0,1fr);gap:14px}.chronicles-editorial-card{min-height:410px}.chronicles-editorial-copy{margin-top:190px;height:calc(100% - 190px)}.chronicles-editorial-copy h2,.chronicles-editorial-card.is-featured h2{font-size:25px}}
+
+@media(max-width:768px){
+  .chronicles-editorial-grid{display:grid !important;grid-template-columns:repeat(2,minmax(0,1fr)) !important;gap:10px !important}
+  .chronicles-editorial-row,.chronicles-editorial-row.is-reversed{display:contents !important}
+  .chronicles-editorial-card{min-height:260px !important;border-radius:13px}
+  .chronicles-editorial-category{top:10px;left:10px;font-size:8px;padding:3px 6px}
+  .chronicles-editorial-tools{top:8px;right:8px;gap:4px}
+  .chronicles-editorial-tools button{width:26px;height:26px}
+  .chronicles-editorial-tools button svg{width:13px;height:13px}
+  .chronicles-editorial-copy{margin-top:70px !important;padding:12px !important}
+  .chronicles-editorial-copy h2,.chronicles-editorial-card.is-featured h2{font-size:14px !important;line-height:1.25;margin:0 0 6px}
+  .chronicles-editorial-copy p{font-size:11px !important;line-height:1.35;margin:0 0 8px;-webkit-line-clamp:2}
+  .chronicles-editorial-meta{padding-top:8px;font-size:8.5px;gap:6px}
+  .chronicles-editorial-open{width:26px !important;height:26px !important}
+  .chronicles-editorial-open svg{width:14px;height:14px}
+}
+@media(max-width:480px){
+  .chronicles-editorial-grid{gap:8px !important}
+  .chronicles-editorial-card{min-height:240px !important;border-radius:11px}
+  .chronicles-editorial-category{top:8px;left:8px;font-size:7.5px;padding:2px 5px}
+  .chronicles-editorial-copy{margin-top:60px !important;padding:10px !important}
+  .chronicles-editorial-copy h2,.chronicles-editorial-card.is-featured h2{font-size:13px !important;line-height:1.2;margin:0 0 4px}
+  .chronicles-editorial-copy p{display:none}
+  .chronicles-editorial-meta{padding-top:6px;font-size:8px;gap:4px}
+  .chronicles-editorial-open{width:24px !important;height:24px !important}
+  .chronicles-editorial-open svg{width:13px;height:13px}
+}
+
 @media(prefers-reduced-motion:reduce){.chronicles-editorial-card,.chronicles-editorial-art{transition:none}.chronicles-editorial-card:hover,.chronicles-editorial-card:hover .chronicles-editorial-art{transform:none}}
 
 .chronicles-editorial-row{align-items:stretch}
@@ -25,4 +52,3 @@
 .chronicles-editorial-meta time{white-space:nowrap}
 .chronicles-editorial-open{flex-shrink:0}
 .chronicles-editorial-card.is-featured{border-color:#e54d647d}
-@media(max-width:768px){.chronicles-editorial-card{min-height:420px}.chronicles-editorial-grid{gap:14px}.chronicles-editorial-copy{padding:20px}}

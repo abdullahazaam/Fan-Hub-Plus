@@ -128,7 +128,7 @@
     left: 0 !important;
     right: 0 !important;
     width: 100% !important;
-    top: calc(100vw * 0.94) !important;
+    top: calc(100vw * 0.84) !important;
     aspect-ratio: 1100 / 839 !important;
     height: auto !important;
     z-index: 2 !important;

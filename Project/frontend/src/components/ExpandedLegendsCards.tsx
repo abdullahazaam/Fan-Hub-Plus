@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react'
 import type { Character } from '../types'
-import { ArrowRightIcon, StarIcon } from './Icons'
+import { ArrowRightIcon, ChevronLeftIcon, ChevronRightIcon } from './Icons'
 import './ExpandedLegendsCards.css'
 
 export interface LegendProfile {
@@ -163,10 +163,43 @@ export const ExpandedLegendsCards: React.FC<ExpandedLegendsCardsProps> = ({
     }
   }
 
-  const hasActiveCard = !mobile && expandedIndex !== null
+  const hasActiveCard = expandedIndex !== null
+
+  const handlePrev = () => {
+    const row = containerRef.current?.querySelector('.expanded-legends-row') as HTMLElement | null
+    if (!row) return
+    const cardWidth = row.firstElementChild?.getBoundingClientRect().width || 160
+    row.scrollBy({ left: -(cardWidth + 12), behavior: 'smooth' })
+  }
+
+  const handleNext = () => {
+    const row = containerRef.current?.querySelector('.expanded-legends-row') as HTMLElement | null
+    if (!row) return
+    const cardWidth = row.firstElementChild?.getBoundingClientRect().width || 160
+    row.scrollBy({ left: cardWidth + 12, behavior: 'smooth' })
+  }
 
   return (
     <div className="expanded-legends-wrapper" ref={containerRef}>
+      {/* Mobile / Tablet Nav Arrows */}
+      <button
+        type="button"
+        className="legends-nav-arrow legends-arrow-left"
+        onClick={handlePrev}
+        aria-label="Previous legend"
+      >
+        <ChevronLeftIcon size={18} />
+      </button>
+
+      <button
+        type="button"
+        className="legends-nav-arrow legends-arrow-right"
+        onClick={handleNext}
+        aria-label="Next legend"
+      >
+        <ChevronRightIcon size={18} />
+      </button>
+
       <div className={`expanded-legends-row ${hasActiveCard ? 'has-active-card' : ''}`} role="region" aria-label="People Behind the Legends Carousel" onScroll={e=>{if(!mobile)return;const node=e.currentTarget;setMobileIndex(Math.round(node.scrollLeft/((node.firstElementChild?.getBoundingClientRect().width||1)+12)))}}>
         {LEGEND_ITEMS.map((legend, index) => {
           const isExpanded = mobile || expandedIndex === index
@@ -214,24 +247,19 @@ export const ExpandedLegendsCards: React.FC<ExpandedLegendsCardsProps> = ({
                 />
               </div>
 
-              {/* Slim collapsed indicator (visible when slim) */}
+              {/* Slim collapsed indicator (desktop only) */}
               <div className="legend-slim-label" aria-hidden={isExpanded}>
                 <span className="legend-slim-num">{itemNumber}</span>
                 <span className="legend-slim-pip" />
                 <span className="legend-slim-name">{legend.name}</span>
               </div>
 
-              {/* Expanded details (smoothly revealed when active) */}
+              {/* Exact character page dossier format */}
               <div className={`legend-expanded-content ${isExpanded ? 'content-visible' : 'content-hidden'}`}>
-                <div className="legend-top-badges">
-                  <span className="legend-universe-badge">
-                    <span className="badge-glow-dot" />
-                    {legend.universe}
-                  </span>
-                  <div className="legend-rating-pill">
-                    <StarIcon size={12} fill="currentColor" />
-                    <span>{legend.popularityScore}% Rating</span>
-                  </div>
+                {/* Character number banner */}
+                <div className="catalog-legend-number">
+                  {itemNumber}
+                  <span />
                 </div>
 
                 <div className="legend-header-block">
@@ -241,22 +269,22 @@ export const ExpandedLegendsCards: React.FC<ExpandedLegendsCardsProps> = ({
 
                 <p className="legend-bio">{legend.bio}</p>
 
-                <div className="legend-action-row">
+                <div className="catalog-legend-bottom">
+                  <div className="catalog-legend-pills">
+                    <span>{legend.universe.split('/')[0].trim()}</span>
+                    <span>{legend.originUniverse.split('(')[0].trim()}</span>
+                  </div>
                   <button
                     type="button"
-                    className="legend-dossier-cta"
+                    className="catalog-legend-arrow"
                     onClick={(e) => {
                       e.stopPropagation()
                       resolveAndOpenDossier(legend)
                     }}
-                    tabIndex={isExpanded ? 0 : -1}
+                    aria-label={`Open ${legend.name} dossier`}
                   >
-                    <span>View Dossier</span>
-                    <ArrowRightIcon size={15} />
+                    <ArrowRightIcon size={20} />
                   </button>
-                  <span className="legend-origin-tag">
-                    Origin: <strong>{legend.originUniverse}</strong>
-                  </span>
                 </div>
               </div>
             </article>
