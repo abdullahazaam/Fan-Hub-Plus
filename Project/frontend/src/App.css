@@ -10105,7 +10105,13 @@ article.content-card.chronicle-flip::after { display: none; }
  margin:0!important;
 }
 
-/* Eliminate any top seam lines, pseudo-borders, or inset outline artifacts on card bodies */
+/* Eliminate any top seam lines, pseudo-borders, glare overlays, or inset outline artifacts on card bodies */
+.portal-universe :is(.merchandise-card,.release-card,.event-card)::after,
+.portal-universe :is(.merchandise-card,.release-card,.event-card)::before,
+.portal-universe :is(.merchandise-card,.release-card,.event-card) .srs-card-body::after {
+ display: none !important;
+ content: none !important;
+}
 .portal-universe :is(.merchandise-card,.release-card,.event-card) .srs-card-body,
 .portal-universe :is(.merchandise-card,.release-card,.event-card) .srs-card-body::before,
 .portal-universe :is(.merchandise-card,.release-card,.event-card) .srs-card-body::after {

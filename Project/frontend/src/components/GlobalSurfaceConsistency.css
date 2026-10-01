@@ -189,7 +189,7 @@
 .srs-card-body {
   background: rgba(12, 15, 22, 0.94) !important;
   border-top: 1px solid var(--portal-crimson-border) !important;
-  box-shadow: var(--portal-specular-shine) !important;
+  box-shadow: none !important;
 }
 
 .theme-light .srs-card-body,

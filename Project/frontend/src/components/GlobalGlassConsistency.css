@@ -245,7 +245,7 @@ html:not([data-theme='light']) body:not(.theme-light) {
 .portal-universe.theme-dark .srs-card-body {
   background: var(--release-glass-bg) !important;
   border-top: 1px solid var(--release-glass-border) !important;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
+  box-shadow: none !important;
 }
 
 /* 5. STAT BOXES & METRIC CONTAINERS */
