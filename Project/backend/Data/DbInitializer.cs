@@ -418,15 +418,14 @@ public static class DbInitializer
         // Seeded solely behind explicit isDevelopment == true check.
         // Fixed development admin account credentials
         var devAdminPassword = Environment.GetEnvironmentVariable("DEV_ADMIN_PASSWORD");
-        if (string.IsNullOrWhiteSpace(devAdminPassword) || devAdminPassword == "Admin@FanHub2026!")
-        {
-            devAdminPassword = "Admin@12345";
-        }
-
         var devUserPassword = Environment.GetEnvironmentVariable("DEV_USER_PASSWORD");
-        if (string.IsNullOrWhiteSpace(devUserPassword) || devUserPassword == "User@FanHub2026!")
+
+        // Never use fallback/default passwords in source control.
+        // If demo credentials are not explicitly configured, skip account seeding.
+        if (string.IsNullOrWhiteSpace(devAdminPassword) || string.IsNullOrWhiteSpace(devUserPassword) ||
+            devAdminPassword.Length < 12 || devUserPassword.Length < 12)
         {
-            devUserPassword = "User@12345";
+            return;
         }
 
         const string devAdminEmail = "admin@fanhubplus.local";
@@ -497,7 +496,7 @@ public static class DbInitializer
         {
             if (!context.Users.Any(u => u.NormalizedEmail == email.ToUpper()))
             {
-                var (h, s) = PasswordHasher.Hash("User@12345");
+                var (h, s) = PasswordHasher.Hash(devUserPassword);
                 context.Users.Add(new User
                 {
                     Email = email,

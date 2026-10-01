@@ -7,6 +7,8 @@
 **/dist/
 **/build/
 Project/backend/lib/
+# Keep local IDE/runtime secrets out of tracked launch profiles
+**/launchSettings.local.json
 packages/
 *.local
 
